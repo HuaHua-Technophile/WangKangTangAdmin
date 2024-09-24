@@ -1,0 +1,19 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 4692627 */
+  src: url("./iconfont.woff2") format("woff2");
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-taiyang:before {
+  content: "\e62e";
+}
+
+.icon-moon:before {
+  content: "\e6c2";
+}

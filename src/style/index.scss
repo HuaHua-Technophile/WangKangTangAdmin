@@ -1,0 +1,37 @@
+// 覆盖主题色
+$primary: #198754;
+$success: #0d6efd;
+// 导入 Bootstrap
+@use "bootstrap/scss/bootstrap" with (
+  $primary: $primary,
+  $success: $success
+);
+@forward "element-plus/theme-chalk/src/dark/var.scss" with (
+  $colors: (
+    //这里定义在暗黑模式下 primary 的颜色，其他同理
+    "primary": ("base": $primary),
+    "success": ("base": $success),
+  )
+); //forward必须写在导入@use前
+
+@use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;
+// 然后在任意部位全局引入(不是像亮色模式时，按需引入需要去vite.config.ts修改配置项)
+
+@use "@/assets/icons/iconfont.css";
+
+$transition-times: 500, 750, 1000, 1250, 1500, 1750, 2000; // 定义一个包含过渡时间（以毫秒为单位）的数组
+@each $time in $transition-times {
+  .transition#{$time} {
+    transition: all #{$time}ms;
+  }
+} // 使用@each指令遍历数组
+
+// 鼠标指针--------------------------
+.cursor-pointer {
+  cursor: pointer;
+}
+// 背景居中填充-------------------------
+.bgimg-center-cover {
+  background-position: center;
+  background-size: cover;
+}

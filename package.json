@@ -1,0 +1,31 @@
+{
+  "name": "wangkangtangadmin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "bootstrap": "5.3.3",
+    "element-plus": "^2.8.3",
+    "pinia": "^2.2.2",
+    "pinia-plugin-persistedstate": "^4.0.2",
+    "unplugin-element-plus": "^0.8.0",
+    "vue": "^3.5.8",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.5",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "scss": "^0.2.4",
+    "typescript": "^5.6.2",
+    "unplugin-auto-import": "^0.18.3",
+    "unplugin-vue-components": "^0.27.4",
+    "vite": "^5.4.7",
+    "vue-tsc": "^2.1.6"
+  }
+}
