@@ -39,17 +39,19 @@ const router = createRouter({
           const authStore = useAuthStore();
 
           // 检查用户是否已存有路由
-          if (authStore.dynamicRoutes.length > 0)
+          if (authStore.dynamicRoutes.length > 0) {
             addRoute(authStore.dynamicRoutes);
-          else if (authStore.isAuthenticated) {
+
+            next({ path: to.path }); // 再跳转回原本的
+          } else if (authStore.isAuthenticated) {
             // 用户已认证，但动态路由未请求，尝试重新加载
             const routes = await getRouters();
             debugLog("返回动态路由=>", routes); // 请求动态路由
             authStore.dynamicRoutes = routes; // 存储动态路由
             addRoute(routes);
-          } else next({ name: "Login" }); // 未认证，重定向到登录页
 
-          next({ path: to.path }); // 再跳转回原本的
+            next({ path: to.path }); // 再跳转回原本的
+          } else next({ name: "Login" }); // 未认证，重定向到登录页
         }
       },
     },

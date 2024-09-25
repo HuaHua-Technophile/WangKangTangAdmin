@@ -10,6 +10,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-yonghu:before {
+  content: "\e68d";
+}
+
+.icon-tuichu:before {
+  content: "\e647";
+}
+
 .icon-taiyang:before {
   content: "\e62e";
 }

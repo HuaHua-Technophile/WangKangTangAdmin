@@ -116,8 +116,10 @@
             authStore.dynamicRoutes = routes; // 存储动态路由
 
             const redirectPath = route.query.redirect;
-            debugLog("重定向路径", redirectPath);
-            if (typeof redirectPath === "string") router.push(redirectPath);
+            if (typeof redirectPath === "string") {
+              debugLog("登陆完毕，重定向回=>", redirectPath);
+              router.push(redirectPath);
+            }
             //确保重定向路径是字符串时，跳转到指定页面
             else router.push({ name: "Layout" }); // 否则默认重定向到Layout整体布局组件
           } else ElMessage.error("登录失败，未返回数据");
