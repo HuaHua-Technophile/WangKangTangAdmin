@@ -4,8 +4,8 @@
     :model-value="isDark"
     @update:model-value="toggleTheme"
     inline-prompt>
-    <template #active-action><Icon name="icon-moon" /></template>
-    <template #inactive-action><Icon name="icon-taiyang" /></template>
+    <template #active-action><Icon icon="icon-moon" /></template>
+    <template #inactive-action><Icon icon="icon-taiyang" /></template>
   </el-switch>
 </template>
 

@@ -3,6 +3,7 @@ import { createWebHistory, createRouter, RouteRecordRaw } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { debugLog } from "@/utils/debug";
 import { getRouters } from "@/api/routes";
+import { useHistoryStore } from "@/stores/history";
 
 const addRoute = (routes: RouteRecordRaw[]) => {
   // 动态添加路由
@@ -11,6 +12,9 @@ const addRoute = (routes: RouteRecordRaw[]) => {
       router.addRoute("Layout", {
         path: i.path + "/" + j.path,
         name: j.name,
+        meta: {
+          title: j.meta?.title,
+        },
         component: () => import(`/src/views/layout/${j.component}.vue`),
       });
     });
@@ -67,6 +71,7 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore();
+  const historyStore = useHistoryStore(); // 获取历史路由 store
   if (to.meta.requiresAuth && !authStore.isAuthenticated)
     next({
       name: "Login",
@@ -75,7 +80,12 @@ router.beforeEach((to, _from, next) => {
   // 需要认证但未登录，重定向到登录页
   else if (to.name === "Login" && authStore.isAuthenticated)
     next({ name: "Layout" }); // 已登录用户试图访问登录页，重定向空组件页面
-  else next(); // 其他情况正常导航
+  else {
+    // 添加当前路由到历史路由
+    if (to.meta.title)
+      historyStore.addRoute({ path: to.path, title: to.meta.title as string });
+    next(); // 其他情况正常导航
+  }
 });
 
 export default router;

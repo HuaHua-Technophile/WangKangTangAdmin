@@ -9,7 +9,7 @@
             :key="i.meta?.title"
             :index="index.toString()">
             <template #title>
-              <Icon name="icon-moon" />
+              <Icon icon="icon-moon" />
               <span class="ms-2">{{ i.meta?.title }}</span>
             </template>
             <el-menu-item
@@ -27,33 +27,44 @@
       <el-header
         class="d-flex justify-content-between align-items-center border-bottom">
         <!-- 历史路由 -->
-        <div></div>
+        <el-scrollbar view-class="h-100 d-flex align-items-end">
+          <div class="h-75 d-flex">
+            <router-link
+              v-for="i in historyStore.historyRoutes"
+              :key="i.path"
+              :to="i.path"
+              class="historyRoute position-relative px-2 me-1 text-decoration-none d-flex align-items-center text-nowrap border rounded-top-3 transition750 bg-primary-subtle">
+              {{ i.title }}
+              <!-- 历史路由关闭按钮 -->
+              <Icon
+                icon="icon-guanbi  "
+                class="historyRouteClose transition500 position-absolute end-0 text-primary" />
+            </router-link>
+          </div>
+        </el-scrollbar>
         <!-- 用户信息/退出登录 -->
         <el-dropdown class="me-5 h-100">
           <div class="px-2 d-flex align-items-center">
-            <el-image
-              style="width: 33px; height: 33px"
-              :src="'src/assets/images/益丰大药房.webp'"
-              fit="cover"
-              class="rounded-circle" />
+            <el-avatar :size="35" :src="avatar" />
             <span class="fw-bold ms-2">{{ userInfo?.user?.nickName }}</span>
           </div>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item>
-                <Icon name="icon-yonghu" />
+                <Icon icon="icon-yonghu" />
                 <span class="ms-1">个人信息</span>
               </el-dropdown-item>
               <el-dropdown-item @click="logout">
-                <Icon name="icon-tuichu"></Icon>
+                <Icon icon="icon-tuichu"></Icon>
                 <span class="ms-1">退出登录</span>
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
       </el-header>
+      <!-- 内容 -->
       <el-main>
-        <router-view></router-view>
+        <router-view />
       </el-main>
     </el-container>
   </el-container>
@@ -68,6 +79,7 @@
   const authStore = useAuthStore();
   // 用户信息不持久化存储--------------------
   const userInfo = ref();
+  import avatar from "@/assets/images/TestLogo.webp"; // 使用 require
   onMounted(async () => {
     userInfo.value = await getInfo();
     debugLog("用户信息=>", userInfo.value);
@@ -75,12 +87,48 @@
   const logout = () => {
     authStore.token = "";
     authStore.dynamicRoutes = [];
+    historyStore.historyRoutes = [];
     router.push("/login");
     debugLog("退出登录");
   };
+
+  // 历史路由-----------------
+  import { useHistoryStore } from "@/stores/history";
+
+  const historyStore = useHistoryStore();
 </script>
 <style lang="scss" scoped>
   .el-header {
     --el-header-height: 2.5rem;
+  }
+  .historyRoute {
+    &::after {
+      display: block;
+      content: "";
+      width: 0%;
+      position: absolute;
+      height: 3px;
+      left: 0;
+      bottom: 0;
+      background-color: var(--bs-primary);
+      transition: all 0.5s;
+    }
+    &:hover,
+    &.active {
+      padding-right: 1.25rem !important;
+      &::after {
+        width: 100%;
+      }
+      .historyRouteClose {
+        transform: scale(1);
+      }
+    }
+    .historyRouteClose {
+      transform: scale(0);
+      &:hover {
+        color: var(--theme-color);
+        transform: scale(1.1) rotate(90deg) !important;
+      }
+    }
   }
 </style>

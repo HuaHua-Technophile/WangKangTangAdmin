@@ -9,6 +9,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.icon-guanbi:before {
+  content: "\e611";
+}
 
 .icon-yonghu:before {
   content: "\e68d";
