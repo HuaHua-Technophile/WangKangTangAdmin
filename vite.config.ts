@@ -23,7 +23,14 @@ export default defineConfig({
     }),
     ElementPlus({
       useSource: true,
-    }), //https://element-plus.org/zh-CN/guide/theming.html#%E5%A6%82%E4%BD%95%E8%A6%86%E7%9B%96%E5%AE%83%EF%BC%9F 如何按需导入的情况下仍然支持自定义主题色
+    }),
+    /*如何按需导入的情况下仍然让亮色模式下,支持自定义主题色?
+    因为按需导入时,仅导入每个组件的style,而在全局main.ts中写的scss覆盖就不会生效
+    如果要在vite按需导入的同时修改elementPlus主题色,必须写明以下css内容
+
+    https://juejin.cn/post/7264952002706096164#heading-3
+    
+    https://element-plus.org/zh-CN/guide/theming.html#%E5%A6%82%E4%BD%95%E8%A6%86%E7%9B%96%E5%AE%83%EF%BC%9F */
   ],
   css: {
     preprocessorOptions: {

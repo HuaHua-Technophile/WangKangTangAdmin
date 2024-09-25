@@ -11,13 +11,20 @@
         label-position="top">
         <el-form-item label="用户名" prop="username">
           <el-input
-            v-model="loginForm.username"
+            v-model.trim="loginForm.username"
+            maxlength="12"
+            clearable
+            @keyup.enter="handleLogin"
             placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input
-            v-model="loginForm.password"
+            v-model.trim="loginForm.password"
+            maxlength="20"
+            clearable
+            @keyup.enter="handleLogin"
             type="password"
+            show-password
             placeholder="请输入密码"></el-input>
         </el-form-item>
         <el-form-item>
@@ -25,7 +32,7 @@
             type="primary"
             @click="handleLogin"
             :loading="loading"
-            style="width: 100%"
+            class="w-100"
             >登录</el-button
           >
         </el-form-item>
@@ -37,19 +44,20 @@
 <script lang="ts" setup>
   import { ref, reactive } from "vue";
   import { ElMessage, FormInstance } from "element-plus";
-  import { useRouter } from "vue-router";
+  import { useRoute, useRouter } from "vue-router";
   import { useAuthStore } from "@/stores/auth";
-  import axios from "axios";
+  import { login } from "@/api/login"; // 引入登录 API
+  import { debugError, debugLog } from "@/utils/debug";
+  import { getRouters } from "@/api/routes";
 
   const router = useRouter();
-  const authStore = useAuthStore();
-
+  const route = useRoute(); // 使用 useRoute 获取当前路由信息
   const loginFormRef = ref<FormInstance>();
   const loading = ref(false);
 
   const loginForm = reactive({
-    username: "",
-    password: "",
+    username: "admin",
+    password: "admin123",
   });
 
   const rules = {
@@ -57,8 +65,8 @@
       { required: true, message: "请输入用户名", trigger: "blur" },
       {
         min: 3,
-        max: 20,
-        message: "用户名长度应在 3 到 20 个字符之间",
+        max: 12,
+        message: "用户名长度应在 3 到 12 个字符之间",
         trigger: "blur",
       },
     ],
@@ -70,37 +78,55 @@
         message: "密码长度应在 6 到 20 个字符之间",
         trigger: "blur",
       },
+      {
+        validator: (
+          _rule: any,
+          value: string,
+          callback: (arg0?: Error) => void
+        ) => {
+          // 检查是否包含空格
+          if (/\s/.test(value)) {
+            callback(new Error("密码不能包含空格"));
+          } else {
+            callback(); // 验证通过
+          }
+        },
+        trigger: ["blur", "change"],
+      },
     ],
   };
 
   const handleLogin = async () => {
     if (!loginFormRef.value) return;
 
-    await loginFormRef.value.validate(async (valid, fields) => {
+    await loginFormRef.value.validate(async (valid) => {
       if (valid) {
         loading.value = true;
         try {
-          const response = await axios.post("http://117.72.77.4:12759/login", {
-            username: loginForm.username,
-            password: loginForm.password,
-          });
+          const response = await login(loginForm);
 
-          if (response.data.code === 200) {
-            authStore.setToken(response.data.data.token);
+          if (response.token) {
             ElMessage.success("登录成功");
-            router.push("/"); // 登录成功后跳转到首页
-          } else {
-            ElMessage.error(response.data.msg || "登录失败");
-          }
+            // 处理登录成功逻辑，例如存储 token 和跳转页面
+            const authStore = useAuthStore();
+            authStore.token = response.token;
+
+            const routes = await getRouters();
+            debugLog("返回动态路由=>", routes); // 请求动态路由
+            authStore.dynamicRoutes = routes; // 存储动态路由
+
+            const redirectPath = route.query.redirect;
+            debugLog("重定向路径", redirectPath);
+            if (typeof redirectPath === "string") router.push(redirectPath);
+            //确保重定向路径是字符串时，跳转到指定页面
+            else router.push({ name: "Layout" }); // 否则默认重定向到Layout整体布局组件
+          } else ElMessage.error("登录失败，未返回数据");
         } catch (error) {
-          console.error("登录错误", error);
-          ElMessage.error("登录失败，请稍后重试");
+          debugError("登陆环节", error);
         } finally {
           loading.value = false;
         }
-      } else {
-        console.log("验证失败", fields);
-      }
+      } else debugLog("表单验证失败");
     });
   };
 </script>

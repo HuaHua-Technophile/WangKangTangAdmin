@@ -1,8 +1,10 @@
-import axios, { AxiosResponse, AxiosError } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { debugLog } from "@/utils/debug";
 import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
+import { toRaw } from "vue";
+import { useAuthStore } from "@/stores/auth";
 export const service = axios.create({
-  baseURL: process.env.VITE_APP_API_BASE_URL, // 基本URL
+  baseURL: import.meta.env.VITE_APP_API_BASE_URL, // 基本URL
   timeout: 30000, //超时时间
   headers: {
     "Content-Type": "application/json;charset=utf-8",
@@ -18,15 +20,13 @@ service.interceptors.request.use(
     // 在发送请求之前做些什么
     loadingInstance = ElLoading.service({ fullscreen: true });
 
-    // 例如：添加token到header
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
+    const authStore = useAuthStore(); // 获取 auth store
+    const token = authStore.token; // 获取 token
+    if (token) config.headers["Authorization"] = `Bearer ${token}`; // 如果 token 存在，则添加到请求头
 
     return config;
   },
-  (error: AxiosError) => {
+  (error) => {
     // 处理请求错误
     debugLog("axios中发送Request报错", error);
     ElMessage.error("请求发送失败");
@@ -36,16 +36,16 @@ service.interceptors.request.use(
 
 // Response 拦截器
 service.interceptors.response.use(
-  (response: AxiosResponse) => {
+  (response) => {
     loadingInstance.close();
-
+    // debugLog("axios中返回response", response);
     // 处理响应数据
     const res = response.data;
-    if (res.code !== 20000) {
+    if (res.code !== 200) {
       ElMessage({
-        message: res.message || "Error",
+        message: res.msg || "axios出错啦",
         type: "error",
-        duration: 5 * 1000,
+        duration: 8 * 1000,
       });
 
       // 50008: 非法token; 50012: 其他客户端登录; 50014: Token 过期;
@@ -62,19 +62,30 @@ service.interceptors.response.use(
           // });
         });
       }
-      return Promise.reject(new Error(res.message || "Error"));
+      return Promise.reject(new Error(res.msg || "axios出错啦"));
     } else {
       return res;
     }
   },
-  (error: AxiosError) => {
+  (error) => {
     loadingInstance.close();
     debugLog("axios中返回response报错" + error);
     ElMessage({
       message: error.message,
       type: "error",
-      duration: 5 * 1000,
+      duration: 8 * 1000,
     });
     return Promise.reject(error);
   }
 );
+
+// 创建一个新的请求函数，允许传入描述文本
+export const customRequest = (
+  config: AxiosRequestConfig,
+  description: string
+) => {
+  // 打印调试信息
+  debugLog(`准备${description}, 数据:`, toRaw(config?.data));
+
+  return service(config);
+};
