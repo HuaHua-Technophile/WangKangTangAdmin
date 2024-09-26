@@ -19,7 +19,7 @@ service.interceptors.request.use(
   (config) => {
     // 在发送请求之前做些什么
     loadingInstance = ElLoading.service({ fullscreen: true });
-
+    console.log("请求了");
     const authStore = useAuthStore(); // 获取 auth store
     const token = authStore.token; // 获取 token
     if (token) config.headers["Authorization"] = `Bearer ${token}`; // 如果 token 存在，则添加到请求头

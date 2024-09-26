@@ -59,4 +59,7 @@ export default defineConfig({
       "@/": `${path.resolve(__dirname, "src")}/`,
     },
   },
+  build: {
+    target: "es2022", // 或者更高版本 'esnext'
+  },
 });

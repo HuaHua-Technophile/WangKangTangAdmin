@@ -5,18 +5,25 @@ import { debugLog } from "@/utils/debug";
 import { getRouters } from "@/api/routes";
 import { useHistoryStore } from "@/stores/history";
 
+// 预加载所有可能的组件
+const modules = import.meta.glob("/src/views/layout/**/*.vue");
 const addRoute = (routes: RouteRecordRaw[]) => {
   // 动态添加路由
   routes.forEach((i) => {
     i.children?.forEach((j) => {
-      router.addRoute("Layout", {
-        path: i.path + "/" + j.path,
-        name: j.name,
-        meta: {
-          title: j.meta?.title,
-        },
-        component: () => import(`/src/views/layout/${j.component}.vue`),
-      });
+      const componentPath = `/src/views/layout/${j.component}.vue`;
+      if (modules[componentPath]) {
+        router.addRoute("Layout", {
+          path: i.path + "/" + j.path,
+          name: j.name,
+          meta: {
+            title: j.meta?.title,
+          },
+          component: modules[componentPath], // 使用预加载的组件
+        });
+      } else {
+        console.error(`Component not found: ${componentPath}`);
+      }
     });
   });
 

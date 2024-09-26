@@ -2,6 +2,21 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import { RouteRecordRaw } from "vue-router";
+import CryptoJS from "crypto-js"; // 引入加密库
+
+// 密钥，可以根据需要修改为更复杂的
+const SECRET_KEY = "my-secret-key";
+
+// 加密函数
+const encrypt = (text: string): string => {
+  return CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
+};
+
+// 解密函数
+const decrypt = (text: string): string => {
+  const bytes = CryptoJS.AES.decrypt(text, SECRET_KEY);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
 
 export const useAuthStore = defineStore(
   "auth",
@@ -18,6 +33,29 @@ export const useAuthStore = defineStore(
     };
   },
   {
-    persist: true,
+    persist: {
+      // 自定义存储逻辑，进行加密解密
+      storage: localStorage, // 或者 sessionStorage
+      serializer: {
+        // 对存储的 token 进行加密
+        serialize: (state) => {
+          const encryptedToken = encrypt(state.token); // 加密token
+          const encryptedRoutes = encrypt(JSON.stringify(state.dynamicRoutes)); // 加密 dynamicRoutes
+          return JSON.stringify({
+            token: encryptedToken,
+            dynamicRoutes: encryptedRoutes,
+          });
+        },
+        // 对取出的数据进行解密
+        deserialize: (value) => {
+          const state = JSON.parse(value);
+          if (state.token) state.token = decrypt(state.token); // 解密 token
+          if (state.dynamicRoutes)
+            state.dynamicRoutes = JSON.parse(decrypt(state.dynamicRoutes)); // 解密 dynamicRoutes
+
+          return state;
+        },
+      },
+    },
   }
 );

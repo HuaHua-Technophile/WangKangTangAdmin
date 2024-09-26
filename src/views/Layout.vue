@@ -29,17 +29,23 @@
         <!-- 历史路由 -->
         <el-scrollbar view-class="h-100 d-flex align-items-end">
           <div class="h-75 d-flex">
-            <router-link
+            <div
               v-for="i in historyStore.historyRoutes"
               :key="i.path"
-              :to="i.path"
-              class="historyRoute position-relative px-2 me-1 text-decoration-none d-flex align-items-center text-nowrap border rounded-top-3 transition750 bg-primary-subtle">
-              {{ i.title }}
+              :class="{ active: i.path === activePath }"
+              class="historyRoute position-relative me-1 border rounded-top-3 transition750 bg-primary-subtle d-flex align-items-center">
+              <router-link
+                :to="i.path"
+                class="text-decoration-none h-100 d-flex align-items-center text-nowrap px-2">
+                {{ i.title }}
+              </router-link>
               <!-- 历史路由关闭按钮 -->
               <Icon
-                icon="icon-guanbi  "
-                class="historyRouteClose transition500 position-absolute end-0 text-primary" />
-            </router-link>
+                icon="icon-guanbi"
+                :size="19"
+                class="historyRouteClose transition500 position-absolute end-0 me-1 text-primary"
+                @click.stop="historyStore.removeRoute(i.path)" />
+            </div>
           </div>
         </el-scrollbar>
         <!-- 用户信息/退出登录 -->
@@ -74,7 +80,7 @@
   import router from "@/router/router";
   import { useAuthStore } from "@/stores/auth";
   import { debugLog } from "@/utils/debug";
-  import { onMounted, ref } from "vue";
+  import { computed, onMounted, ref } from "vue";
 
   const authStore = useAuthStore();
   // 用户信息不持久化存储--------------------
@@ -94,8 +100,12 @@
 
   // 历史路由-----------------
   import { useHistoryStore } from "@/stores/history";
-
+  import { useRoute } from "vue-router";
   const historyStore = useHistoryStore();
+
+  // 当前激活路由------------
+  const route = useRoute();
+  const activePath = computed(() => route.path);
 </script>
 <style lang="scss" scoped>
   .el-header {
@@ -115,7 +125,7 @@
     }
     &:hover,
     &.active {
-      padding-right: 1.25rem !important;
+      padding-right: 1.3rem !important;
       &::after {
         width: 100%;
       }

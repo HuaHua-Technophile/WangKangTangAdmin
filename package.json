@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^1.7.7",
     "bootstrap": "5.3.3",
+    "crypto-js": "^4.2.0",
     "element-plus": "^2.8.3",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^4.0.2",
@@ -19,13 +20,20 @@
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
-    "@types/node": "^22.5.5",
+    "@types/crypto-js": "^4.2.2",
+    "@types/node": "^22.7.2",
     "@vitejs/plugin-vue": "^5.1.4",
     "scss": "^0.2.4",
     "typescript": "^5.6.2",
     "unplugin-auto-import": "^0.18.3",
     "unplugin-vue-components": "^0.27.4",
-    "vite": "^5.4.7",
+    "vite": "^5.4.8",
     "vue-tsc": "^2.1.6"
-  }
+  },
+  "browserslist": [
+    "last 2 versions",
+    "not dead",
+    "not < 0.5%",
+    "supports es2022"
+  ]
 }
