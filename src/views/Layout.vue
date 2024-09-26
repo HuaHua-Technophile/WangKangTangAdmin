@@ -3,7 +3,7 @@
     <!-- 左侧菜单 -->
     <el-aside width="150px" class="border-end">
       <el-scrollbar>
-        <el-menu router :default-openeds="['0']" class="border-0">
+        <el-menu router :default-active="activePath" class="border-0">
           <el-sub-menu
             v-for="(i, index) in authStore.dynamicRoutes"
             :key="i.meta?.title"
@@ -108,6 +108,9 @@
   const activePath = computed(() => route.path);
 </script>
 <style lang="scss" scoped>
+  .el-menu-item.is-active {
+    background: var(--bs-primary-bg-subtle);
+  }
   .el-header {
     --el-header-height: 2.5rem;
   }
