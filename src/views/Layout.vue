@@ -15,7 +15,8 @@
             <el-menu-item
               v-for="j in i.children"
               :key="j.meta?.title"
-              :index="i.path + '/' + j.path">
+              :index="i.path + '/' + j.path"
+              class="transition1000">
               <span class="ms-2">{{ j.meta?.title }}</span>
             </el-menu-item>
           </el-sub-menu>
@@ -69,8 +70,16 @@
         </el-dropdown>
       </el-header>
       <!-- 内容 -->
-      <el-main>
-        <router-view />
+      <el-main class="p-0">
+        <el-scrollbar
+          :class="themeStore.isDark ? 'bg-black' : 'bg-body-secondary'"
+          class="px-3"
+          wrap-class="rounded-3"
+          view-class="py-3">
+          <router-view
+            style="height: 2000px"
+            class="rounded-3 border p-2 w-100 bg-body" />
+        </el-scrollbar>
       </el-main>
     </el-container>
   </el-container>
@@ -93,15 +102,34 @@
   // 历史路由-----------------
   import { useHistoryStore } from "@/stores/history";
   import { useRoute } from "vue-router";
+  import { useThemeStore } from "@/stores/theme";
   const historyStore = useHistoryStore();
 
   // 当前激活路由------------
   const route = useRoute();
   const activePath = computed(() => route.path);
+
+  // 主题色检测
+  const themeStore = useThemeStore();
 </script>
 <style lang="scss" scoped>
-  .el-menu-item.is-active {
-    background: var(--bs-primary-bg-subtle);
+  .el-menu-item {
+    border-radius: 5px;
+    margin: 4px 10px;
+    height: calc(var(--el-menu-sub-item-height) - (4px * 2));
+    padding-left: calc(
+      var(--el-menu-base-level-padding) +
+        (var(--el-menu-level) * var(--el-menu-level-padding)) - 10px
+    ) !important;
+    &.is-active {
+      color: var(--bs-link-color);
+      background: var(--bs-primary-border-subtle);
+      border: var(--bs-primary-border-subtle) 1px solid;
+      padding-left: calc(
+        var(--el-menu-base-level-padding) +
+          (var(--el-menu-level) * var(--el-menu-level-padding)) - 10px - 0.7px
+      ) !important;
+    }
   }
   .el-header {
     --el-header-height: 2.5rem;
@@ -131,7 +159,7 @@
     .historyRouteClose {
       transform: scale(0);
       &:hover {
-        color: var(--theme-color);
+        color: rgb(189, 43, 43) !important;
         transform: scale(1.1) rotate(90deg) !important;
       }
     }

@@ -4,7 +4,10 @@ $success: #0d6efd;
 // 导入 Bootstrap
 @use "bootstrap/scss/bootstrap" with (
   $primary: $primary,
-  $success: $success
+  $success: $success,
+  $body-bg-dark: #151515,
+  $body-tertiary-bg-dark: #262626,
+  $body-secondary-bg-dark: #353535
 );
 
 @forward "element-plus/theme-chalk/src/dark/var.scss" with (

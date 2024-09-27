@@ -1,7 +1,9 @@
 <template>
   <div>
     <!-- 顶部查询框 -->
-    <el-form :model="queryParams" class="query-form">
+    <el-form
+      :model="queryParams"
+      class="d-flex justify-content-between align-items-center">
       <el-form-item label="菜单名称">
         <el-input v-model="queryParams.menuName" placeholder="请输入菜单名称" />
       </el-form-item>
