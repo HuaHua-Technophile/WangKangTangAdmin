@@ -56,7 +56,7 @@ const router = createRouter({
             next({ path: to.path }); // 再跳转回原本的
           } else if (authStore.isAuthenticated) {
             // 用户已认证，但动态路由未请求，尝试重新加载
-            const routes = await getRouters();
+            const routes = (await getRouters()).data;
             debugLog("返回动态路由=>", routes); // 请求动态路由
             authStore.dynamicRoutes = routes; // 存储动态路由
             addRoute(routes);
