@@ -19,8 +19,9 @@ export const useHistoryStore = defineStore(
 
       const isCurrentRoute = router.currentRoute.value.path === path; // 判断待关闭路由是否为当前激活项
 
-      if (isCurrentRoute && historyRoutes.value.length > 0) router.go(-1);
-      else router.push("/"); // 如果没有匹配项，跳转到首页或其他默认页面
+      if ((historyRoutes.value.length = 0))
+        router.push("/"); //路由被全部关掉了，跳转布局组件
+      else if (isCurrentRoute) router.go(-1); //路由还剩下，但是关闭的是当前路由，则跳回上一个
     };
     return {
       historyRoutes,

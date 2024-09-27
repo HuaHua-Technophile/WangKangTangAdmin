@@ -44,13 +44,13 @@
 <script lang="ts" setup>
   import { ref, reactive } from "vue";
   import { ElMessage, FormInstance } from "element-plus";
-  import { useRoute, useRouter } from "vue-router";
+  import { useRoute } from "vue-router";
   import { useAuthStore } from "@/stores/auth";
   import { login } from "@/api/login"; // 引入登录 API
   import { debugError, debugLog } from "@/utils/debug";
   import { getRouters } from "@/api/routes";
+  import router from "@/router/router";
 
-  const router = useRouter();
   const route = useRoute(); // 使用 useRoute 获取当前路由信息
   const loginFormRef = ref<FormInstance>();
   const loading = ref(false);

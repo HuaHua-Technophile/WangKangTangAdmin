@@ -21,7 +21,7 @@ $success: #0d6efd;
 @use "element-plus/theme-chalk/src/message.scss";
 @use "element-plus/theme-chalk/src/message-box.scss";
 @use "element-plus/theme-chalk/src/loading.scss";
-// 按需导入element plus时,API调用的特殊样式需要手动引入
+// 按需导入element plus时,API调用的特殊样式需要手动引入https://element-plus.org/zh-CN/guide/quickstart.html#:~:text=ElementPlus()%5D%2C%0A%7D)-,WARNING,-%E5%A6%82%E6%9E%9C%E4%BD%BF%E7%94%A8%20unplugin
 
 @use "@/assets/icons/iconfont.css";
 

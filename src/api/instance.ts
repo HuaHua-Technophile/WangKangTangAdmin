@@ -3,7 +3,6 @@ import { debugLog } from "@/utils/debug";
 import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
 import { toRaw } from "vue";
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
 
 export const service = axios.create({
   baseURL: import.meta.env.VITE_APP_API_BASE_URL, // 基本URL
@@ -13,8 +12,6 @@ export const service = axios.create({
   },
   // withCredentials: true, //发送跨域请求时，浏览器默认不会发送凭证信息。 这个配置项允许跨域请求时携带凭证信息（如 cookies、HTTP 认证及客户端 SSL 证明等）使用这个选项时，服务器也需要配置 CORS 来允许接收凭证，否则请求会失败。
 });
-
-const router = useRouter();
 
 let loadingInstance: any;
 
