@@ -104,7 +104,7 @@
         loading.value = true;
         try {
           const response = await login(loginForm);
-
+          console.log("登录成功", response);
           if (response.token) {
             ElMessage.success("登录成功");
             // 处理登录成功逻辑，例如存储 token 和跳转页面

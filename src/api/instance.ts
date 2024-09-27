@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { debugLog } from "@/utils/debug";
 import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
 import { toRaw } from "vue";
@@ -75,12 +75,13 @@ service.interceptors.response.use(
 );
 
 // 创建一个新的请求函数，允许传入描述文本
-export const customRequest = (
+
+export const customRequest = async <T>(
   config: AxiosRequestConfig,
   description: string
-) => {
-  // 打印调试信息
+): Promise<AxiosResponse<T>> => {
   debugLog(`准备${description}, 数据:`, toRaw(config.data || config.params));
 
-  return service(config);
+  const response: AxiosResponse<T> = await service(config);
+  return response;
 };

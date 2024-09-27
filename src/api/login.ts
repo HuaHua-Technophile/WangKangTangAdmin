@@ -2,7 +2,12 @@
 
 import { customRequest } from "./instance";
 
-export const login = (data: any) => {
+interface LoginData {
+  username: string;
+  password: string;
+}
+
+export const login = (data: LoginData) => {
   return customRequest(
     {
       url: "/login",

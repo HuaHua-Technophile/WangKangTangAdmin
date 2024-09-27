@@ -3,9 +3,10 @@ $primary: #198754;
 $success: #0d6efd;
 // 导入 Bootstrap
 @use "bootstrap/scss/bootstrap" with (
-  $primary: $primary,
+  /* node_modules\bootstrap\scss\_variables.scss */$primary: $primary,
   $success: $success,
-  $body-bg-dark: #151515,
+
+  /* node_modules\bootstrap\scss\_variables-dark.scss */$body-bg-dark: #151515,
   $body-tertiary-bg-dark: #262626,
   $body-secondary-bg-dark: #353535
 );
