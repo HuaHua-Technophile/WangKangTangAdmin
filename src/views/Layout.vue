@@ -88,7 +88,7 @@
   import { getInfo } from "@/api/getInfo";
   import { useAuthStore } from "@/stores/auth";
   import { debugLog } from "@/utils/debug";
-  import { computed, onMounted, ref } from "vue";
+  import { computed, onMounted, ref, toRaw } from "vue";
 
   const authStore = useAuthStore();
   // 用户信息不持久化存储--------------------
@@ -96,7 +96,7 @@
   import avatar from "@/assets/images/TestLogo.webp"; // 使用 require
   onMounted(async () => {
     userInfo.value = await getInfo();
-    debugLog("用户信息=>", userInfo.value);
+    debugLog("用户信息=>", toRaw(userInfo.value));
   });
 
   // 历史路由-----------------

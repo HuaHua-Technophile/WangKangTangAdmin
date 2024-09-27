@@ -4,7 +4,7 @@ import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
 import { toRaw } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
-export const service = axios.create({
+const service = axios.create({
   baseURL: import.meta.env.VITE_APP_API_BASE_URL, // 基本URL
   timeout: 30000, //超时时间
   headers: {
@@ -75,12 +75,15 @@ service.interceptors.response.use(
 );
 
 // 创建一个新的请求函数，允许传入描述文本
-
 export const customRequest = async <T>(
   config: AxiosRequestConfig,
   description: string
 ): Promise<AxiosResponse<T>> => {
-  debugLog(`准备${description}, 数据:`, toRaw(config.data || config.params));
+  debugLog(
+    `准备${description},传参:${
+      toRaw(config.data) || toRaw(config.params) || "(无)"
+    }`
+  );
 
   const response: AxiosResponse<T> = await service(config);
   return response;

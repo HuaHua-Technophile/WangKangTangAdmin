@@ -55,7 +55,7 @@
   const fetchMenuList = async () => {
     const res = (await getMenuList(queryParams.value)).data;
     debugLog("获取到菜单列表=>", res);
-    res.map((i: any) => {});
+    res.map((i) => {});
   };
 
   // 组件挂载时获取菜单列表

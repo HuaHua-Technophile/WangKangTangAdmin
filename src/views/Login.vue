@@ -111,7 +111,7 @@
             const authStore = useAuthStore();
             authStore.token = response.token;
 
-            const routes = await getRouters();
+            const routes = (await getRouters()).data;
             debugLog("返回动态路由=>", routes); // 请求动态路由
             authStore.dynamicRoutes = routes; // 存储动态路由
 

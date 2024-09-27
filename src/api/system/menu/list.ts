@@ -7,7 +7,7 @@ interface GetMenuListParams {
   orderNum?: number; // 可选参数
 }
 
-/* interface MenuItem {
+interface MenuItem {
   createTime: string;
   updateTime: string | null;
   menuId: number;
@@ -27,10 +27,8 @@ interface GetMenuListParams {
   perms: string;
   icon: string;
   children: MenuItem[]; // 递归定义子菜单
-} */
-interface MenuItem {
-  id: number;
 }
+
 // 封装获取菜单列表的请求方法
 export const getMenuList = (params: GetMenuListParams) => {
   return customRequest<MenuItem[]>(
