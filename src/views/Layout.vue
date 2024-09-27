@@ -60,7 +60,7 @@
                 <Icon icon="icon-yonghu" />
                 <span class="ms-1">个人信息</span>
               </el-dropdown-item>
-              <el-dropdown-item @click="logout">
+              <el-dropdown-item @click="authStore.logout()">
                 <Icon icon="icon-tuichu"></Icon>
                 <span class="ms-1">退出登录</span>
               </el-dropdown-item>
@@ -77,7 +77,6 @@
 </template>
 <script lang="ts" setup>
   import { getInfo } from "@/api/getInfo";
-  import router from "@/router/router";
   import { useAuthStore } from "@/stores/auth";
   import { debugLog } from "@/utils/debug";
   import { computed, onMounted, ref } from "vue";
@@ -90,13 +89,6 @@
     userInfo.value = await getInfo();
     debugLog("用户信息=>", userInfo.value);
   });
-  const logout = () => {
-    authStore.token = "";
-    authStore.dynamicRoutes = [];
-    historyStore.historyRoutes = [];
-    router.push("/login");
-    debugLog("退出登录");
-  };
 
   // 历史路由-----------------
   import { useHistoryStore } from "@/stores/history";

@@ -3,6 +3,8 @@ import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import { RouteRecordRaw } from "vue-router";
 import CryptoJS from "crypto-js"; // 引入加密库
+import router from "@/router/router";
+import { useHistoryStore } from "./history";
 
 // 密钥，可以根据需要修改为更复杂的
 const SECRET_KEY = "my-secret-key";
@@ -26,10 +28,19 @@ export const useAuthStore = defineStore(
     // 计算属性，判断是否已认证
     const isAuthenticated = computed(() => token.value !== "");
 
+    const logout = () => {
+      token.value = ""; // 清空 token
+      dynamicRoutes.value = []; // 清空动态路由
+      const historyStore = useHistoryStore();
+      historyStore.historyRoutes = []; // 清空历史记录
+      router.push("/login"); // 重定向到登录页面
+    };
+
     return {
       token,
       isAuthenticated,
       dynamicRoutes,
+      logout,
     };
   },
   {

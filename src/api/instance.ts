@@ -3,6 +3,8 @@ import { debugLog } from "@/utils/debug";
 import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
 import { toRaw } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
+
 export const service = axios.create({
   baseURL: import.meta.env.VITE_APP_API_BASE_URL, // 基本URL
   timeout: 30000, //超时时间
@@ -12,6 +14,8 @@ export const service = axios.create({
   // withCredentials: true, //发送跨域请求时，浏览器默认不会发送凭证信息。 这个配置项允许跨域请求时携带凭证信息（如 cookies、HTTP 认证及客户端 SSL 证明等）使用这个选项时，服务器也需要配置 CORS 来允许接收凭证，否则请求会失败。
 });
 
+const router = useRouter();
+
 let loadingInstance: any;
 
 // Request 拦截器
@@ -19,7 +23,6 @@ service.interceptors.request.use(
   (config) => {
     // 在发送请求之前做些什么
     loadingInstance = ElLoading.service({ fullscreen: true });
-    console.log("请求了");
     const authStore = useAuthStore(); // 获取 auth store
     const token = authStore.token; // 获取 token
     if (token) config.headers["Authorization"] = `Bearer ${token}`; // 如果 token 存在，则添加到请求头
@@ -41,6 +44,7 @@ service.interceptors.response.use(
     // debugLog("axios中返回response", response);
     // 处理响应数据
     const res = response.data;
+
     if (res.code !== 200) {
       ElMessage({
         message: res.msg || "axios出错啦",
@@ -48,24 +52,18 @@ service.interceptors.response.use(
         duration: 8 * 1000,
       });
 
-      // 50008: 非法token; 50012: 其他客户端登录; 50014: Token 过期;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        // 重新登录
+      if (res.code === 401) {
         ElMessageBox.confirm("您已登出，请重新登录", "确认登出", {
           confirmButtonText: "重新登录",
           cancelButtonText: "取消",
           type: "warning",
         }).then(() => {
-          // 这里可以调用你的登出方法
-          // store.dispatch('user/resetToken').then(() => {
-          //   location.reload();
-          // });
+          const authStore = useAuthStore(); // 获取 auth store
+          authStore.logout(); // 调用 logout 方法
         });
       }
       return Promise.reject(new Error(res.msg || "axios出错啦"));
-    } else {
-      return res;
-    }
+    } else return res;
   },
   (error) => {
     loadingInstance.close();
@@ -85,7 +83,7 @@ export const customRequest = (
   description: string
 ) => {
   // 打印调试信息
-  debugLog(`准备${description}, 数据:`, toRaw(config?.data));
+  debugLog(`准备${description}, 数据:`, toRaw(config.data || config.params));
 
   return service(config);
 };

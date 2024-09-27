@@ -13,8 +13,9 @@ export default defineConfig({
     AutoImport({
       resolvers: [ElementPlusResolver()],
       imports: [
-        // 自动导入 debug
-        { "@/utils/debug": ["debugLog", "debugWarn", "debugError"] },
+        "vue", //自动导入ref,reactive,onMounted等
+        "vue-router", //自动导入路由相关api
+        { "@/utils/debug": ["debugLog", "debugWarn", "debugError"] }, // 自动导入 debug
       ],
       dts: true, // 这将生成 'auto-imports.d.ts' 文件
     }),
