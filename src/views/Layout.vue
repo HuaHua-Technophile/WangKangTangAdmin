@@ -76,9 +76,7 @@
           class="px-3"
           wrap-class="rounded-3"
           view-class="py-3">
-          <router-view
-            style="height: 2000px"
-            class="rounded-3 border p-2 w-100 bg-body" />
+          <router-view class="rounded-3 border p-2 w-100 bg-body" />
         </el-scrollbar>
       </el-main>
     </el-container>
