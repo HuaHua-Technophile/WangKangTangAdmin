@@ -28,6 +28,7 @@ declare module 'vue' {
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     Icon: typeof import('./src/components/Icon.vue')['default']
     MenuTableItem: typeof import('./src/components/system/menu/MenuTableItem.vue')['default']
