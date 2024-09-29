@@ -31,7 +31,10 @@
             '--el-fill-color-light': ' #353535',
             '--el-table-tr-bg-color': ' transparent',
           }
-        : { '--el-fill-color-light': ' #505050' }
+        : {
+            '--el-fill-color-light': ' #505050',
+            '--el-table-tr-bg-color': ' transparent',
+          }
     ">
     <slot />
     <MenuTableItem />

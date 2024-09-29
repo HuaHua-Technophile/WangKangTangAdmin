@@ -9,6 +9,14 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.icon-shanchu:before {
+  content: "\e66e";
+}
+
+.icon-bianji:before {
+  content: "\e651";
+}
+
 .icon-guanbi:before {
   content: "\e611";
 }

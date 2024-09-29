@@ -79,4 +79,13 @@
       </el-tooltip>
     </template>
   </el-table-column>
+  <el-table-column label="操作">
+    <template #default="scope">
+      <div class="d-flex justify-content-between align-items-center">
+        <Icon icon="icon-bianji" class="cursor-pointer" />
+        <Icon icon="icon-shanchu" class="cursor-pointer text-danger" />
+      </div>
+    </template>
+  </el-table-column>
 </template>
+<script lang="ts" setup></script>

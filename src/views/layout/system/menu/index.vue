@@ -1,9 +1,9 @@
 <template>
   <div>
-    <!-- 顶部查询框 -->
+    <!-- 顶部查询表单/添加按钮 -->
     <el-form
       :model="queryParams"
-      class="d-flex justify-content-between align-items-center">
+      class="flex-grow-1 d-flex justify-content-between align-items-center">
       <el-form-item label="菜单名称">
         <el-input
           v-model="queryParams.menuName"
@@ -26,6 +26,9 @@
       <el-form-item>
         <el-button type="primary" @click="fetchMenuList">查询</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="toAddMenu">添加菜单</el-button>
+      </el-form-item>
     </el-form>
     <!-- 菜单 -->
     <CustomMenuTable :data="menuTree">
@@ -44,14 +47,25 @@
         </template>
       </el-table-column>
     </CustomMenuTable>
+    <!-- 添加/修改弹窗 -->
+    <MenuDialog
+      v-model="A_EVisible"
+      :A_ETitle="A_ETitle"
+      :isAdd="isAdd"
+      :A_EForm="A_EForm"
+      :idKey="idKey"
+      :reQueryFun="fetchMenuList">
+    </MenuDialog>
   </div>
 </template>
 <script lang="ts" setup>
   import { getMenuList } from "@/api/system/menu/list";
   import { MenuItem } from "@/types/menuItem";
   import { debugLog } from "@/utils/debug";
-  import { onMounted, ref } from "vue";
-
+  import { onMounted, reactive, ref } from "vue";
+  import { addMenu } from "@/api/system/menu/menu";
+  import MenuDialog from "./MenuDialog.vue";
+  import CustomMenuTable from "./CustomMenuTable.vue";
   // 查询表单----------------
   const queryParams = ref({
     menuName: "",
@@ -73,13 +87,13 @@
     // 第二步: 构建树形结构
     items.forEach((item) => {
       const treeItem = itemMap.get(item.menuId)!;
-      if (item.parentId === 0 || !itemMap.has(item.parentId)) {
+      if (item.parentId === 0 || !itemMap.has(item.parentId!)) {
         // 如果是根节点(parentId为0)或父节点不存在,则添加到根数组
         rootItems.push(treeItem);
       } else {
         // 否则,将当前节点添加到父节点的children数组中
-        const parentItem = itemMap.get(item.parentId)!;
-        parentItem.children.push(treeItem);
+        const parentItem = itemMap.get(item.parentId!)!;
+        parentItem.children?.push(treeItem);
       }
     });
 
@@ -92,10 +106,34 @@
     menuTree.value = buildTree(res);
     debugLog("转换后的菜单列表=>", menuTree.value);
   };
-
-  // 组件挂载时获取菜单列表-----------------
   onMounted(() => {
     fetchMenuList();
   });
+
+  // 添加/修改弹窗----------------
+  const A_EVisible = ref(false);
+  const A_ETitle = ref("");
+  const isAdd = ref(true);
+  const A_EForm = reactive<MenuItem>({
+    menuId: -1,
+    menuName: "",
+    parentId: 0,
+    orderNum: 0,
+    path: "",
+    component: null,
+    routeName: "",
+    isFrame: "1", //是否为外链（0是 1否）
+    isCache: "1", //0缓存 1不缓存
+    menuType: "C", //M目录 C菜单  F按钮
+    visible: "0", //0显示 1隐藏
+    status: "0", //0正常 1停用
+    icon: "", //图标
+  });
+  const idKey = "menuId";
+  const toAddMenu = () => {
+    A_EVisible.value = true;
+    A_ETitle.value = "添加菜单";
+    isAdd.value = true;
+  };
 </script>
 <style lang="scss" scoped></style>
