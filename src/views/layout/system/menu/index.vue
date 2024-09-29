@@ -28,69 +28,29 @@
       </el-form-item>
     </el-form>
     <!-- 菜单 -->
-    <el-table
-      :data="menuTree"
-      table-layout="auto"
-      header-cell-class-name="text-center"
-      cell-class-name="text-center"
-      class="w-100">
-      <!-- 1级展开 -->
+    <CustomMenuTable :data="menuTree">
       <el-table-column type="expand">
         <template #default="props">
-          <el-table
-            :data="props.row.children"
-            table-layout="auto"
-            :header-cell-class-name="
-              themeStore.isDark
-                ? 'text-center bg-transparent'
-                : 'text-center bg-transparent text-dark'
-            "
-            header-row-class-name="bg-primary bg-opacity-75"
-            cell-class-name="text-center "
-            class="w-100 rounded bg-body-tertiary border border-3 border-primary border-opacity-75"
-            style="
-              --el-fill-color-light: #353535;
-              --el-table-tr-bg-color: transparent;
-            ">
-            <!-- 2级展开 -->
+          <CustomMenuTable :data="props.row.children" :level="2">
             <el-table-column type="expand">
               <template #default="props2">
-                <div class="px-2">
-                  <el-table
-                    :data="props2.row.children"
-                    table-layout="auto"
-                    :header-cell-class-name="
-                      themeStore.isDark
-                        ? 'text-center bg-transparent'
-                        : 'text-center bg-transparent text-dark'
-                    "
-                    header-row-class-name="bg-success bg-opacity-75"
-                    row-class-name="bg-transparent"
-                    cell-class-name="text-center"
-                    class="w-100 rounded bg-body-secondary"
-                    style="--el-fill-color-light: #505050">
-                    <MenuTableItem />
-                  </el-table>
+                <div class="px-2" v-if="props2.row.children.length > 0">
+                  <CustomMenuTable :data="props2.row.children" :level="3">
+                  </CustomMenuTable>
                 </div>
               </template>
             </el-table-column>
-            <MenuTableItem />
-          </el-table>
+          </CustomMenuTable>
         </template>
       </el-table-column>
-      <MenuTableItem />
-    </el-table>
+    </CustomMenuTable>
   </div>
 </template>
 <script lang="ts" setup>
   import { getMenuList } from "@/api/system/menu/list";
-  import { useThemeStore } from "@/stores/theme";
   import { MenuItem } from "@/types/menuItem";
   import { debugLog } from "@/utils/debug";
   import { onMounted, ref } from "vue";
-
-  //主题色----------------
-  const themeStore = useThemeStore();
 
   // 查询表单----------------
   const queryParams = ref({

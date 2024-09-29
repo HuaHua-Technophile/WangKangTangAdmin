@@ -80,8 +80,3 @@
     </template>
   </el-table-column>
 </template>
-<script lang="ts" setup>
-  /*  import { MenuItem } from "@/types/menuItem";
-
-  const props = defineProps<{ menuList?: MenuItem[] }>(); */
-</script>
