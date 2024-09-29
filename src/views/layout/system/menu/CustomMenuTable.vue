@@ -37,15 +37,18 @@
           }
     ">
     <slot />
-    <MenuTableItem />
+    <MenuTableItem :fetchMenuList="fetchMenuList" />
   </el-table>
 </template>
 <script lang="ts" setup>
   import { useThemeStore } from "@/stores/theme";
   import MenuTableItem from "@/views/layout/system/menu/MenuTableItem.vue";
-  const props = withDefaults(defineProps<{ data?: any[]; level?: number }>(), {
-    level: 1,
-  });
+  const props = withDefaults(
+    defineProps<{ data?: any[]; level?: number; fetchMenuList: () => void }>(),
+    {
+      level: 1,
+    }
+  );
 
   const themeStore = useThemeStore();
 </script>

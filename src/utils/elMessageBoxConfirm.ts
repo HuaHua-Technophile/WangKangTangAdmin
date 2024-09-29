@@ -8,7 +8,10 @@ export const elMessageBoxConfirm = (title: string, callback: () => void) => {
     draggable: true,
     customClass: "rounded",
   })
-    .then(callback)
+    .then(() => {
+      callback();
+      ElMessage.info(title);
+    })
     .catch(() => {
       ElMessage.info(`取消操作:${title}`);
     });

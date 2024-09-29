@@ -19,12 +19,10 @@
 </template>
 <script lang="ts" setup>
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
-  import { ElMessage } from "element-plus";
   const A_EVisible = defineModel<boolean>("A_EVisible");
   const props = withDefaults(
     defineProps<{
       A_ETitle: string;
-      isAdd: boolean;
       reQueryFun: () => void;
       submitFun: () => void;
       width?: string;
@@ -37,14 +35,12 @@
   const closeConfirmFun = (done: () => void) => {
     elMessageBoxConfirm(`放弃${props.A_ETitle}`, () => {
       done();
-      // emit("update:visible", false); 不使用defineModel的方法
-      ElMessage.info(`放弃${props.A_ETitle}`);
     });
   };
 
   const submitForm = () => {
     props.submitFun();
     A_EVisible.value = false;
-    props.reQueryFun();
+    console.log(props.reQueryFun);
   };
 </script>

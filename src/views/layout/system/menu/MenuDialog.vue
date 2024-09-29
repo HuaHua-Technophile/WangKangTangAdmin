@@ -1,16 +1,20 @@
 <template>
   <A_EDialog
-    v-model="A_EVisible"
+    v-model:A_EVisible="A_EVisible"
     :A_ETitle="A_ETitle"
-    :isAdd="isAdd"
-    :A_EForm="A_EForm"
-    :idKey="idKey"
     :reQueryFun="reQueryFun"
     :submitFun="submitFun">
     <template #headerBtn>
-      <span class="ms-2" v-if="!isAdd">ID:{{ idKey && A_EForm[idKey] }}</span>
+      <span class="ms-2" v-if="!isAdd"
+        >ID:{{ idKey && A_EForm && A_EForm[idKey] }}</span
+      >
     </template>
-    <el-form :model="A_EForm" ref="form" label-width="auto" :rules="rules">
+    <el-form
+      :model="A_EForm"
+      ref="form"
+      label-width="auto"
+      :rules="rules"
+      v-if="A_EForm">
       <el-form-item label="菜单名称" prop="menuName">
         <el-input v-model="A_EForm.menuName" />
       </el-form-item>
@@ -83,8 +87,8 @@
       reQueryFun: () => void;
       width?: string;
       idKey?: keyof MenuItem;
-      A_EForm: MenuItem;
-      A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
+      A_EForm?: MenuItem;
+      A_EFun?: (data: MenuItem) => Promise<AxiosResponse>;
     }>(),
     {
       width: "485px",
@@ -100,6 +104,6 @@
   };
 
   const submitFun = async () => {
-    await props.A_EFun(props.A_EForm);
+    if (props.A_EForm && props.A_EFun) await props.A_EFun(props.A_EForm);
   };
 </script>

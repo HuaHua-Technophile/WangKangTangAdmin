@@ -83,9 +83,27 @@
     <template #default="scope">
       <div class="d-flex justify-content-between align-items-center">
         <Icon icon="icon-bianji" class="cursor-pointer" />
-        <Icon icon="icon-shanchu" class="cursor-pointer text-danger" />
+        <Icon
+          icon="icon-shanchu"
+          class="cursor-pointer text-danger"
+          @click="toDelMenu(scope.row)" />
       </div>
     </template>
   </el-table-column>
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+  import { delMenu } from "@/api/system/menu/menu";
+  import { MenuItem } from "@/types/menuItem";
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
+
+  const props = defineProps<{
+    fetchMenuList: () => void;
+  }>();
+
+  const toDelMenu = (row: MenuItem) => {
+    elMessageBoxConfirm(`删除菜单,ID:${row.menuId}`, async () => {
+      await delMenu(row.menuId);
+      props.fetchMenuList();
+    });
+  };
+</script>

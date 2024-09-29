@@ -31,14 +31,21 @@
       </el-form-item>
     </el-form>
     <!-- 菜单 -->
-    <CustomMenuTable :data="menuTree">
+    <CustomMenuTable :data="menuTree" :fetchMenuList="fetchMenuList">
       <el-table-column type="expand">
         <template #default="props">
-          <CustomMenuTable :data="props.row.children" :level="2">
+          <CustomMenuTable
+            :data="props.row.children"
+            :level="2"
+            :fetchMenuList="fetchMenuList"
+            v-if="props.row.children.length > 0">
             <el-table-column type="expand">
               <template #default="props2">
                 <div class="px-2" v-if="props2.row.children.length > 0">
-                  <CustomMenuTable :data="props2.row.children" :level="3">
+                  <CustomMenuTable
+                    :data="props2.row.children"
+                    :level="3"
+                    :fetchMenuList="fetchMenuList">
                   </CustomMenuTable>
                 </div>
               </template>
@@ -49,7 +56,7 @@
     </CustomMenuTable>
     <!-- 添加/修改弹窗 -->
     <MenuDialog
-      v-model="A_EVisible"
+      v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
       :isAdd="isAdd"
       :A_EForm="A_EForm"
@@ -116,7 +123,7 @@
   const A_EVisible = ref(false);
   const A_ETitle = ref("");
   const isAdd = ref(true);
-  const A_EForm = reactive<MenuItem>({
+  const defaultsForm: MenuItem = {
     menuId: -1,
     menuName: "",
     parentId: 0,
@@ -130,7 +137,9 @@
     visible: "0", //0显示 1隐藏
     status: "0", //0正常 1停用
     icon: "", //图标
-  });
+  };
+  let A_EForm: MenuItem;
+
   const idKey = "menuId";
   let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
   const toAddMenu = () => {
@@ -138,6 +147,7 @@
     A_ETitle.value = "添加菜单";
     isAdd.value = true;
     A_EFun = addMenu;
+    A_EForm = reactive(defaultsForm);
   };
 </script>
 <style lang="scss" scoped></style>

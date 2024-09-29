@@ -22,3 +22,13 @@ export const editMenu = (params: MenuItem) => {
 
   return customRequest(config, "添加菜单"); // 调用二次封装的请求方法
 };
+
+// 删除菜单函数
+export const delMenu = (menuId: number) => {
+  const config: AxiosRequestConfig = {
+    method: "DELETE", // 使用 DELETE 方法
+    url: `/system/menu/${menuId}`, // API 路径
+  };
+
+  return customRequest(config, `删除菜单`); // 调用封装的请求方法
+};
