@@ -28,23 +28,50 @@
       </el-form-item>
     </el-form>
     <!-- 菜单 -->
-    <el-table :data="menuTree" table-layout="auto" class="w-100">
+    <el-table
+      :data="menuTree"
+      table-layout="auto"
+      header-cell-class-name="text-center"
+      cell-class-name="text-center"
+      class="w-100">
       <!-- 1级展开 -->
       <el-table-column type="expand">
         <template #default="props">
           <el-table
             :data="props.row.children"
             table-layout="auto"
-            class="w-100 bg-body-tertiary">
+            :header-cell-class-name="
+              themeStore.isDark
+                ? 'text-center bg-transparent'
+                : 'text-center bg-transparent text-dark'
+            "
+            header-row-class-name="bg-primary bg-opacity-75"
+            cell-class-name="text-center "
+            class="w-100 rounded bg-body-tertiary border border-3 border-primary border-opacity-75"
+            style="
+              --el-fill-color-light: #353535;
+              --el-table-tr-bg-color: transparent;
+            ">
             <!-- 2级展开 -->
             <el-table-column type="expand">
               <template #default="props2">
-                <el-table
-                  :data="props2.row.children"
-                  table-layout="auto"
-                  class="w-100">
-                  <MenuTableItem />
-                </el-table>
+                <div class="px-2">
+                  <el-table
+                    :data="props2.row.children"
+                    table-layout="auto"
+                    :header-cell-class-name="
+                      themeStore.isDark
+                        ? 'text-center bg-transparent'
+                        : 'text-center bg-transparent text-dark'
+                    "
+                    header-row-class-name="bg-success bg-opacity-75"
+                    row-class-name="bg-transparent"
+                    cell-class-name="text-center"
+                    class="w-100 rounded bg-body-secondary"
+                    style="--el-fill-color-light: #505050">
+                    <MenuTableItem />
+                  </el-table>
+                </div>
               </template>
             </el-table-column>
             <MenuTableItem />
@@ -57,18 +84,23 @@
 </template>
 <script lang="ts" setup>
   import { getMenuList } from "@/api/system/menu/list";
+  import { useThemeStore } from "@/stores/theme";
   import { MenuItem } from "@/types/menuItem";
   import { debugLog } from "@/utils/debug";
   import { onMounted, ref } from "vue";
 
+  //主题色----------------
+  const themeStore = useThemeStore();
+
+  // 查询表单----------------
   const queryParams = ref({
     menuName: "",
     menuType: "",
     orderNum: undefined,
   });
 
+  // 请求菜单列表-----------
   const menuTree = ref();
-
   const buildTree = (items: MenuItem[]) => {
     const itemMap: Map<number, MenuItem> = new Map();
     const rootItems: MenuItem[] = [];
@@ -93,7 +125,6 @@
 
     return rootItems;
   };
-  // 查询菜单列表
   const fetchMenuList = async () => {
     const res = (await getMenuList(queryParams.value)).data;
     debugLog("获取到菜单列表=>", res);
@@ -102,8 +133,9 @@
     debugLog("转换后的菜单列表=>", menuTree.value);
   };
 
-  // 组件挂载时获取菜单列表
+  // 组件挂载时获取菜单列表-----------------
   onMounted(() => {
     fetchMenuList();
   });
 </script>
+<style lang="scss" scoped></style>
