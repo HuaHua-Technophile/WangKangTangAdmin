@@ -13,6 +13,7 @@
     "bootstrap": "5.3.3",
     "crypto-js": "^4.2.0",
     "element-plus": "^2.8.4",
+    "lodash": "^4.17.21",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^4.0.2",
     "unplugin-element-plus": "^0.8.0",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
+    "@types/lodash": "^4.17.9",
     "@types/node": "^22.7.4",
     "@vitejs/plugin-vue": "^5.1.4",
     "scss": "^0.2.4",

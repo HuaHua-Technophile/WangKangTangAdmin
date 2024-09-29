@@ -80,9 +80,8 @@ export const customRequest = async <T>(
   description: string
 ): Promise<AxiosResponse<T>> => {
   debugLog(
-    `准备${description},传参:${
-      toRaw(config.data) || toRaw(config.params) || "(无)"
-    }`
+    `准备${description},传参:`,
+    toRaw(config.data) || toRaw(config.params) || "(无)"
   );
 
   const response: AxiosResponse<T> = await service(config);

@@ -13,14 +13,14 @@ export const addMenu = (data: MenuItem) => {
   return customRequest(config, "添加菜单"); // 调用二次封装的请求方法
 };
 // 封装获取菜单列表的请求方法
-export const editMenu = (params: MenuItem) => {
+export const editMenu = (data: MenuItem) => {
   const config: AxiosRequestConfig = {
     method: "PUT", // 请求方法
     url: "/system/menu", // API 路径
-    params, // 将参数传递给请求
+    data, // 将参数传递给请求
   };
 
-  return customRequest(config, "添加菜单"); // 调用二次封装的请求方法
+  return customRequest(config, "修改菜单"); // 调用二次封装的请求方法
 };
 
 // 删除菜单函数

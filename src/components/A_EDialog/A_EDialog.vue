@@ -41,6 +41,6 @@
   const submitForm = () => {
     props.submitFun();
     A_EVisible.value = false;
-    console.log(props.reQueryFun);
+    props.reQueryFun();
   };
 </script>

@@ -37,22 +37,31 @@
           <CustomMenuTable
             :data="props.row.children"
             :level="2"
-            :fetchMenuList="fetchMenuList"
             v-if="props.row.children.length > 0">
             <el-table-column type="expand">
               <template #default="props2">
                 <div class="px-2" v-if="props2.row.children.length > 0">
-                  <CustomMenuTable
-                    :data="props2.row.children"
-                    :level="3"
-                    :fetchMenuList="fetchMenuList">
+                  <CustomMenuTable :data="props2.row.children" :level="3">
+                    <MenuTableItem
+                      :fetchMenuList="fetchMenuList"
+                      v-model:A_EVisible="A_EVisible" />
                   </CustomMenuTable>
                 </div>
               </template>
             </el-table-column>
+            <MenuTableItem
+              :fetchMenuList="fetchMenuList"
+              v-model:A_EVisible="A_EVisible" />
           </CustomMenuTable>
         </template>
       </el-table-column>
+      <MenuTableItem
+        :fetchMenuList="fetchMenuList"
+        v-model:A_EVisible="A_EVisible"
+        v-model:A_ETitle="A_ETitle"
+        v-model:isAdd="isAdd"
+        v-model:A_EFun="A_EFun"
+        v-model:A_EForm="A_EForm" />
     </CustomMenuTable>
     <!-- 添加/修改弹窗 -->
     <MenuDialog
@@ -74,6 +83,7 @@
   import { addMenu } from "@/api/system/menu/menu";
   import MenuDialog from "./MenuDialog.vue";
   import CustomMenuTable from "./CustomMenuTable.vue";
+  import MenuTableItem from "./MenuTableItem.vue";
   import { AxiosResponse } from "axios";
   // 查询表单----------------
   const queryParams = ref({
