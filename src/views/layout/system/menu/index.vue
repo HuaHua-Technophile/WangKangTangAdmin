@@ -54,7 +54,8 @@
       :isAdd="isAdd"
       :A_EForm="A_EForm"
       :idKey="idKey"
-      :reQueryFun="fetchMenuList">
+      :reQueryFun="fetchMenuList"
+      :A_EFun="A_EFun">
     </MenuDialog>
   </div>
 </template>
@@ -66,6 +67,7 @@
   import { addMenu } from "@/api/system/menu/menu";
   import MenuDialog from "./MenuDialog.vue";
   import CustomMenuTable from "./CustomMenuTable.vue";
+  import { AxiosResponse } from "axios";
   // 查询表单----------------
   const queryParams = ref({
     menuName: "",
@@ -130,10 +132,12 @@
     icon: "", //图标
   });
   const idKey = "menuId";
+  let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
   const toAddMenu = () => {
     A_EVisible.value = true;
     A_ETitle.value = "添加菜单";
     isAdd.value = true;
+    A_EFun = addMenu;
   };
 </script>
 <style lang="scss" scoped></style>

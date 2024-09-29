@@ -26,7 +26,7 @@
       A_ETitle: string;
       isAdd: boolean;
       reQueryFun: () => void;
-      A_EFun: () => void;
+      submitFun: () => void;
       width?: string;
     }>(),
     {
@@ -43,7 +43,7 @@
   };
 
   const submitForm = () => {
-    props.A_EFun();
+    props.submitFun();
     A_EVisible.value = false;
     props.reQueryFun();
   };

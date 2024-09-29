@@ -6,7 +6,7 @@
     :A_EForm="A_EForm"
     :idKey="idKey"
     :reQueryFun="reQueryFun"
-    :A_EFun="A_EFun">
+    :submitFun="submitFun">
     <template #headerBtn>
       <span class="ms-2" v-if="!isAdd">ID:{{ idKey && A_EForm[idKey] }}</span>
     </template>
@@ -71,8 +71,8 @@
   </A_EDialog>
 </template>
 <script lang="ts" setup>
-  import { addMenu } from "@/api/system/menu/menu";
   import { MenuItem } from "@/types/menuItem";
+  import { AxiosResponse } from "axios";
 
   const A_EVisible = defineModel<boolean>("A_EVisible");
 
@@ -84,6 +84,7 @@
       width?: string;
       idKey?: keyof MenuItem;
       A_EForm: MenuItem;
+      A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
     }>(),
     {
       width: "485px",
@@ -98,7 +99,7 @@
     ],
   };
 
-  const A_EFun = async () => {
-    await addMenu(props.A_EForm);
+  const submitFun = async () => {
+    await props.A_EFun(props.A_EForm);
   };
 </script>
