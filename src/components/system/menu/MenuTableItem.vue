@@ -16,7 +16,7 @@
   <!-- <el-table-column label="路由参数" prop="query" /> -->
   <el-table-column label="外链" prop="isFrame">
     <template #default="scope">
-      <el-tag :type="scope.row.isFrame == 0 ? '' : 'info'">{{
+      <el-tag :type="scope.row.isFrame == 0 ? 'primary' : 'info'">{{
         scope.row.isFrame == 0 ? "是" : "否"
       }}</el-tag>
     </template>
@@ -28,12 +28,12 @@
       }}</el-tag>
     </template>
   </el-table-column>
-  <el-table-column label="菜单类型" prop="menuType">
+  <el-table-column label="类型" prop="menuType">
     <template #default="scope">
       <el-tag
         :type="
           scope.row.menuType === 'M'
-            ? ''
+            ? 'primary'
             : scope.row.menuType === 'C'
             ? 'success'
             : 'warning'
@@ -50,14 +50,14 @@
   </el-table-column>
   <el-table-column label="隐藏" prop="visible">
     <template #default="scope">
-      <el-tag :type="scope.row.isFrame == 0 ? '' : 'info'">{{
+      <el-tag :type="scope.row.isFrame == 0 ? 'danger' : 'primary'">{{
         scope.row.isFrame == 0 ? "是" : "否"
       }}</el-tag>
     </template>
   </el-table-column>
   <el-table-column label="停用" prop="status">
     <template #default="scope">
-      <el-tag :type="scope.row.isFrame == 0 ? 'danger' : ''">{{
+      <el-tag :type="scope.row.isFrame == 0 ? 'danger' : 'primary'">{{
         scope.row.isFrame == 0 ? "停用" : "正常"
       }}</el-tag>
     </template>
