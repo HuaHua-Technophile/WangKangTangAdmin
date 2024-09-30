@@ -39,7 +39,7 @@
       <el-form-item label="父菜单ID" prop="parentId">
         <el-tree-select
           v-model="A_EForm.parentId"
-          :data="props.MenuTree"
+          :data="props.MenuTreeSelect"
           check-strictly
           :render-after-expand="false" />
       </el-form-item>
@@ -105,7 +105,7 @@
     idKey?: keyof MenuItem;
     A_EForm?: MenuItem;
     A_EFun?: (data: MenuItem) => Promise<AxiosResponse>;
-    MenuTree: MenuTreeItem[];
+    MenuTreeSelect?: MenuTreeItem[];
   }>();
   // 验证-----------
   const validateNoChineseOrSpaces = (
@@ -130,7 +130,7 @@
   };
   // 提交修改/添加
   const submitFun = async () => {
-    console.log("MenuTree", props.MenuTree);
+    console.log(props.MenuTreeSelect);
     /* if (props.A_EForm && props.A_EFun) await props.A_EFun(props.A_EForm); */
   };
 </script>

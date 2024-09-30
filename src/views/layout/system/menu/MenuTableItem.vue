@@ -96,8 +96,11 @@
 </template>
 <script lang="ts" setup>
   import { delMenu, editMenu } from "@/api/system/menu/menu";
-  import { MenuItem } from "@/types/system/menu/menu";
+  import { getMenuTreeSelect } from "@/api/system/menu/treeselect";
+  import { MenuItem, MenuTreeItem } from "@/types/system/menu/menu";
+  import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
+  import { formatTreeSelect } from "@/utils/formatTreeSelect";
   import { AxiosResponse } from "axios";
   import { reactive } from "vue";
   const props = defineProps<{
@@ -111,29 +114,17 @@
   const A_EFun =
     defineModel<(params: MenuItem) => Promise<AxiosResponse>>("A_EFun");
   const A_EForm = defineModel<MenuItem>("A_EForm");
-  const toEditMenu = (row: MenuItem) => {
+  const MenuTreeSelect = defineModel<MenuTreeItem[]>("MenuTreeSelect");
+  const toEditMenu = async (row: MenuItem) => {
     A_EVisible.value = true;
     A_ETitle.value = "修改菜单";
     isAdd.value = false;
     A_EFun.value = editMenu;
-
-    A_EForm.value = reactive({
-      menuId: row.menuId,
-      menuName: row.menuName,
-      parentName: row.parentName,
-      parentId: row.parentId,
-      orderNum: row.orderNum,
-      path: row.path,
-      component: row.component,
-      routeName: row.routeName,
-      isFrame: row.isFrame, //是否为外链（0是 1否）
-      isCache: row.isCache, //0缓存 1不缓存
-      menuType: row.menuType, //M目录 C菜单  F按钮
-      visible: row.visible, //0显示 1隐藏
-      status: row.status, //0正常 1停用
-      perms: row.perms,
-      icon: row.icon,
-    });
+    debugLog("点击了这一行=>", row);
+    A_EForm.value = reactive(row);
+    const res = (await getMenuTreeSelect()).data;
+    MenuTreeSelect.value = await formatTreeSelect(res);
+    debugLog("下拉树菜单列表=>", res, "格式化后=>", MenuTreeSelect.value);
   };
 
   // 删除

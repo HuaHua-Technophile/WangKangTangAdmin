@@ -44,14 +44,24 @@
                   <CustomMenuTable :data="props2.row.children" :level="3">
                     <MenuTableItem
                       :fetchMenuList="fetchMenuList"
-                      v-model:A_EVisible="A_EVisible" />
+                      v-model:A_EVisible="A_EVisible"
+                      v-model:A_ETitle="A_ETitle"
+                      v-model:isAdd="isAdd"
+                      v-model:A_EFun="A_EFun"
+                      v-model:A_EForm="A_EForm"
+                      v-model:MenuTreeSelect="MenuTreeSelect" />
                   </CustomMenuTable>
                 </div>
               </template>
             </el-table-column>
             <MenuTableItem
               :fetchMenuList="fetchMenuList"
-              v-model:A_EVisible="A_EVisible" />
+              v-model:A_EVisible="A_EVisible"
+              v-model:A_ETitle="A_ETitle"
+              v-model:isAdd="isAdd"
+              v-model:A_EFun="A_EFun"
+              v-model:A_EForm="A_EForm"
+              v-model:MenuTreeSelect="MenuTreeSelect" />
           </CustomMenuTable>
         </template>
       </el-table-column>
@@ -61,7 +71,8 @@
         v-model:A_ETitle="A_ETitle"
         v-model:isAdd="isAdd"
         v-model:A_EFun="A_EFun"
-        v-model:A_EForm="A_EForm" />
+        v-model:A_EForm="A_EForm"
+        v-model:MenuTreeSelect="MenuTreeSelect" />
     </CustomMenuTable>
     <!-- 添加/修改弹窗 -->
     <MenuDialog
@@ -69,11 +80,11 @@
       :A_ETitle="A_ETitle"
       :isAdd="isAdd"
       :width="'550px'"
-      :A_EForm="A_EForm"
+      v-model:A_EForm="A_EForm"
       :idKey="idKey"
       :reQueryFun="fetchMenuList"
       :A_EFun="A_EFun"
-      :MenuTree="MenuTree">
+      :MenuTreeSelect="MenuTreeSelect">
     </MenuDialog>
   </div>
 </template>
@@ -159,7 +170,7 @@
   };
   let A_EForm: MenuItem;
   const idKey = "menuId";
-  const MenuTree = ref<MenuTreeItem[]>([]);
+  const MenuTreeSelect = ref<MenuTreeItem[]>();
   let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
   const toAddMenu = async () => {
     A_EVisible.value = true;
@@ -167,8 +178,9 @@
     isAdd.value = true;
     A_EFun = addMenu;
     A_EForm = reactive(defaultsForm);
-    MenuTree.value = formatTreeSelect((await getMenuTreeSelect()).data);
-    debugLog("下拉树菜单列表=>", MenuTree.value);
+    const res = (await getMenuTreeSelect()).data;
+    MenuTreeSelect.value = await formatTreeSelect(res);
+    debugLog("下拉树菜单列表=>", res, "格式化后=>", MenuTreeSelect.value);
   };
 </script>
 <style lang="scss" scoped></style>

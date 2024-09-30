@@ -1,7 +1,7 @@
 import { MenuTreeItem } from "@/types/system/menu/menu";
 
-export const formatTreeSelect = (data: any[]) => {
-  return [
+export const formatTreeSelect = (data: MenuTreeItem[]) => {
+  return Promise.resolve([
     {
       label: "根目录",
       id: 0,
@@ -13,7 +13,7 @@ export const formatTreeSelect = (data: any[]) => {
         children: formatChildren(item.children),
       })),
     },
-  ];
+  ]);
 };
 
 // 辅助函数：格式化子节点
