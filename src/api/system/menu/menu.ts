@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import { customRequest } from "@/api/instance"; // 引入之前封装的请求方法
-import { MenuItem } from "@/types/menuItem";
+import { MenuItem } from "@/types/system/menu/menu";
 
 // 封装获取菜单列表的请求方法
 export const addMenu = (data: MenuItem) => {

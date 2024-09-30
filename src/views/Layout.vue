@@ -9,7 +9,7 @@
             :key="i.meta?.title"
             :index="index.toString()">
             <template #title>
-              <Icon icon="icon-moon" />
+              <Icon :icon="i.meta?.icon" />
               <span class="ms-2">{{ i.meta?.title }}</span>
             </template>
             <el-menu-item

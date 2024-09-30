@@ -65,7 +65,7 @@
   <el-table-column label="权限" prop="perms" />
   <el-table-column label="排序" prop="orderNum" />
   <el-table-column label="子级" prop="children.length" />
-  <el-table-column label="更新(创建)">
+  <el-table-column label="更新时间">
     <template #default="scope">
       <!-- effect="light/dark"是反过来的  -->
       <el-tooltip effect="light" placement="left">
@@ -96,7 +96,7 @@
 </template>
 <script lang="ts" setup>
   import { delMenu, editMenu } from "@/api/system/menu/menu";
-  import { MenuItem } from "@/types/menuItem";
+  import { MenuItem } from "@/types/system/menu/menu";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { AxiosResponse } from "axios";
   import { reactive } from "vue";

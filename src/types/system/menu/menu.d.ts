@@ -19,3 +19,9 @@ export interface MenuItem {
   icon: string;
   children?: MenuItem[]; // 递归定义子菜单
 }
+export interface MenuTreeItem {
+  id: number;
+  label: string;
+  value: number;
+  children?: MenuTreeItem[];
+}

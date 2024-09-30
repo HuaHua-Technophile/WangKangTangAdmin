@@ -1,5 +1,5 @@
 import { customRequest } from "@/api/instance"; // 引入之前封装的请求方法
-import { MenuItem } from "@/types/menuItem";
+import { MenuItem } from "@/types/system/menu/menu";
 
 // 定义接口请求的参数类型
 interface GetMenuListParams {

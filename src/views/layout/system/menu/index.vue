@@ -68,16 +68,18 @@
       v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
       :isAdd="isAdd"
+      :width="'550px'"
       :A_EForm="A_EForm"
       :idKey="idKey"
       :reQueryFun="fetchMenuList"
-      :A_EFun="A_EFun">
+      :A_EFun="A_EFun"
+      :MenuTree="MenuTree">
     </MenuDialog>
   </div>
 </template>
 <script lang="ts" setup>
   import { getMenuList } from "@/api/system/menu/list";
-  import { MenuItem } from "@/types/menuItem";
+  import { MenuItem, MenuTreeItem } from "@/types/system/menu/menu";
   import { debugLog } from "@/utils/debug";
   import { onMounted, reactive, ref } from "vue";
   import { addMenu } from "@/api/system/menu/menu";
@@ -85,6 +87,8 @@
   import CustomMenuTable from "./CustomMenuTable.vue";
   import MenuTableItem from "./MenuTableItem.vue";
   import { AxiosResponse } from "axios";
+  import { getMenuTreeSelect } from "@/api/system/menu/treeselect";
+  import { formatTreeSelect } from "@/utils/formatTreeSelect";
   // 查询表单----------------
   const queryParams = ref({
     menuName: "",
@@ -149,15 +153,17 @@
     icon: "", //图标
   };
   let A_EForm: MenuItem;
-
   const idKey = "menuId";
+  const MenuTree = ref<MenuTreeItem[]>([]);
   let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
-  const toAddMenu = () => {
+  const toAddMenu = async () => {
     A_EVisible.value = true;
     A_ETitle.value = "添加菜单";
     isAdd.value = true;
     A_EFun = addMenu;
     A_EForm = reactive(defaultsForm);
+    MenuTree.value = formatTreeSelect((await getMenuTreeSelect()).data);
+    debugLog("下拉树菜单列表=>", MenuTree.value);
   };
 </script>
 <style lang="scss" scoped></style>

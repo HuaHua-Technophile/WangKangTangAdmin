@@ -9,6 +9,22 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.icon-shouye:before {
+  content: "\e616";
+}
+
+.icon-jiankong:before {
+  content: "\e6d0";
+}
+
+.icon-xitong:before {
+  content: "\e62a";
+}
+
+.icon-tool:before {
+  content: "\e669";
+}
+
 .icon-shanchu:before {
   content: "\e66e";
 }
