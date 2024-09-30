@@ -50,6 +50,7 @@
   import { debugError, debugLog } from "@/utils/debug";
   import { getRouters } from "@/api/routes";
   import router from "@/router/router";
+  import { passwordRule } from "@/utils/passwordRules";
 
   const route = useRoute(); // 使用 useRoute 获取当前路由信息
   const loginFormRef = ref<FormInstance>();
@@ -70,30 +71,7 @@
         trigger: "blur",
       },
     ],
-    password: [
-      { required: true, message: "请输入密码", trigger: "blur" },
-      {
-        min: 6,
-        max: 20,
-        message: "密码长度应在 6 到 20 个字符之间",
-        trigger: "blur",
-      },
-      {
-        validator: (
-          _rule: any,
-          value: string,
-          callback: (arg0?: Error) => void
-        ) => {
-          // 检查是否包含空格
-          if (/\s/.test(value)) {
-            callback(new Error("密码不能包含空格"));
-          } else {
-            callback(); // 验证通过
-          }
-        },
-        trigger: ["blur", "change"],
-      },
-    ],
+    password: passwordRule,
   };
 
   const handleLogin = async () => {

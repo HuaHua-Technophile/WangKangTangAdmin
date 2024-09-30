@@ -27,6 +27,15 @@ const addRoute = (routes: RouteRecordRaw[]) => {
     });
   });
 
+  router.addRoute("Layout", {
+    path: "/CurrentUserProfile",
+    name: "CurrentUserProfile",
+    meta: {
+      title: "当前用户信息",
+    },
+    component: () => import("@/views/layout/CurrentUserProfile.vue"),
+  });
+
   const allRoutes = router.getRoutes();
   debugLog("当前动态添加的路由列表:", allRoutes);
 };
@@ -54,8 +63,10 @@ const router = createRouter({
             addRoute(authStore.dynamicRoutes);
 
             next({ path: to.path }); // 再跳转回原本的
-          } else if (authStore.isAuthenticated) {
-            // 用户已认证，但动态路由未请求，尝试重新加载
+          }
+
+          // 用户已认证，但动态路由未请求，尝试重新加载
+          else if (authStore.isAuthenticated) {
             const routes = (await getRouters()).data;
             debugLog("返回动态路由=>", routes); // 请求动态路由
             authStore.dynamicRoutes = routes; // 存储动态路由
@@ -79,19 +90,21 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore();
   const historyStore = useHistoryStore(); // 获取历史路由 store
+
+  // 需要认证但未登录，重定向到登录页
   if (to.meta.requiresAuth && !authStore.isAuthenticated)
     next({
       name: "Login",
       query: { redirect: to.fullPath },
     });
-  // 需要认证但未登录，重定向到登录页
+  // 已登录用户试图访问登录页，重定向空组件页面
   else if (to.name === "Login" && authStore.isAuthenticated)
-    next({ name: "Layout" }); // 已登录用户试图访问登录页，重定向空组件页面
+    next({ name: "Layout" });
+  // 其他情况正常导航
   else {
-    // 添加当前路由到历史路由
     if (to.meta.title)
-      historyStore.addRoute({ path: to.path, title: to.meta.title as string });
-    next(); // 其他情况正常导航
+      historyStore.addRoute({ path: to.path, title: to.meta.title as string }); // 添加当前路由到历史路由
+    next();
   }
 });
 

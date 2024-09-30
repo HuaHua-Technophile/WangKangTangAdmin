@@ -59,7 +59,11 @@
             <el-dropdown-menu>
               <el-dropdown-item>
                 <Icon icon="icon-yonghu" />
-                <span class="ms-1">个人信息</span>
+                <RouterLink
+                  to="/CurrentUserProfile"
+                  class="ms-1 text-decoration-none"
+                  >个人信息</RouterLink
+                >
               </el-dropdown-item>
               <el-dropdown-item @click="authStore.logout()">
                 <Icon icon="icon-tuichu"></Icon>

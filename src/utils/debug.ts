@@ -1,7 +1,9 @@
 // src/utils/debug.ts
 
 // 从环境变量中获取调试模式设置,注意，环境变量总是字符串，所以我们需要比较 'true'。
-const isDebugMode = import.meta.env.VITE_APP_DEBUG_MODE === "true";
+// const isDebugMode = import.meta.env.VITE_APP_DEBUG_MODE === "true";
+const isDebugMode = true;
+
 // 创建一个调试日志函数
 export const debugLog = (...args: any[]) => {
   if (isDebugMode) {
@@ -22,5 +24,3 @@ export const debugError = (...args: any[]) => {
     console.error("[DEBUG ERROR]", ...args);
   }
 };
-
-// 你可以根据需要添加更多的调试函数
