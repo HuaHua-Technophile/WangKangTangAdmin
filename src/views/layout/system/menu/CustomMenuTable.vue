@@ -28,12 +28,12 @@
         ? {}
         : props.level == 2
         ? {
-            '--el-fill-color-light': ' #353535',
-            '--el-table-tr-bg-color': ' transparent',
+            '--el-fill-color-light': themeStore.isDark ? '#353535' : '#EFEFF5',
+            '--el-table-tr-bg-color': 'transparent',
           }
         : {
-            '--el-fill-color-light': ' #505050',
-            '--el-table-tr-bg-color': ' transparent',
+            '--el-fill-color-light': themeStore.isDark ? '#505050' : '#E3E3ED',
+            '--el-table-tr-bg-color': 'transparent',
           }
     ">
     <slot />
