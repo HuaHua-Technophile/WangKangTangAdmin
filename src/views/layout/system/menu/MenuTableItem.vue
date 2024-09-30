@@ -139,7 +139,7 @@
   // 删除
   const toDelMenu = (row: MenuItem) => {
     elMessageBoxConfirm(`删除菜单,ID:${row.menuId}`, async () => {
-      await delMenu(row.menuId);
+      if (row.menuId !== undefined) await delMenu(row.menuId);
       props.fetchMenuList();
     });
   };

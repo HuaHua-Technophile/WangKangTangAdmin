@@ -104,19 +104,25 @@
 
     // 第一步: 创建一个以 menuId 为键的 Map
     items.forEach((item) => {
-      itemMap.set(item.menuId, { ...item, children: [] });
+      if (item.menuId !== undefined)
+        itemMap.set(item.menuId, { ...item, children: [] });
     });
 
     // 第二步: 构建树形结构
     items.forEach((item) => {
-      const treeItem = itemMap.get(item.menuId)!;
-      if (item.parentId === 0 || !itemMap.has(item.parentId!)) {
+      if (item.menuId !== undefined) {
+        const treeItem = itemMap.get(item.menuId)!;
+        if (
+          item.parentId === 0 ||
+          (item.parentId !== undefined && !itemMap.has(item.parentId))
+        )
+          rootItems.push(treeItem);
         // 如果是根节点(parentId为0)或父节点不存在,则添加到根数组
-        rootItems.push(treeItem);
-      } else {
-        // 否则,将当前节点添加到父节点的children数组中
-        const parentItem = itemMap.get(item.parentId!)!;
-        parentItem.children?.push(treeItem);
+        else if (item.parentId !== undefined) {
+          // 否则,将当前节点添加到父节点的children数组中
+          const parentItem = itemMap.get(item.parentId);
+          if (parentItem) parentItem.children?.push(treeItem);
+        }
       }
     });
 
@@ -138,7 +144,6 @@
   const A_ETitle = ref("");
   const isAdd = ref(true);
   const defaultsForm: MenuItem = {
-    menuId: -1,
     menuName: "",
     parentId: 0,
     orderNum: 0,

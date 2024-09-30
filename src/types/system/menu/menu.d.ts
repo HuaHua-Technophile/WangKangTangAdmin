@@ -1,7 +1,7 @@
 export interface MenuItem {
   createTime?: string;
   updateTime?: string | null;
-  menuId: number;
+  menuId?: number;
   menuName: string;
   parentName?: string | null;
   parentId: number;
