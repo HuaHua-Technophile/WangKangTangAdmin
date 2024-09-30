@@ -12,3 +12,14 @@ export const getUserProfile = () => {
     "获取个人信息"
   );
 };
+
+export const editUserProfile = (data: UserProFile) => {
+  return customRequest(
+    {
+      url: "/system/user/profile",
+      method: "PUT",
+      data,
+    },
+    "修改个人信息"
+  );
+};

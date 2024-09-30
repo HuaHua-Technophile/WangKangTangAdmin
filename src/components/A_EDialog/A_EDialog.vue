@@ -24,7 +24,7 @@
     defineProps<{
       A_ETitle: string;
       reQueryFun: () => void;
-      submitFun: () => void;
+      submitFun: () => Promise<boolean>;
       width?: string;
     }>(),
     {
@@ -38,9 +38,11 @@
     });
   };
 
-  const submitForm = () => {
-    props.submitFun();
-    A_EVisible.value = false;
-    props.reQueryFun();
+  const submitForm = async () => {
+    const submitSuccess = await props.submitFun();
+    if (submitSuccess) {
+      A_EVisible.value = false;
+      props.reQueryFun();
+    }
   };
 </script>

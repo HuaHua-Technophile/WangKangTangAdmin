@@ -64,12 +64,7 @@
   const rules = {
     username: [
       { required: true, message: "请输入用户名", trigger: "blur" },
-      {
-        min: 3,
-        max: 12,
-        message: "用户名长度应在 3 到 12 个字符之间",
-        trigger: "blur",
-      },
+      { min: 3, max: 12, message: "长度在3~12个字符", trigger: "blur" },
     ],
     password: passwordRule,
   };
