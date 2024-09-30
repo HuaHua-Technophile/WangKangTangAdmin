@@ -130,7 +130,6 @@
   };
   // 提交修改/添加
   const submitFun = async () => {
-    console.log(props.MenuTreeSelect);
-    /* if (props.A_EForm && props.A_EFun) await props.A_EFun(props.A_EForm); */
+    if (props.A_EForm && props.A_EFun) await props.A_EFun(props.A_EForm);
   };
 </script>

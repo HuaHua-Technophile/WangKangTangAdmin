@@ -115,19 +115,21 @@
     defineModel<(params: MenuItem) => Promise<AxiosResponse>>("A_EFun");
   const A_EForm = defineModel<MenuItem>("A_EForm");
   const MenuTreeSelect = defineModel<MenuTreeItem[]>("MenuTreeSelect");
+
+  // 编辑------------------
   const toEditMenu = async (row: MenuItem) => {
     A_EVisible.value = true;
     A_ETitle.value = "修改菜单";
     isAdd.value = false;
     A_EFun.value = editMenu;
     debugLog("点击了这一行=>", row);
-    A_EForm.value = reactive(row);
+    A_EForm.value = reactive({ ...row });
     const res = (await getMenuTreeSelect()).data;
     MenuTreeSelect.value = await formatTreeSelect(res);
     debugLog("下拉树菜单列表=>", res, "格式化后=>", MenuTreeSelect.value);
   };
 
-  // 删除
+  // 删除-------------------
   const toDelMenu = (row: MenuItem) => {
     elMessageBoxConfirm(`删除菜单,ID:${row.menuId}`, async () => {
       if (row.menuId !== undefined) await delMenu(row.menuId);
