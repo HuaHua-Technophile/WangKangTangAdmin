@@ -9,7 +9,7 @@
     center>
     <!-- 具名插槽 -->
     <template #header>
-      <el-button @click="submitForm"
+      <el-button @click="submitForm()"
         >确认{{ A_ETitle }}<slot name="headerBtn" />
       </el-button>
     </template>
@@ -23,8 +23,7 @@
   const props = withDefaults(
     defineProps<{
       A_ETitle: string;
-      reQueryFun: () => void;
-      submitFun: () => Promise<boolean>;
+      submitForm: () => void;
       width?: string;
     }>(),
     {
@@ -36,13 +35,5 @@
     elMessageBoxConfirm(`放弃${props.A_ETitle}`, () => {
       done();
     });
-  };
-
-  const submitForm = async () => {
-    const submitSuccess = await props.submitFun();
-    if (submitSuccess) {
-      A_EVisible.value = false;
-      props.reQueryFun();
-    }
   };
 </script>

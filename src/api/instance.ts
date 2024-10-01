@@ -39,17 +39,11 @@ service.interceptors.response.use(
   (response) => {
     loadingInstance.close();
     // debugLog("axios中返回response", response);
-    // 处理响应数据
-    const res = response.data;
 
-    if (res.code !== 200) {
-      ElMessage({
-        message: res.msg || "axios出错啦",
-        type: "error",
-        duration: 8 * 1000,
-      });
-
-      if (res.code === 401) {
+    // 由HTTP协议定义，是服务器响应的标准HTTP状态码：200
+    if (response.status === 200) {
+      // 开发者自定义的API业务逻辑的状态，在若依框架下，401表示验证过期
+      if (response.data.code === 401) {
         ElMessageBox.confirm("您已登出，请重新登录", "确认登出", {
           confirmButtonText: "重新登录",
           cancelButtonText: "取消",
@@ -58,9 +52,17 @@ service.interceptors.response.use(
           const authStore = useAuthStore(); // 获取 auth store
           authStore.logout(); // 调用 logout 方法
         });
-      }
-      return Promise.reject(new Error(res.msg || "axios出错啦"));
-    } else return res;
+      } else return response.data;
+    }
+    // HTTP请求异常，请求在网络或服务器层面有问题，需要进行网络错误处理
+    else {
+      ElMessage({
+        message: response.data.msg || "axios出错啦",
+        type: "error",
+        duration: 8 * 1000,
+      });
+      return Promise.reject(new Error(response.data.msg || "axios出错啦"));
+    }
   },
   (error) => {
     loadingInstance.close();

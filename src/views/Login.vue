@@ -69,10 +69,8 @@
     password: passwordRule,
   };
 
-  const handleLogin = async () => {
-    if (!loginFormRef.value) return;
-
-    await loginFormRef.value.validate(async (valid) => {
+  const handleLogin = () => {
+    loginFormRef.value?.validate(async (valid) => {
       if (valid) {
         loading.value = true;
         try {
@@ -101,7 +99,7 @@
         } finally {
           loading.value = false;
         }
-      } else debugLog("表单验证失败");
+      }
     });
   };
 </script>

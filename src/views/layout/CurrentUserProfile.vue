@@ -113,8 +113,7 @@
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
-      :reQueryFun="reQueryFun"
-      :submitFun="submitFun"
+      :submitForm="submitForm"
       class="pb-0 overflow-hidden">
       <el-form
         :model="passwordForm"
@@ -152,7 +151,6 @@
     editUserProfile,
     getUserProfile,
   } from "@/api/system/userProfile/userProfile";
-  import router from "@/router/router";
   import { useAuthStore } from "@/stores/auth";
   import { UserProFile } from "@/types/system/userProfile/userProfile";
   import { debugLog } from "@/utils/debug";
@@ -216,7 +214,7 @@
           const res = await editUserProfile(userProfileForm);
           debugLog("更新个人信息=>", res);
           if (res.code === 200) {
-            ElMessage.success("更新个人信息成功,部分信息需要重新登录");
+            ElMessage.success("更新个人信息成功,部分信息生效需重新登录");
             getCurrentUserProfileFun();
             isEditing.value = false;
           }
@@ -237,12 +235,7 @@
   // 修改密码----------------------
   const A_EVisible = ref(false);
   const A_ETitle = ref("修改密码");
-  const reQueryFun = () => {
-    ElMessage.success("修改成功,请重新登录");
-    const authStore = useAuthStore();
-    authStore.logout();
-    router.push({ name: "Login" });
-  };
+
   const passwordForm = ref({
     oldPassword: "",
     newPassword: "",
@@ -264,19 +257,6 @@
       },
     ],
   };
-  const submitFun = async () => {
-    if (!passwordFormRef.value) return;
-
-    await passwordFormRef.value.validate(async (valid: boolean) => {
-      if (valid) {
-        const res = await updatePwd({
-          oldPassword: passwordForm.value.oldPassword,
-          newPassword: passwordForm.value.newPassword,
-        });
-        debugLog("修改密码=>", res);
-      } else return false;
-    });
-  };
   const toEditPwdFun = () => {
     A_EVisible.value = true;
     passwordForm.value = {
@@ -285,5 +265,18 @@
       confirmPassword: "",
     };
     passwordFormRef.value?.resetFields();
+  };
+  const submitForm = () => {
+    passwordFormRef.value?.validate(async (valid: boolean) => {
+      if (valid) {
+        const res = await updatePwd(passwordForm.value);
+        debugLog("修改密码=>", res);
+        if (res.code === 200) {
+          ElMessage.success("修改成功,请重新登录");
+          const authStore = useAuthStore();
+          authStore.logout();
+        }
+      }
+    });
   };
 </script>

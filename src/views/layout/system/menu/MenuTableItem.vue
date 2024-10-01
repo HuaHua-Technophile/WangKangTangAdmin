@@ -107,7 +107,7 @@
     fetchMenuList: () => void;
   }>();
 
-  // 编辑
+  // 表单
   const A_EVisible = defineModel<boolean>("A_EVisible");
   const A_ETitle = defineModel<string>("A_ETitle");
   const isAdd = defineModel<boolean>("isAdd");
@@ -116,24 +116,41 @@
   const A_EForm = defineModel<MenuItem>("A_EForm");
   const MenuTreeSelect = defineModel<MenuTreeItem[]>("MenuTreeSelect");
 
-  // 编辑------------------
+  // 切换编辑状态------------------
   const toEditMenu = async (row: MenuItem) => {
     A_EVisible.value = true;
     A_ETitle.value = "修改菜单";
     isAdd.value = false;
     A_EFun.value = editMenu;
     debugLog("点击了这一行=>", row);
-    A_EForm.value = reactive({ ...row });
+    A_EForm.value = reactive<MenuItem>({
+      menuId: row.menuId,
+      menuName: row.menuName,
+      parentId: row.parentId,
+      orderNum: row.orderNum,
+      path: row.path,
+      component: row.component,
+      routeName: row.routeName,
+      isFrame: row.isFrame,
+      isCache: row.isCache,
+      menuType: row.menuType, //M目录 C菜单  F按钮
+      visible: row.visible, //0显示 1隐藏
+      status: row.status, //0正常 1停用
+      icon: row.icon, //图标
+    });
     const res = (await getMenuTreeSelect()).data;
     MenuTreeSelect.value = await formatTreeSelect(res);
     debugLog("下拉树菜单列表=>", res, "格式化后=>", MenuTreeSelect.value);
   };
 
-  // 删除-------------------
+  // 直接删除-------------------
   const toDelMenu = (row: MenuItem) => {
-    elMessageBoxConfirm(`删除菜单,ID:${row.menuId}`, async () => {
-      if (row.menuId !== undefined) await delMenu(row.menuId);
-      props.fetchMenuList();
-    });
+    elMessageBoxConfirm(
+      `删除菜单:${row.menuName} , ID:${row.menuId}`,
+      async () => {
+        if (row.menuId !== undefined) await delMenu(row.menuId);
+        props.fetchMenuList();
+      }
+    );
   };
 </script>

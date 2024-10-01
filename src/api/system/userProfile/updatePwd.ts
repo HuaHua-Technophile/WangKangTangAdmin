@@ -2,7 +2,7 @@
 
 import { customRequest } from "@/api/instance";
 
-export const updatePwd = (data: {
+export const updatePwd = (params: {
   oldPassword: string;
   newPassword: string;
 }) => {
@@ -10,7 +10,7 @@ export const updatePwd = (data: {
     {
       url: "/system/user/profile/updatePwd",
       method: "PUT",
-      data,
+      params,
     },
     "修改密码"
   );

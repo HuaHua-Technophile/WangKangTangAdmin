@@ -78,8 +78,7 @@
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
-      :reQueryFun="fetchMenuList"
-      :submitFun="submitFun"
+      :submitForm="submitForm"
       :width="'550px'"
       class="pb-0 overflow-hidden">
       <template #headerBtn>
@@ -174,7 +173,7 @@
   import { AxiosResponse } from "axios";
   import { getMenuTreeSelect } from "@/api/system/menu/treeselect";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
-  import { FormInstance } from "element-plus";
+  import { ElMessage, FormInstance } from "element-plus";
 
   // 请求菜单列表-----------
   const menuTree = ref();
@@ -282,17 +281,18 @@
   };
   const A_EFormRef = ref<FormInstance>();
 
-  const submitFun = async (): Promise<boolean> => {
-    if (!A_EFormRef.value) return false;
-
-    try {
-      await A_EFormRef.value.validate();
-      const res = await A_EFun(A_EForm);
-      debugLog(`${A_ETitle.value}结果`, res);
-      return true; // 提交成功
-    } catch (error) {
-      return false; // 提交失败
-    }
+  const submitForm = () => {
+    A_EFormRef.value?.validate(async (valid: boolean) => {
+      if (valid) {
+        const res = await A_EFun(A_EForm);
+        debugLog(`${A_ETitle.value}结果`, res);
+        if (res.code === 200) {
+          A_EVisible.value = false;
+          ElMessage.success(`${A_ETitle.value}成功`);
+          fetchMenuList();
+        }
+      }
+    });
   };
 </script>
 <style lang="scss" scoped></style>
