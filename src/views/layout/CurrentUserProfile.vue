@@ -25,6 +25,26 @@
           <el-image
             style="width: 300px; height: 300px"
             :src="currentUserProfile.avatar" />
+          <el-upload
+            ref="upload"
+            v-model:file-list="fileList"
+            :auto-upload="false"
+            :limit="1"
+            accept=".jpg,.jpeg,.png,.webp,.gif"
+            :before-upload="beforeAvatarUpload"
+            :http-request="customUpload">
+            <template #trigger>
+              <el-button v-if="!fileList.length" type="primary"
+                >修改头像(2MB)</el-button
+              >
+            </template>
+            <el-button
+              v-if="fileList.length"
+              type="primary"
+              @click="upload?.submit()"
+              >确认上传</el-button
+            >
+          </el-upload>
         </el-descriptions-item>
         <el-descriptions-item
           label="用户名"
@@ -151,11 +171,19 @@
     editUserProfile,
     getUserProfile,
   } from "@/api/system/userProfile/userProfile";
+  import { userProfileAvatar } from "@/api/system/userProfile/userProfileAvatar";
   import { useAuthStore } from "@/stores/auth";
   import { UserProFile } from "@/types/system/userProfile/userProfile";
   import { debugLog } from "@/utils/debug";
   import { passwordRule } from "@/utils/passwordRules";
-  import { ElMessage, FormInstance } from "element-plus";
+  import {
+    ElMessage,
+    FormInstance,
+    UploadInstance,
+    UploadProps,
+    UploadRequestOptions,
+    UploadUserFile,
+  } from "element-plus";
   import { computed, onMounted, reactive, ref } from "vue";
 
   // 获取个人信息-------------------
@@ -278,5 +306,25 @@
         }
       }
     });
+  };
+
+  // 上传头像-----------------------
+  const upload = ref<UploadInstance>();
+  const fileList = ref<UploadUserFile[]>([]);
+
+  const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
+    debugLog("选择的文件=>", rawFile);
+    if (!rawFile.type.startsWith("image/")) {
+      ElMessage.error("格式必须为图片");
+      return false;
+    } else if (rawFile.size / 1024 / 1024 > 2) {
+      ElMessage.error("文件体积不能超出2MB!");
+      return false;
+    }
+    return true;
+  };
+  const customUpload = async (options: UploadRequestOptions) => {
+    const res = await userProfileAvatar(options.file);
+    debugLog("上传头像结果=>", res);
   };
 </script>
