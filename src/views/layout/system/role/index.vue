@@ -1,1 +1,2 @@
-<template>角色</template>
+<template></template>
+<script lang="ts" setup></script>

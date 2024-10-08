@@ -313,7 +313,7 @@
   const fileList = ref<UploadUserFile[]>([]);
 
   const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
-    debugLog("选择的文件=>", rawFile);
+    debugLog("选择的头像文件=>", rawFile);
     if (!rawFile.type.startsWith("image/")) {
       ElMessage.error("格式必须为图片");
       return false;

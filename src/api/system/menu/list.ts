@@ -4,7 +4,7 @@ import { MenuItem } from "@/types/system/menu/menu";
 // 定义接口请求的参数类型
 interface GetMenuListParams {
   menuName?: string; // 可选参数
-  menuType?: string; // 可选参数
+  menuType?: "M" | "C" | "F"; //M目录 C菜单  F按钮;
   orderNum?: number; // 可选参数
 }
 

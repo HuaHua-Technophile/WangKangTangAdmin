@@ -102,6 +102,7 @@
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
   import { AxiosResponse } from "axios";
+  import { ElMessage } from "element-plus";
   import { reactive } from "vue";
   const props = defineProps<{
     fetchMenuList: () => void;
@@ -148,8 +149,12 @@
     elMessageBoxConfirm(
       `删除菜单:${row.menuName} , ID:${row.menuId}`,
       async () => {
-        if (row.menuId !== undefined) await delMenu(row.menuId);
-        props.fetchMenuList();
+        if (row.menuId) {
+          const res = await delMenu(row.menuId);
+          debugLog("删除菜单结果=>", res);
+          if (res.code === 200) props.fetchMenuList();
+          else ElMessage.error(res.msg);
+        }
       }
     );
   };

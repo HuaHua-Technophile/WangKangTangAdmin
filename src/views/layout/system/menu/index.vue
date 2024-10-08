@@ -11,10 +11,12 @@
           clearable />
       </el-form-item>
       <el-form-item label="菜单类型">
-        <el-input
-          v-model="queryParams.menuType"
-          placeholder="请输入菜单类型"
-          clearable />
+        <el-radio-group v-model="queryParams.menuType">
+          <el-radio :value="undefined">全部</el-radio>
+          <el-radio :value="'M'">目录</el-radio>
+          <el-radio :value="'C'">菜单</el-radio>
+          <el-radio :value="'F'">按钮</el-radio>
+        </el-radio-group>
       </el-form-item>
       <el-form-item label="排序号">
         <el-input-number
@@ -178,8 +180,8 @@
   // 请求菜单列表-----------
   const menuTree = ref();
   const queryParams = ref({
-    menuName: "",
-    menuType: "",
+    menuName: undefined,
+    menuType: undefined,
     orderNum: undefined,
   });
   const buildTree = (items: MenuItem[]) => {
