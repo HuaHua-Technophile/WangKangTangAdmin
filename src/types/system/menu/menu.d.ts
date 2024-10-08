@@ -25,3 +25,8 @@ export interface MenuTreeItem {
   value: number;
   children?: MenuTreeItem[];
 }
+export interface GetMenuListParams {
+  menuName?: string; // 可选参数
+  menuType: "" | "M" | "C" | "F"; //M目录 C菜单  F按钮;
+  orderNum?: number; // 可选参数
+}

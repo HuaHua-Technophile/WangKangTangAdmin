@@ -12,7 +12,7 @@
       </el-form-item>
       <el-form-item label="菜单类型">
         <el-radio-group v-model="queryParams.menuType">
-          <el-radio :value="undefined">全部</el-radio>
+          <el-radio :value="''">全选</el-radio>
           <el-radio :value="'M'">目录</el-radio>
           <el-radio :value="'C'">菜单</el-radio>
           <el-radio :value="'F'">按钮</el-radio>
@@ -166,7 +166,11 @@
 </template>
 <script lang="ts" setup>
   import { getMenuList } from "@/api/system/menu/list";
-  import { MenuItem, MenuTreeItem } from "@/types/system/menu/menu";
+  import {
+    GetMenuListParams,
+    MenuItem,
+    MenuTreeItem,
+  } from "@/types/system/menu/menu";
   import { debugLog } from "@/utils/debug";
   import { onMounted, reactive, ref, toRaw } from "vue";
   import { addMenu } from "@/api/system/menu/menu";
@@ -179,9 +183,9 @@
 
   // 请求菜单列表-----------
   const menuTree = ref();
-  const queryParams = ref({
+  const queryParams = ref<GetMenuListParams>({
     menuName: undefined,
-    menuType: undefined,
+    menuType: "",
     orderNum: undefined,
   });
   const buildTree = (items: MenuItem[]) => {
