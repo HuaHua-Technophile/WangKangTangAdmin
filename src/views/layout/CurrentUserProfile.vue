@@ -24,13 +24,16 @@
           :align="'center'">
           <el-image
             style="width: 300px; height: 300px"
-            :src="currentUserProfile.avatar" />
+            :src="baseUrl + currentUserProfile.avatar"
+            :preview-src-list="[baseUrl + currentUserProfile.avatar]"
+            :hide-on-click-modal="true"
+            :preview-teleported="true" />
           <el-upload
             ref="upload"
             v-model:file-list="fileList"
             :auto-upload="false"
             :limit="1"
-            accept=".jpg,.jpeg,.png,.webp,.gif"
+            accept=".jpg,.jpeg,.png,.gif.bmp"
             :before-upload="beforeAvatarUpload"
             :http-request="customUpload">
             <template #trigger>
@@ -309,6 +312,7 @@
   };
 
   // 上传头像-----------------------
+  const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
   const upload = ref<UploadInstance>();
   const fileList = ref<UploadUserFile[]>([]);
 
@@ -326,5 +330,9 @@
   const customUpload = async (options: UploadRequestOptions) => {
     const res = await userProfileAvatar(options.file);
     debugLog("上传头像结果=>", res);
+    if (res.code === 200) {
+      ElMessage.success("上传成功,退出后重新登陆生效");
+      getCurrentUserProfileFun();
+    } else ElMessage.error(res.msg);
   };
 </script>

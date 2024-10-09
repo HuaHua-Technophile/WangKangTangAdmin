@@ -52,7 +52,7 @@
         <!-- 用户信息/退出登录 -->
         <el-dropdown class="me-5 h-100">
           <div class="px-2 d-flex align-items-center">
-            <el-avatar :size="35" :src="avatar" />
+            <el-avatar :size="35" :src="baseUrl + userInfo?.user?.avatar" />
             <span class="fw-bold ms-2">{{ userInfo?.user?.nickName }}</span>
           </div>
           <template #dropdown>
@@ -94,8 +94,9 @@
 
   const authStore = useAuthStore();
   // 用户信息不持久化存储--------------------
+  const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+
   const userInfo = ref();
-  import avatar from "@/assets/images/TestLogo.webp"; // 使用 require
   onMounted(async () => {
     userInfo.value = await getInfo();
     debugLog("用户信息=>", toRaw(userInfo.value));
