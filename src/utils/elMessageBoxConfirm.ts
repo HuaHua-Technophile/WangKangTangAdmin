@@ -1,7 +1,7 @@
 import { ElMessage, ElMessageBox } from "element-plus";
 
 export const elMessageBoxConfirm = (title: string, callback: () => void) => {
-  ElMessageBox.confirm(`确认${title}吗?`, {
+  ElMessageBox.confirm(`确认 ${title} 吗?`, {
     confirmButtonText: "确认",
     cancelButtonText: "取消",
     type: "warning",

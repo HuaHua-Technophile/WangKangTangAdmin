@@ -82,18 +82,14 @@
   <el-table-column label="操作">
     <template #default="scope">
       <div class="d-flex justify-content-between align-items-center">
-        <el-tooltip effect="light" content="编辑">
-          <Icon
-            icon="icon-bianji"
-            class="cursor-pointer"
-            @click="toEditMenu(scope.row)" />
-        </el-tooltip>
-        <el-tooltip effect="light" content="删除">
-          <Icon
-            icon="icon-shanchu"
-            class="cursor-pointer text-danger"
-            @click="toDelMenu(scope.row)" />
-        </el-tooltip>
+        <Icon
+          icon="icon-bianji"
+          class="cursor-pointer"
+          @click="toEditMenu(scope.row)" />
+        <Icon
+          icon="icon-shanchu"
+          class="cursor-pointer text-danger"
+          @click="toDelMenu(scope.row)" />
       </div>
     </template>
   </el-table-column>

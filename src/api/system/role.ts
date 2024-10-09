@@ -1,4 +1,5 @@
 import { customRequest } from "@/api/instance";
+import { MenuTreeItem } from "@/types/system/menu";
 import { GetRoleListParams, RoleItem } from "@/types/system/role";
 
 // 封装获取菜单列表的请求方法
@@ -40,6 +41,16 @@ export const delRole = (roleId: number) => {
       method: "DELETE", // 请求方法
       url: `/system/role/${roleId}`, // API 路径
     },
-    "删除角色"
+    `删除角色 ${roleId}`
+  ); // 调用二次封装的请求方法
+};
+
+export const getRoleMenuTreeselect = (roleId: number) => {
+  return customRequest(
+    {
+      method: "GET", // 请求方法
+      url: `/system/menu/roleMenuTreeselect/${roleId}`, // API 路径
+    },
+    `获取角色菜单 ${roleId}`
   ); // 调用二次封装的请求方法
 };

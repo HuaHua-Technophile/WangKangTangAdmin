@@ -71,26 +71,20 @@
       <el-table-column label="操作">
         <template #default="scope">
           <div class="d-flex justify-content-around align-items-center">
-            <el-tooltip effect="light" content="授权角色">
-              <div class="d-flex align-items-center cursor-pointer" @click="">
-                授权角色
-                <Icon
-                  icon="icon-riLine-contacts-line"
-                  class="fs-5 text-primary" />
-              </div>
-            </el-tooltip>
-            <el-tooltip effect="light" content="编辑">
+            <div class="d-flex align-items-center cursor-pointer" @click="">
+              授权角色
               <Icon
-                icon="icon-bianji"
-                class="cursor-pointer"
-                @click="toEditRole(scope.row)" />
-            </el-tooltip>
-            <el-tooltip effect="light" content="删除">
-              <Icon
-                icon="icon-shanchu"
-                class="cursor-pointer text-danger"
-                @click="toDelRole(scope.row)" />
-            </el-tooltip>
+                icon="icon-riLine-contacts-line"
+                class="fs-5 text-primary" />
+            </div>
+            <Icon
+              icon="icon-bianji"
+              class="cursor-pointer"
+              @click="toEditRole(scope.row)" />
+            <Icon
+              icon="icon-shanchu"
+              class="cursor-pointer text-danger"
+              @click="toDelRole(scope.row)" />
           </div>
         </template>
       </el-table-column>
@@ -140,7 +134,7 @@
             </el-radio-group>
           </el-form-item>
         </div>
-        <el-form-item label="授权菜单ID" prop="menuIds">
+        <el-form-item label="授权菜单ID" prop="menuIds" v-if="!isAdd">
           <el-tree-select
             v-model="A_EForm.menuIds"
             :data="menuTreeSelect"
@@ -153,8 +147,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { getMenuTreeSelect } from "@/api/system/menu";
-  import { addRole, delRole, editRole, getRoleList } from "@/api/system/role";
+  import {
+    addRole,
+    delRole,
+    editRole,
+    getRoleList,
+    getRoleMenuTreeselect,
+  } from "@/api/system/role";
   import { MenuTreeItem } from "@/types/system/menu";
   import { GetRoleListParams, RoleItem } from "@/types/system/role";
   import { debugLog } from "@/utils/debug";
@@ -190,7 +189,7 @@
     roleName: undefined,
     roleSort: undefined,
     status: "0",
-    menuIds: undefined,
+    menuIds: [],
   };
   let A_EForm: RoleItem;
   const menuTreeSelect = ref<MenuTreeItem[]>([]);
@@ -203,11 +202,11 @@
     roleSort: [{ required: true, message: "请输入排序", trigger: "blur" }],
   };
   let A_EFun: (data: RoleItem) => Promise<AxiosResponse>;
-  const fetchMenuTreeSelect = async () => {
-    const res = await getMenuTreeSelect();
-    debugLog("获取菜单树=>", res.data);
-    if (res.code === 200)
-      menuTreeSelect.value = await formatTreeSelect(res.data);
+  const fetchMenuTreeSelect = async (roleId: number) => {
+    const res = await getRoleMenuTreeselect(roleId);
+    debugLog("获取菜单树=>", res.menus);
+    if (res.code === 200 && res.menus)
+      menuTreeSelect.value = await formatTreeSelect(res.menus);
     else ElMessage.error(res.msg || "获取菜单树失败");
   };
   // 提交函数
@@ -231,7 +230,6 @@
     isAdd.value = true;
     A_EFun = addRole;
     A_EForm = reactive(defaultsForm);
-    await fetchMenuTreeSelect();
     A_EVisible.value = true;
   };
   // 修改角色--------------
@@ -248,7 +246,7 @@
       menuIds: row.menuIds,
     });
     A_EFun = editRole;
-    await fetchMenuTreeSelect();
+    if (row.roleId) await fetchMenuTreeSelect(row.roleId);
     A_EVisible.value = true;
   };
   // 删除角色--------------
