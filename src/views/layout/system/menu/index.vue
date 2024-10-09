@@ -51,7 +51,7 @@
                       v-model:isAdd="isAdd"
                       v-model:A_EFun="A_EFun"
                       v-model:A_EForm="A_EForm"
-                      v-model:MenuTreeSelect="MenuTreeSelect" />
+                      v-model:MenuTreeSelect="menuTreeSelect" />
                   </CustomMenuTable>
                 </div>
               </template>
@@ -63,7 +63,7 @@
               v-model:isAdd="isAdd"
               v-model:A_EFun="A_EFun"
               v-model:A_EForm="A_EForm"
-              v-model:MenuTreeSelect="MenuTreeSelect" />
+              v-model:MenuTreeSelect="menuTreeSelect" />
           </CustomMenuTable>
         </template>
       </el-table-column>
@@ -74,7 +74,7 @@
         v-model:isAdd="isAdd"
         v-model:A_EFun="A_EFun"
         v-model:A_EForm="A_EForm"
-        v-model:MenuTreeSelect="MenuTreeSelect" />
+        v-model:MenuTreeSelect="menuTreeSelect" />
     </CustomMenuTable>
     <!-- 添加/修改弹窗 -->
     <A_EDialog
@@ -116,7 +116,7 @@
         <el-form-item label="父菜单ID" prop="parentId">
           <el-tree-select
             v-model="A_EForm.parentId"
-            :data="MenuTreeSelect"
+            :data="menuTreeSelect"
             check-strictly
             :render-after-expand="false" />
         </el-form-item>
@@ -178,6 +178,7 @@
   import { AxiosResponse } from "axios";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
   import { ElMessage, FormInstance } from "element-plus";
+  import { validateNoChineseOrSpaces } from "@/utils/regularExpression";
 
   // 请求菜单列表-----------
   const menuTree = ref();
@@ -247,16 +248,7 @@
     status: "0", //0正常 1停用
     icon: "", //图标
   };
-  const validateNoChineseOrSpaces = (
-    _rule: any,
-    value: string,
-    callback: (arg0?: Error) => void
-  ) => {
-    const regex = /^[^\u4E00-\u9FFF\s]*$/; // 不能有中文和空格的正则表达式
-    if (value === "") callback(); // 允许空字符串通过
-    else if (!regex.test(value)) callback(new Error("不能包含中文和空格"));
-    else callback();
-  };
+
   const rules = {
     menuName: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
     orderNum: [{ required: true, message: "请输入排序", trigger: "blur" }],
@@ -268,7 +260,7 @@
     icon: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
   };
   let A_EForm: MenuItem;
-  const MenuTreeSelect = ref<MenuTreeItem[]>();
+  const menuTreeSelect = ref<MenuTreeItem[]>();
   let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
 
   // 提交修改/添加-------------
@@ -279,8 +271,8 @@
     A_EFun = addMenu;
     A_EForm = reactive(defaultsForm);
     const res = (await getMenuTreeSelect()).data;
-    MenuTreeSelect.value = await formatTreeSelect(res);
-    debugLog("下拉树菜单列表=>", res, "格式化后=>", MenuTreeSelect.value);
+    menuTreeSelect.value = await formatTreeSelect(res);
+    debugLog("下拉树菜单列表=>", res, "格式化后=>", menuTreeSelect.value);
   };
   const A_EFormRef = ref<FormInstance>();
 

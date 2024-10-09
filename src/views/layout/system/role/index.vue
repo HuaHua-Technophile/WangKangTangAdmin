@@ -114,10 +114,10 @@
         :rules="rules"
         v-if="A_EForm">
         <el-form-item label="权限字符" prop="roleKey">
-          <el-input v-model="A_EForm.roleKey" />
+          <el-input v-model="A_EForm.roleKey" maxlength="15" clearable />
         </el-form-item>
         <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="A_EForm.roleName" />
+          <el-input v-model="A_EForm.roleName" maxlength="10" clearable />
         </el-form-item>
         <el-form-item label="排序" prop="roleSort">
           <el-input-number
@@ -140,15 +140,27 @@
             </el-radio-group>
           </el-form-item>
         </div>
+        <el-form-item label="授权菜单ID" prop="menuIds">
+          <el-tree-select
+            v-model="A_EForm.menuIds"
+            :data="menuTreeSelect"
+            multiple
+            :render-after-expand="false"
+            show-checkbox />
+        </el-form-item>
       </el-form>
     </A_EDialog>
   </div>
 </template>
 <script lang="ts" setup>
+  import { getMenuTreeSelect } from "@/api/system/menu";
   import { addRole, delRole, editRole, getRoleList } from "@/api/system/role";
+  import { MenuTreeItem } from "@/types/system/menu";
   import { GetRoleListParams, RoleItem } from "@/types/system/role";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
+  import { formatTreeSelect } from "@/utils/formatTreeSelect";
+  import { validateNoChineseOrSpaces } from "@/utils/regularExpression";
   import { AxiosResponse } from "axios";
   import { ElMessage, FormInstance } from "element-plus";
   import { onMounted, reactive, ref } from "vue";
@@ -178,15 +190,26 @@
     roleName: undefined,
     roleSort: undefined,
     status: "0",
+    menuIds: undefined,
   };
   let A_EForm: RoleItem;
+  const menuTreeSelect = ref<MenuTreeItem[]>([]);
   const rules = {
-    roleKey: [{ required: true, message: "请输入权限支付", trigger: "blur" }],
+    roleKey: [
+      { required: true, message: "请输入权限字符", trigger: "blur" },
+      { validator: validateNoChineseOrSpaces, trigger: "blur" },
+    ],
     roleName: [{ required: true, message: "请输入角色名称", trigger: "blur" }],
     roleSort: [{ required: true, message: "请输入排序", trigger: "blur" }],
   };
   let A_EFun: (data: RoleItem) => Promise<AxiosResponse>;
-
+  const fetchMenuTreeSelect = async () => {
+    const res = await getMenuTreeSelect();
+    debugLog("获取菜单树=>", res.data);
+    if (res.code === 200)
+      menuTreeSelect.value = await formatTreeSelect(res.data);
+    else ElMessage.error(res.msg || "获取菜单树失败");
+  };
   // 提交函数
   const A_EFormRef = ref<FormInstance>();
   const submitForm = async () => {
@@ -204,11 +227,12 @@
   };
   // 添加角色---------------
   const toAddRole = async () => {
-    A_EVisible.value = true;
     A_ETitle.value = "添加角色";
     isAdd.value = true;
     A_EFun = addRole;
     A_EForm = reactive(defaultsForm);
+    await fetchMenuTreeSelect();
+    A_EVisible.value = true;
   };
   // 修改角色--------------
   const toEditRole = async (row: RoleItem) => {
@@ -221,9 +245,11 @@
       roleSort: row.roleSort,
       status: row.status,
       admin: row.admin,
+      menuIds: row.menuIds,
     });
-    A_EVisible.value = true;
     A_EFun = editRole;
+    await fetchMenuTreeSelect();
+    A_EVisible.value = true;
   };
   // 删除角色--------------
   const toDelRole = (row: RoleItem) => {

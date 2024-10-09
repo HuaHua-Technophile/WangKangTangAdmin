@@ -28,7 +28,7 @@ export const editRole = (data: RoleItem) => {
   return customRequest(
     {
       method: "PUT", // 请求方法
-      url: "/system/role/edit", // API 路径
+      url: "/system/role", // API 路径
       data, // 将参数传递给请求
     },
     "修改角色"
