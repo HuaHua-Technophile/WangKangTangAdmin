@@ -169,14 +169,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { updatePwd } from "@/api/system/userProfile/updatePwd";
   import {
     editUserProfile,
     getUserProfile,
-  } from "@/api/system/userProfile/userProfile";
-  import { userProfileAvatar } from "@/api/system/userProfile/userProfileAvatar";
+    updatePwd,
+    userProfileAvatar,
+  } from "@/api/system/userProfile";
   import { useAuthStore } from "@/stores/auth";
-  import { UserProFile } from "@/types/system/userProfile/userProfile";
+  import { UserProFile } from "@/types/userProfile";
   import { debugLog } from "@/utils/debug";
   import { passwordRule } from "@/utils/passwordRules";
   import {

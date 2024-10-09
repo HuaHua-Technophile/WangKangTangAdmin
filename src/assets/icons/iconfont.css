@@ -9,6 +9,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.icon-riLine-contacts-line:before {
+  content: "\e614";
+}
+
 .icon-shouye:before {
   content: "\e616";
 }

@@ -1,4 +1,4 @@
-import { MenuTreeItem } from "@/types/system/menu/menu";
+import { MenuTreeItem } from "@/types/system/menu";
 
 export const formatTreeSelect = (data: MenuTreeItem[]) => {
   return Promise.resolve([

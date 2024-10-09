@@ -82,22 +82,25 @@
   <el-table-column label="操作">
     <template #default="scope">
       <div class="d-flex justify-content-between align-items-center">
-        <Icon
-          icon="icon-bianji"
-          class="cursor-pointer"
-          @click="toEditMenu(scope.row)" />
-        <Icon
-          icon="icon-shanchu"
-          class="cursor-pointer text-danger"
-          @click="toDelMenu(scope.row)" />
+        <el-tooltip effect="light" content="编辑">
+          <Icon
+            icon="icon-bianji"
+            class="cursor-pointer"
+            @click="toEditMenu(scope.row)" />
+        </el-tooltip>
+        <el-tooltip effect="light" content="删除">
+          <Icon
+            icon="icon-shanchu"
+            class="cursor-pointer text-danger"
+            @click="toDelMenu(scope.row)" />
+        </el-tooltip>
       </div>
     </template>
   </el-table-column>
 </template>
 <script lang="ts" setup>
-  import { delMenu, editMenu } from "@/api/system/menu/menu";
-  import { getMenuTreeSelect } from "@/api/system/menu/treeselect";
-  import { MenuItem, MenuTreeItem } from "@/types/system/menu/menu";
+  import { delMenu, editMenu, getMenuTreeSelect } from "@/api/system/menu";
+  import { MenuItem, MenuTreeItem } from "@/types/system/menu";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";

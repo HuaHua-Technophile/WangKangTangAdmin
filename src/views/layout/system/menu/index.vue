@@ -85,7 +85,7 @@
       class="pb-0 overflow-hidden">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
-          >ID:{{ idKey && A_EForm && A_EForm[idKey] }}</span
+          >ID:{{ A_EForm && A_EForm["menuId"] }}</span
         >
       </template>
       <el-form
@@ -165,19 +165,17 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { getMenuList } from "@/api/system/menu/list";
   import {
     GetMenuListParams,
     MenuItem,
     MenuTreeItem,
-  } from "@/types/system/menu/menu";
+  } from "@/types/system/menu";
   import { debugLog } from "@/utils/debug";
   import { onMounted, reactive, ref, toRaw } from "vue";
-  import { addMenu } from "@/api/system/menu/menu";
+  import { addMenu, getMenuTreeSelect, getMenuList } from "@/api/system/menu";
   import CustomMenuTable from "./CustomMenuTable.vue";
   import MenuTableItem from "./MenuTableItem.vue";
   import { AxiosResponse } from "axios";
-  import { getMenuTreeSelect } from "@/api/system/menu/treeselect";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
   import { ElMessage, FormInstance } from "element-plus";
 
@@ -270,7 +268,6 @@
     icon: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
   };
   let A_EForm: MenuItem;
-  const idKey = "menuId";
   const MenuTreeSelect = ref<MenuTreeItem[]>();
   let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
 
