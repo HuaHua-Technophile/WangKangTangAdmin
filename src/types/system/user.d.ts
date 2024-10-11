@@ -15,4 +15,5 @@ export interface UserItem {
   }[]; //所拥有的角色
   loginIp?: string;
   loginDate?: string;
+  status?: "0" | "1" | ""; //状态：0-正常，1-停用
 }

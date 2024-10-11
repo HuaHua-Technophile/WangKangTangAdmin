@@ -8,6 +8,6 @@ export const getInfo = () => {
       url: "/getInfo",
       method: "GET",
     },
-    "获取用户信息"
+    "获取个人信息"
   );
 };

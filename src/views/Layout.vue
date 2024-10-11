@@ -93,13 +93,13 @@
   import { computed, onMounted, ref, toRaw } from "vue";
 
   const authStore = useAuthStore();
-  // 用户信息不持久化存储--------------------
+  // 个人信息不持久化存储--------------------
   const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
 
   const userInfo = ref();
   onMounted(async () => {
     userInfo.value = await getInfo();
-    debugLog("用户信息=>", toRaw(userInfo.value));
+    debugLog("个人信息=>", toRaw(userInfo.value));
   });
 
   // 历史路由-----------------

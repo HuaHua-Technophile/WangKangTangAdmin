@@ -65,20 +65,7 @@
   <el-table-column label="权限" prop="perms" />
   <el-table-column label="排序" prop="orderNum" />
   <el-table-column label="子级" prop="children.length" />
-  <el-table-column label="更新时间">
-    <template #default="scope">
-      <!-- effect="light/dark"是反过来的  -->
-      <el-tooltip effect="light" placement="left">
-        <template #content>
-          更新: {{ scope.row.updateTime || "无" }} <br />创建:
-          {{ scope.row.createTime || "无" }}
-        </template>
-        <div>
-          {{ (scope.row.updateTime || scope.row.createTime).slice(5, 16) }}
-        </div>
-      </el-tooltip>
-    </template>
-  </el-table-column>
+  <DataTebleColumnTime />
   <el-table-column label="操作">
     <template #default="scope">
       <div class="d-flex justify-content-between align-items-center">

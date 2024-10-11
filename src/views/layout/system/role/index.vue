@@ -3,7 +3,7 @@
     <!-- 顶部查询表单/添加按钮 -->
     <el-form
       :model="queryParams"
-      class="flex-grow-1 d-flex justify-content-between align-items-center">
+      class="d-flex justify-content-between align-items-center">
       <el-form-item label="角色Key">
         <el-input
           v-model="queryParams.roleKey"
@@ -35,7 +35,7 @@
       :data="roleList"
       table-layout="auto"
       cell-class-name="text-center"
-      :header-cell-class-name="'text-center'">
+      header-cell-class-name="text-center">
       <el-table-column label="ID" prop="roleId" />
       <el-table-column label="权限字符串" prop="roleKey" />
       <el-table-column label="名称" prop="roleName" />

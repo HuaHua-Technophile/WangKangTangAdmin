@@ -1,4 +1,5 @@
 import { customRequest } from "@/api/instance";
+import { PaginationParams } from "@/types/pagination";
 import { MenuTreeItem } from "@/types/system/menu";
 import { GetRoleListParams, RoleItem } from "@/types/system/role";
 import { UserItem } from "@/types/system/user";
@@ -57,9 +58,7 @@ export const getRoleMenuTreeselect = (roleId: number) => {
     `获取角色已授权的菜单 ${roleId}`
   ); // 调用二次封装的请求方法
 };
-interface AuthUserListParams {
-  pageNum: number;
-  pageSize: number;
+interface AuthUserListParams extends PaginationParams {
   roleId: number;
 }
 export const getAuthUserUnallocatedList = (params: AuthUserListParams) => {
