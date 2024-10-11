@@ -176,7 +176,7 @@
     userProfileAvatar,
   } from "@/api/system/userProfile";
   import { useAuthStore } from "@/stores/auth";
-  import { UserProFile } from "@/types/userProfile";
+  import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
   import { passwordRule } from "@/utils/passwordRules";
   import {
@@ -190,7 +190,7 @@
   import { computed, onMounted, reactive, ref } from "vue";
 
   // 获取个人信息-------------------
-  const currentUserProfile = ref<UserProFile>();
+  const currentUserProfile = ref<UserItem>();
   const getCurrentUserProfileFun = async () => {
     const res = (await getUserProfile()).data;
     debugLog("个人信息=>", res);
@@ -209,7 +209,7 @@
 
   const isEditing = ref(false);
   const formRef = ref<FormInstance>();
-  const userProfileForm = reactive<UserProFile>({
+  const userProfileForm = reactive<UserItem>({
     userName: "",
     nickName: "",
     email: "",

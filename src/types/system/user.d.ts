@@ -1,4 +1,5 @@
-export interface UserProFile {
+export interface UserItem {
+  userId?: number;
   admin?: boolean; //是否管理员
   avatar?: string; //头像
   createTime?: string; //创建时间

@@ -1,10 +1,10 @@
 // src/api/system/userProfile.ts
 
 import { customRequest } from "@/api/instance";
-import { UserProFile } from "@/types/userProfile";
+import { UserItem } from "@/types/system/user";
 
 export const getUserProfile = () => {
-  return customRequest<UserProFile>(
+  return customRequest<UserItem>(
     {
       url: "/system/user/profile",
       method: "GET",
@@ -13,7 +13,7 @@ export const getUserProfile = () => {
   );
 };
 
-export const editUserProfile = (data: UserProFile) => {
+export const editUserProfile = (data: UserItem) => {
   return customRequest(
     {
       url: "/system/user/profile",
