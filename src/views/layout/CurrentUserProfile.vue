@@ -178,7 +178,7 @@
   import { useAuthStore } from "@/stores/auth";
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
-  import { passwordRule } from "@/utils/formRegularExpression";
+  import { passwordRule, userNameRule } from "@/utils/formRegularExpression";
   import {
     ElMessage,
     FormInstance,
@@ -217,10 +217,7 @@
     sex: "1",
   });
   const profileRules = {
-    userName: [
-      { required: true, message: "请输入用户名", trigger: "blur" },
-      { min: 3, max: 12, message: "长度在3~12个字符", trigger: "blur" },
-    ],
+    userName: userNameRule,
     email: [
       { required: true, message: "请输入邮箱地址", trigger: "blur" },
       {

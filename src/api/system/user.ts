@@ -54,3 +54,18 @@ export const delUser = (userIds: number[]) => {
     `删除用户 ${userIds}`
   ); // 调用二次封装的请求方法
 };
+
+// 重置密码 /system/user/resetPwd
+export const userResetPwd = (userId: number) => {
+  return customRequest(
+    {
+      method: "PUT", // 请求方法
+      url: `/system/user/resetPwd`, // API 路径
+      data: {
+        userId,
+        password: 123456,
+      },
+    },
+    `重置用户密码`
+  ); // 调用二次封装的请求方法
+};

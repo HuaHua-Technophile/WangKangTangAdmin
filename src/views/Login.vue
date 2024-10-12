@@ -12,7 +12,6 @@
         <el-form-item label="用户名" prop="username">
           <el-input
             v-model.trim="loginForm.username"
-            maxlength="12"
             clearable
             @keyup.enter="handleLogin"
             placeholder="请输入用户名"></el-input>
@@ -20,7 +19,6 @@
         <el-form-item label="密码" prop="password">
           <el-input
             v-model.trim="loginForm.password"
-            maxlength="20"
             clearable
             @keyup.enter="handleLogin"
             type="password"
@@ -47,10 +45,10 @@
   import { useRoute } from "vue-router";
   import { useAuthStore } from "@/stores/auth";
   import { login } from "@/api/login"; // 引入登录 API
-  import { debugError, debugLog } from "@/utils/debug";
+  import { debugLog } from "@/utils/debug";
   import { getRouters } from "@/api/routes";
   import router from "@/router/router";
-  import { passwordRule } from "@/utils/formRegularExpression";
+  import { passwordRule, userNameRule } from "@/utils/formRegularExpression";
 
   const route = useRoute(); // 使用 useRoute 获取当前路由信息
   const loginFormRef = ref<FormInstance>();
@@ -58,14 +56,11 @@
 
   const loginForm = reactive({
     username: "admin",
-    password: "admin123",
+    password: "123456",
   });
 
   const rules = {
-    username: [
-      { required: true, message: "请输入用户名", trigger: "blur" },
-      { min: 3, max: 12, message: "长度在3~12个字符", trigger: "blur" },
-    ],
+    username: userNameRule,
     password: passwordRule,
   };
 

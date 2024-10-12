@@ -108,10 +108,10 @@
         :rules="rules"
         v-if="A_EForm">
         <el-form-item label="权限字符" prop="roleKey">
-          <el-input v-model="A_EForm.roleKey" maxlength="15" clearable />
+          <el-input v-model="A_EForm.roleKey" clearable />
         </el-form-item>
         <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="A_EForm.roleName" maxlength="10" clearable />
+          <el-input v-model="A_EForm.roleName" clearable />
         </el-form-item>
         <el-form-item label="排序" prop="roleSort">
           <el-input-number
@@ -197,6 +197,7 @@
   import { ElMessage, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, toRaw } from "vue";
   import UserListTable from "./UserListTable.vue";
+
   // 请求角色列表-----------
   const roleList = ref<RoleItem[]>([]);
   const queryParams = ref<GetRoleListParams>({
@@ -229,9 +230,17 @@
   const rules = {
     roleKey: [
       { required: true, message: "请输入权限字符", trigger: "blur" },
+      { max: 15, message: "权限字符长度不能超过15个字符", trigger: "blur" },
       { validator: validateNoChineseOrSpaces, trigger: "blur" },
     ],
-    roleName: [{ required: true, message: "请输入角色名称", trigger: "blur" }],
+    roleName: [
+      { required: true, message: "请输入角色名称", trigger: "blur" },
+      {
+        max: 10,
+        message: "角色名称长度不能超过10个字符",
+        trigger: "blur",
+      },
+    ],
     roleSort: [{ required: true, message: "请输入排序", trigger: "blur" }],
   };
   let A_EFun: (data: RoleItem) => Promise<AxiosResponse>;

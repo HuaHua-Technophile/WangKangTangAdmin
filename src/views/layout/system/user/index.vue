@@ -144,9 +144,10 @@
           <el-input
             v-model="A_EForm.phonenumber"
             placeholder="请输入手机号码"
-            clearable />
+            clearable
+            maxlength="11" />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item label="密码" prop="password" v-if="isAdd">
           <el-input
             v-model="A_EForm.password"
             placeholder="密码为6~20位数,不能包含空格与中文"
@@ -154,7 +155,7 @@
             type="password"
             show-password />
         </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
+        <el-form-item label="确认密码" prop="confirmPassword" v-if="isAdd">
           <el-input
             v-model="A_EForm.confirmPassword"
             placeholder="请再次输入密码"
@@ -175,6 +176,11 @@
               <el-radio :value="'1'">停用</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-form-item v-if="A_EForm.userId">
+            <el-button @click="toResetPassword(A_EForm.userId)">
+              重置密码</el-button
+            >
+          </el-form-item>
         </div>
       </el-form>
     </A_EDialog>
@@ -182,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, onMounted, computed } from "vue";
+  import { ref, reactive, onMounted } from "vue";
   import { ElMessage, FormInstance, FormRules } from "element-plus";
   import {
     addUser,
@@ -190,16 +196,14 @@
     editUser,
     getUserList,
     UserQueryParams,
+    userResetPwd,
   } from "@/api/system/user";
   import { UserFormData, UserItem } from "@/types/system/user";
   import { PaginationParams } from "@/types/pagination";
   import { debugLog } from "@/utils/debug";
   import { formatToReadableDate } from "@/utils/formatToReadableDate";
   import { AxiosResponse } from "axios";
-  import {
-    passwordRule,
-    validateNoChineseOrSpaces,
-  } from "@/utils/formRegularExpression";
+  import { passwordRule, userNameRule } from "@/utils/formRegularExpression";
   import { cloneDeep } from "lodash";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
 
@@ -263,16 +267,10 @@
     status: "0",
   };
   let A_EForm: UserFormData;
-  let A_EFun: (
-    data: Omit<UserItem, "confirmPassword">
-  ) => Promise<AxiosResponse>;
+  let A_EFun: (data: UserItem) => Promise<AxiosResponse>;
 
-  const rules = computed<FormRules>(() => ({
-    userName: [
-      { required: true, message: "请输入用户名", trigger: "blur" },
-      { validator: validateNoChineseOrSpaces, trigger: "blur" },
-      { min: 3, max: 12, message: "用户名长度在3~12个字符", trigger: "blur" },
-    ],
+  const rules: FormRules = {
+    userName: userNameRule,
     nickName: [{ required: true, message: "请输入昵称", trigger: "blur" }],
     email: [
       { required: true, message: "请输入邮箱地址", trigger: "blur" },
@@ -290,15 +288,13 @@
         trigger: "blur",
       },
     ],
-    password: [
-      ...passwordRule.map((rule) => {
-        return rule.required !== undefined
-          ? { ...rule, required: isAdd.value }
-          : rule;
-      }),
-    ],
+    password: passwordRule,
     confirmPassword: [
-      { required: isAdd.value, message: "请再次输入密码", trigger: "blur" },
+      {
+        required: true,
+        message: "请再次输入密码",
+        trigger: "blur",
+      },
       {
         validator: (
           _rule: any,
@@ -316,23 +312,15 @@
     ],
     sex: [{ required: true, message: "请选择性别", trigger: "change" }],
     status: [{ required: true, message: "请选择状态", trigger: "change" }],
-  }));
+  };
 
   // 提交表单--------------------------
   const A_EFormRef = ref<FormInstance>();
-  interface SubmitData extends Omit<UserItem, "confirmPassword"> {
-    password?: string;
-  }
+
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
-        // 剔除 confirmPassword
-        const { confirmPassword, password, ...rest } = A_EForm;
-        const submitData: SubmitData = { ...rest };
-        // 仅在添加用户时传递密码
-        if (isAdd.value || password) submitData.password = password;
-
-        const res = await A_EFun(submitData);
+        const res = await A_EFun(A_EForm);
         debugLog("提交表单结果=>", res);
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
@@ -367,8 +355,6 @@
       phonenumber: data.phonenumber,
       sex: data.sex,
       status: data.status,
-      password: "",
-      confirmPassword: "",
     });
     A_EVisible.value = true;
   };
@@ -399,5 +385,16 @@
         } else ElMessage.error(res.msg || "删除失败");
       }
     );
+  };
+
+  // 重置密码-----------------
+  const toResetPassword = (userId: number) => {
+    elMessageBoxConfirm(`重置 ID:${userId} 的密码为: 123456`, async () => {
+      const res = await userResetPwd(userId);
+      debugLog("重置密码结果=>", res);
+      if (res.code === 200) {
+        ElMessage.success("重置密码成功");
+      } else ElMessage.error(res.msg || "重置密码失败");
+    });
   };
 </script>
