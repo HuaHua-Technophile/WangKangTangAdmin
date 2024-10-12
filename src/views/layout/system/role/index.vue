@@ -95,9 +95,7 @@
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
-      :submitForm="submitForm"
-      :width="'550px'"
-      class="pb-0 overflow-hidden">
+      :submitForm="submitForm">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
           >ID:{{ A_EForm && A_EForm["roleId"] }}</span
@@ -194,7 +192,7 @@
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
-  import { validateNoChineseOrSpaces } from "@/utils/regularExpression";
+  import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
   import { AxiosResponse } from "axios";
   import { ElMessage, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, toRaw } from "vue";
@@ -219,7 +217,7 @@
   const isAdd = ref(true);
   const A_EVisible = ref(false);
   const A_ETitle = ref("");
-  const defaultsForm: RoleItem = {
+  const defaultForm: RoleItem = {
     roleKey: undefined,
     roleName: undefined,
     roleSort: undefined,
@@ -258,7 +256,7 @@
     A_ETitle.value = "添加角色";
     isAdd.value = true;
     A_EFun = addRole;
-    A_EForm = reactive(defaultsForm);
+    A_EForm = reactive(defaultForm);
     A_EVisible.value = true;
   };
   // 修改角色--------------

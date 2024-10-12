@@ -50,7 +50,7 @@
   import { debugError, debugLog } from "@/utils/debug";
   import { getRouters } from "@/api/routes";
   import router from "@/router/router";
-  import { passwordRule } from "@/utils/passwordRules";
+  import { passwordRule } from "@/utils/formRegularExpression";
 
   const route = useRoute(); // 使用 useRoute 获取当前路由信息
   const loginFormRef = ref<FormInstance>();
@@ -73,32 +73,27 @@
     loginFormRef.value?.validate(async (valid) => {
       if (valid) {
         loading.value = true;
-        try {
-          const response = await login(loginForm);
-          console.log("登录成功", response);
-          if (response.token) {
-            ElMessage.success("登录成功");
-            // 处理登录成功逻辑，例如存储 token 和跳转页面
-            const authStore = useAuthStore();
-            authStore.token = response.token;
+        const res = await login(loginForm);
+        debugLog("返回的登录结果=>", res); // 请求返回结果
+        if (res.code == 200 && res.token) {
+          ElMessage.success("登录成功");
+          // 处理登录成功逻辑，例如存储 token 和跳转页面
+          const authStore = useAuthStore();
+          authStore.token = res.token;
 
-            const routes = (await getRouters()).data;
-            debugLog("返回动态路由=>", routes); // 请求动态路由
-            authStore.dynamicRoutes = routes; // 存储动态路由
+          const routes = (await getRouters()).data;
+          debugLog("返回动态路由=>", routes); // 请求动态路由
+          authStore.dynamicRoutes = routes; // 存储动态路由
 
-            const redirectPath = route.query.redirect;
-            if (typeof redirectPath === "string") {
-              debugLog("登陆完毕，重定向回=>", redirectPath);
-              router.push(redirectPath);
-            }
-            //确保重定向路径是字符串时，跳转到指定页面
-            else router.push({ name: "Layout" }); // 否则默认重定向到Layout整体布局组件
-          } else ElMessage.error("登录失败，未返回数据");
-        } catch (error) {
-          debugError("登陆环节", error);
-        } finally {
-          loading.value = false;
-        }
+          const redirectPath = route.query.redirect;
+          if (typeof redirectPath === "string") {
+            debugLog("重定向回到=> ", redirectPath);
+            router.push(redirectPath);
+          }
+          //确保重定向路径是字符串时，跳转到指定页面
+          else router.push({ name: "Layout" }); // 否则默认重定向到Layout整体布局组件
+        } else ElMessage.error(res.msg);
+        loading.value = false;
       }
     });
   };

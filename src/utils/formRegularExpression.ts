@@ -8,3 +8,12 @@ export const validateNoChineseOrSpaces = (
   else if (!regex.test(value)) callback(new Error("不能包含中文和空格"));
   else callback();
 };
+
+export const passwordRule = [
+  { required: true, message: "请输入密码", trigger: "blur" },
+  { min: 6, max: 20, message: "密码长度为6~20个字符", trigger: "blur" },
+  {
+    validator: validateNoChineseOrSpaces,
+    trigger: "blur",
+  },
+];

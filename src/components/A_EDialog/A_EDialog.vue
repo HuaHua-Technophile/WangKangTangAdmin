@@ -4,7 +4,7 @@
     :title="A_ETitle"
     :width="width"
     :before-close="closeConfirmFun"
-    class="rounded-4"
+    class="rounded-4 pb-0 overflow-hidden"
     draggable
     center>
     <!-- 具名插槽 -->
@@ -27,7 +27,7 @@
       width?: string;
     }>(),
     {
-      width: "485px",
+      width: "550px",
     }
   );
 

@@ -17,3 +17,8 @@ export interface UserItem {
   loginDate?: string;
   status?: "0" | "1" | ""; //状态：0-正常，1-停用
 }
+// 扩展 UserItem 接口
+export interface UserFormData extends UserItem {
+  password?: string;
+  confirmPassword?: string;
+}

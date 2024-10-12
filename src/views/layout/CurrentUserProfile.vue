@@ -178,7 +178,7 @@
   import { useAuthStore } from "@/stores/auth";
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
-  import { passwordRule } from "@/utils/passwordRules";
+  import { passwordRule } from "@/utils/formRegularExpression";
   import {
     ElMessage,
     FormInstance,

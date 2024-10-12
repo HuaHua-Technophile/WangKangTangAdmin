@@ -80,9 +80,7 @@
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
-      :submitForm="submitForm"
-      :width="'550px'"
-      class="pb-0 overflow-hidden">
+      :submitForm="submitForm">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
           >ID:{{ A_EForm && A_EForm["menuId"] }}</span
@@ -178,7 +176,7 @@
   import { AxiosResponse } from "axios";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
   import { ElMessage, FormInstance } from "element-plus";
-  import { validateNoChineseOrSpaces } from "@/utils/regularExpression";
+  import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
 
   // 请求菜单列表-----------
   const menuTree = ref();
@@ -234,7 +232,7 @@
   const isAdd = ref(true);
 
   // 表单-----------
-  const defaultsForm: MenuItem = {
+  const defaultForm: MenuItem = {
     menuName: "",
     parentId: 0,
     orderNum: 0,
@@ -269,7 +267,7 @@
     A_ETitle.value = "添加菜单";
     isAdd.value = true;
     A_EFun = addMenu;
-    A_EForm = reactive(defaultsForm);
+    A_EForm = reactive(defaultForm);
     const res = (await getMenuTreeSelect()).data;
     menuTreeSelect.value = await formatTreeSelect(res);
     debugLog("下拉树菜单列表=>", res, "格式化后=>", menuTreeSelect.value);
