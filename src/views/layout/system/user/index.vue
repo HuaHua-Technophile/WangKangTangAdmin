@@ -102,7 +102,8 @@
       v-model:current-page="pagination.pageNum"
       v-model:page-size="pagination.pageSize"
       :total="total"
-      :page-sizes="[10, 15, 20, 30, 50]"
+      :page-sizes="[10, 13, 16, 19, 22, 25, 30, 50]"
+      layout=" prev, pager, next, jumper,->,sizes,total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       class="mt-3" />
@@ -321,7 +322,7 @@
         debugLog("提交表单结果=>", res);
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
-          A_EVisible.value = false;
+          // A_EVisible.value = false;
           fetchUserList();
         } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
       }

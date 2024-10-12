@@ -95,7 +95,8 @@
       background
       v-model:current-page="queryParams.pageNum"
       v-model:page-size="queryParams.pageSize"
-      :page-sizes="[10, 20, 50, 100]"
+      :page-sizes="[10, 13, 16, 19, 22, 25, 30, 50]"
+      layout=" prev, pager, next, jumper,->,sizes,total"
       :total="total"
       @current-change="handlePageChange"
       @size-change="handleSizeChange"
