@@ -4,29 +4,29 @@
     <el-form
       :model="queryParams"
       class="d-flex justify-content-between align-items-center">
-      <el-form-item label="角色Key">
-        <el-input
-          v-model="queryParams.roleKey"
-          placeholder="请输入角色Key"
-          clearable />
-      </el-form-item>
-      <el-form-item label="角色名称">
+      <el-form-item label="角色名称" class="mx-md-2 flex-grow-1">
         <el-input
           v-model="queryParams.roleName"
           placeholder="请输入角色名称"
           clearable />
       </el-form-item>
-      <el-form-item label="排序号">
-        <el-input-number
-          v-model.number="queryParams.roleSort"
-          :min="0"
-          :max="99"
-          placeholder="排序号" />
+      <el-form-item label="权限字符" class="mx-md-2 flex-grow-1">
+        <el-input
+          v-model="queryParams.roleKey"
+          placeholder="请输入角色Key"
+          clearable />
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="状态" class="mx-md-2">
+        <el-radio-group v-model="queryParams.status">
+          <el-radio :value="''">全部</el-radio>
+          <el-radio :value="'0'">正常</el-radio>
+          <el-radio :value="'1'">停用</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item class="mx-md-2">
         <el-button type="primary" @click="fetchRoleList">查询</el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="mx-md-2">
         <el-button type="primary" @click="toAddRole">添加角色</el-button>
       </el-form-item>
     </el-form>
@@ -91,6 +91,15 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      background
+      v-model:current-page="queryParams.pageNum"
+      v-model:page-size="queryParams.pageSize"
+      :page-sizes="[10, 20, 50, 100]"
+      :total="total"
+      @current-change="handlePageChange"
+      @size-change="handleSizeChange"
+      class="mt-3" />
     <!-- 添加/修改弹窗 -->
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
@@ -107,11 +116,11 @@
         label-width="auto"
         :rules="rules"
         v-if="A_EForm">
-        <el-form-item label="权限字符" prop="roleKey">
-          <el-input v-model="A_EForm.roleKey" clearable />
-        </el-form-item>
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="A_EForm.roleName" clearable />
+        </el-form-item>
+        <el-form-item label="权限字符" prop="roleKey">
+          <el-input v-model="A_EForm.roleKey" clearable />
         </el-form-item>
         <el-form-item label="排序" prop="roleSort">
           <el-input-number
@@ -201,18 +210,30 @@
   // 请求角色列表-----------
   const roleList = ref<RoleItem[]>([]);
   const queryParams = ref<GetRoleListParams>({
-    roleKey: undefined,
-    roleName: undefined,
-    roleSort: undefined,
+    status: "",
+    pageNum: 1,
+    pageSize: 10,
   });
   const fetchRoleList = async () => {
-    const res = (await getRoleList(queryParams.value)).rows;
+    const res = await getRoleList(queryParams.value);
     debugLog("获取角色列表=>", res);
-    if (res) roleList.value = res;
+    if (res.rows) roleList.value = res.rows;
+    if (res.total) total.value = res.total;
   };
   onMounted(() => {
     fetchRoleList();
   });
+  // 分页逻辑-----------
+  const total = ref(0);
+  const handlePageChange = (pageNum: number) => {
+    queryParams.value.pageNum = pageNum;
+    fetchRoleList();
+  };
+  const handleSizeChange = (pageSize: number) => {
+    queryParams.value.pageSize = pageSize;
+    queryParams.value.pageNum = 1; // 重置为第一页
+    fetchRoleList();
+  };
 
   // 添加/修改表单--------------
   const isAdd = ref(true);

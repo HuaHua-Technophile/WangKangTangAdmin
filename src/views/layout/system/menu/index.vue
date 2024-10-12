@@ -4,31 +4,23 @@
     <el-form
       :model="queryParams"
       class="flex-grow-1 d-flex justify-content-between align-items-center">
-      <el-form-item label="菜单名称">
+      <el-form-item label="菜单名称" class="flex-grow-1 mx-md-2">
         <el-input
           v-model="queryParams.menuName"
           placeholder="请输入菜单名称"
           clearable />
       </el-form-item>
-      <el-form-item label="菜单类型">
-        <el-radio-group v-model="queryParams.menuType">
-          <el-radio :value="''">全选</el-radio>
-          <el-radio :value="'M'">目录</el-radio>
-          <el-radio :value="'C'">菜单</el-radio>
-          <el-radio :value="'F'">按钮</el-radio>
+      <el-form-item label="状态" class="mx-md-2">
+        <el-radio-group v-model="queryParams.status">
+          <el-radio :value="''">全部</el-radio>
+          <el-radio :value="'0'">正常</el-radio>
+          <el-radio :value="'1'">停用</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="排序号">
-        <el-input-number
-          v-model.number="queryParams.orderNum"
-          :min="0"
-          :max="99"
-          placeholder="排序号" />
-      </el-form-item>
-      <el-form-item>
+      <el-form-item class="mx-md-2">
         <el-button type="primary" @click="fetchMenuList">查询</el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="mx-md-2">
         <el-button type="primary" @click="toAddMenu">添加菜单</el-button>
       </el-form-item>
     </el-form>
@@ -111,52 +103,78 @@
               placeholder="排序号" />
           </el-form-item>
         </div>
-        <el-form-item label="父菜单ID" prop="parentId">
+        <el-form-item label="上级目录" prop="parentId">
           <el-tree-select
             v-model="A_EForm.parentId"
             :data="menuTreeSelect"
             check-strictly
             :render-after-expand="false" />
         </el-form-item>
-        <el-form-item label="路径" prop="path">
+        <CustomFormItemTip
+          label="路由路径"
+          prop="path"
+          tip="访问的路由地址，如：`user`，如外网地址需内链访问则以`http(s)://`开头"
+          v-if="A_EForm.menuType !== 'F'">
           <el-input v-model="A_EForm.path" />
-        </el-form-item>
-        <el-form-item label="组件" prop="component">
+        </CustomFormItemTip>
+        <CustomFormItemTip
+          label="组件地址"
+          prop="component"
+          tip="访问的组件路径，如：`system/user/index`，默认在`views`目录下"
+          v-if="A_EForm.menuType !== 'F' && A_EForm.menuType !== 'M'">
           <el-input v-model="A_EForm.component" />
-        </el-form-item>
-        <el-form-item label="路由名称" prop="routeName">
-          <el-input v-model="A_EForm.routeName" />
-        </el-form-item>
-        <el-form-item label="图标" prop="icon">
+        </CustomFormItemTip>
+        <CustomFormItemTip
+          label="权限字符"
+          prop="perms"
+          tip="控制器中定义的权限字符，如：@PreAuthorize(`@ss.hasPermi('system:user:list')`)"
+          v-if="A_EForm.menuType !== 'M'">
+          <el-input v-model="A_EForm.perms" />
+        </CustomFormItemTip>
+        <el-form-item label="图标" prop="icon" v-if="A_EForm.menuType !== 'F'">
           <el-input v-model="A_EForm.icon" />
         </el-form-item>
-        <div class="d-flex align-items-center justify-content-between">
-          <el-form-item label="外链" prop="isFrame">
+        <div
+          class="d-flex align-items-center justify-content-between"
+          v-if="A_EForm.menuType !== 'F'">
+          <CustomFormItemTip
+            prop="isFrame"
+            label="外链"
+            tip="选择是外链则路由地址需要以`http(s)://`开头">
             <el-radio-group v-model="A_EForm.isFrame">
               <el-radio :value="'1'">是</el-radio>
               <el-radio :value="'0'">否</el-radio>
             </el-radio-group>
-          </el-form-item>
-          <el-form-item label="缓存" prop="isCache">
+          </CustomFormItemTip>
+          <CustomFormItemTip
+            label="缓存"
+            prop="isCache"
+            tip="选择是则会被`keep-alive`缓存，需要匹配组件的`name`和地址保持一致">
             <el-radio-group v-model="A_EForm.isCache">
               <el-radio :value="'0'">缓存</el-radio>
               <el-radio :value="'1'">不缓存</el-radio>
             </el-radio-group>
-          </el-form-item>
+          </CustomFormItemTip>
         </div>
         <div class="d-flex align-items-center justify-content-between">
-          <el-form-item label="状态" prop="status">
+          <CustomFormItemTip
+            label="状态"
+            prop="status"
+            tip="选择停用则路由将不会出现在侧边栏，也不能被访问">
             <el-radio-group v-model="A_EForm.status">
               <el-radio :value="'0'">正常</el-radio>
               <el-radio :value="'1'">停用</el-radio>
             </el-radio-group>
-          </el-form-item>
-          <el-form-item label="显示隐藏" prop="visible">
+          </CustomFormItemTip>
+          <CustomFormItemTip
+            label="显示隐藏"
+            prop="visible"
+            tip="选择隐藏则路由将不会出现在侧边栏，但仍然可以访问">
             <el-radio-group v-model="A_EForm.visible">
               <el-radio :value="'0'">显示</el-radio>
               <el-radio :value="'1'">隐藏</el-radio>
             </el-radio-group>
-          </el-form-item>
+          </CustomFormItemTip>
         </div>
       </el-form>
     </A_EDialog>
@@ -176,14 +194,16 @@
   import { AxiosResponse } from "axios";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
   import { ElMessage, FormInstance } from "element-plus";
-  import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
+  import {
+    validateAlphaNumericUnderscore,
+    validateNoChineseOrSpaces,
+  } from "@/utils/formRegularExpression";
 
   // 请求菜单列表-----------
   const menuTree = ref();
   const queryParams = ref<GetMenuListParams>({
     menuName: undefined,
-    menuType: "",
-    orderNum: undefined,
+    status: "",
   });
   const buildTree = (items: MenuItem[]) => {
     const itemMap: Map<number, MenuItem> = new Map();
@@ -234,17 +254,11 @@
   // 表单-----------
   const defaultForm: MenuItem = {
     menuName: "",
+    menuType: "C", //M目录 C菜单  F按钮
     parentId: 0,
     orderNum: 0,
-    path: "",
-    component: null,
-    routeName: "",
-    isFrame: "1", //是否为外链（0是 1否）
-    isCache: "1", //0缓存 1不缓存
-    menuType: "C", //M目录 C菜单  F按钮
     visible: "0", //0显示 1隐藏
     status: "0", //0正常 1停用
-    icon: "", //图标
   };
 
   const rules = {
@@ -253,8 +267,12 @@
     menuType: [
       { required: true, message: "请选择菜单类型", trigger: "change" },
     ],
-    path: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
+    path: [
+      { validator: validateAlphaNumericUnderscore, trigger: "blur" },
+      { required: true, message: "请输入路由路径", trigger: "blur" },
+    ],
     component: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
+    perms: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
     icon: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
   };
   let A_EForm: MenuItem;

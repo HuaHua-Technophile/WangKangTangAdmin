@@ -27,7 +27,7 @@
       width?: string;
     }>(),
     {
-      width: "550px",
+      width: "590px",
     }
   );
 

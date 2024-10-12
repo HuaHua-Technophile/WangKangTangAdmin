@@ -1,12 +1,14 @@
 export interface GetRoleListParams {
   roleKey?: string;
   roleName?: string;
-  roleSort?: number;
+  status: "0" | "1" | "";
+  pageNum?: number;
+  pageSize?: number;
 }
 
 export interface RoleItem extends GetRoleListParams {
   roleId?: number;
-  status: "0" | "1"; // 0: 启用;1: 禁用
+  roleSort?: number;
   admin?: boolean;
   menuIds?: number[];
   createTime?: string;

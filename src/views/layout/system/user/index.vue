@@ -1,32 +1,31 @@
 <template>
   <div>
     <!-- 查询表单 -->
-    <el-form
-      :model="queryForm"
-      class="d-flex justify-content-between align-items-center">
-      <el-form-item label="用户名">
+    <el-form :model="queryForm" class="d-flex align-items-center">
+      <el-form-item label="用户名" class="mx-md-2 flex-grow-1">
         <el-input
           v-model="queryForm.userName"
-          placeholder="请输入用户名"
+          placeholder="用户名(非昵称)"
           clearable />
       </el-form-item>
-      <el-form-item label="手机号">
+      <el-form-item label="手机号" class="mx-md-2 flex-grow-1">
         <el-input
           v-model="queryForm.phonenumber"
           placeholder="请输入手机号"
-          clearable />
+          clearable
+          class="flex-grow-1" />
       </el-form-item>
-      <el-form-item label="状态">
+      <el-form-item label="状态" class="mx-md-2">
         <el-radio-group v-model="queryForm.status">
           <el-radio :value="''">全部</el-radio>
           <el-radio :value="'0'">禁用</el-radio>
           <el-radio :value="'1'">启用</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="mx-md-2">
         <el-button type="primary" @click="handleQuery">查询</el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="mx-md-2">
         <el-button type="primary" @click="toAddUser">添加用户</el-button>
       </el-form-item>
     </el-form>
@@ -39,7 +38,7 @@
       cell-class-name="text-center"
       header-cell-class-name="text-center"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="30" />
+      <el-table-column type="selection" width="30" :selectable="selectable" />
       <el-table-column prop="userId" label="ID" />
       <el-table-column prop="userName" label="用户名" />
       <el-table-column prop="nickName" label="昵称" />
@@ -81,7 +80,9 @@
       <DataTebleColumnTime />
       <el-table-column label="操作">
         <template #default="scope">
-          <div class="d-flex justify-content-around align-items-center">
+          <div
+            class="d-flex justify-content-around align-items-center"
+            v-if="!scope.row.admin">
             <Icon
               icon="icon-bianji"
               class="cursor-pointer"
@@ -209,8 +210,6 @@
 
   // 查询用户列表------------------
   const queryForm = reactive<UserQueryParams>({
-    userName: "",
-    phonenumber: "",
     status: "",
   });
   const pagination = reactive<PaginationParams>({
@@ -301,11 +300,9 @@
           value: string,
           callback: (arg0?: Error) => void
         ) => {
-          if (value !== A_EForm.password) {
+          if (value !== A_EForm.password)
             callback(new Error("两次输入密码不一致"));
-          } else {
-            callback();
-          }
+          else callback();
         },
         trigger: "blur",
       },
@@ -362,7 +359,10 @@
   // 删除角色--------------
   const selectedUsers = ref<UserItem[]>([]);
   const userTable = ref();
-
+  // 定义选择行的条件
+  const selectable = (row: any) => {
+    return !row.admin; // 如果不是管理员，则可以选择
+  };
   const handleSelectionChange = (selection: UserItem[]) => {
     selectedUsers.value = selection;
   };
@@ -398,3 +398,10 @@
     });
   };
 </script>
+<style lang="scss" scoped>
+  ::v-deep .el-input__wrapper,
+  .el-form-item__content {
+    overflow: hidden !important;
+    transition: all 500ms !important;
+  }
+</style>

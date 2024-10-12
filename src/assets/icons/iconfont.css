@@ -9,6 +9,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.icon-wenhao:before {
+  content: "\e621";
+}
+
 .icon-riLine-contacts-line:before {
   content: "\e614";
 }

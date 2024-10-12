@@ -1,6 +1,4 @@
 <template>
-  <!-- 复选框 -->
-  <!-- <el-table-column type="selection" width="30" /> -->
   <el-table-column label="ID" prop="menuId" />
   <el-table-column label="名称" prop="menuName" />
   <el-table-column label="图标">
@@ -11,9 +9,8 @@
       </el-tooltip>
     </template>
   </el-table-column>
-  <el-table-column label="路径" prop="path" />
+  <el-table-column label="路由路径" prop="path" />
   <el-table-column label="组件地址" prop="component" />
-  <!-- <el-table-column label="路由参数" prop="query" /> -->
   <el-table-column label="外链" prop="isFrame">
     <template #default="scope">
       <el-tag :type="scope.row.isFrame == 0 ? 'primary' : 'info'">{{
@@ -117,7 +114,6 @@
       orderNum: row.orderNum,
       path: row.path,
       component: row.component,
-      routeName: row.routeName,
       isFrame: row.isFrame,
       isCache: row.isCache,
       menuType: row.menuType, //M目录 C菜单  F按钮

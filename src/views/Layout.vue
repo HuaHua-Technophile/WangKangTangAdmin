@@ -26,7 +26,7 @@
     <el-container>
       <!-- 顶栏:历史路由、用户信息 -->
       <el-header
-        class="d-flex justify-content-between align-items-center border-bottom">
+        class="d-flex justify-content-between align-items-center border-bottom p-0 px-md-3">
         <!-- 历史路由 -->
         <el-scrollbar view-class="h-100 d-flex align-items-end">
           <div class="h-75 d-flex">
@@ -34,17 +34,17 @@
               v-for="i in historyStore.historyRoutes"
               :key="i.path"
               :class="{ active: i.path === activePath }"
-              class="historyRoute position-relative me-1 border rounded-top-3 transition750 bg-primary-subtle d-flex align-items-center">
+              class="historyRoute position-relative me-md-1 border rounded-top-3 transition750 bg-primary-subtle d-flex align-items-center">
               <router-link
                 :to="i.path"
-                class="text-decoration-none h-100 d-flex align-items-center text-nowrap px-2">
+                class="text-decoration-none h-100 d-flex align-items-center text-nowrap px-md-2">
                 {{ i.title }}
               </router-link>
               <!-- 历史路由关闭按钮 -->
               <Icon
                 icon="icon-guanbi"
                 :size="19"
-                class="historyRouteClose transition500 position-absolute end-0 me-1 text-primary"
+                class="historyRouteClose transition500 position-absolute end-0 me-md-1 text-primary"
                 @click.stop="historyStore.removeRoute(i.path)" />
             </div>
           </div>
@@ -77,10 +77,10 @@
       <el-main class="p-0">
         <el-scrollbar
           :class="themeStore.isDark ? 'bg-black' : 'bg-body-secondary'"
-          class="px-3"
+          class="px-md-3"
           wrap-class="rounded-3"
-          view-class="py-3">
-          <router-view class="rounded-3 border p-2 w-100 bg-body" />
+          view-class="py-md-3">
+          <router-view class="rounded-3 border p-md-2 w-100 bg-body" />
         </el-scrollbar>
       </el-main>
     </el-container>

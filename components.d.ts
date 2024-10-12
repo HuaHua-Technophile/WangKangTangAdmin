@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     A_EDialog: typeof import('./src/components/A_EDialog/A_EDialog.vue')['default']
+    CustomFormItemTip: typeof import('./src/components/ElForm/CustomFormItemTip.vue')['default']
     DataTebleColumnTime: typeof import('./src/components/DataTable/DataTebleColumnTime.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
@@ -23,6 +24,7 @@ declare module 'vue' {
     ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
+    ElFormItemTip: typeof import('./src/components/ElForm/ElFormItemTip.vue')['default']
     ElHeader: typeof import('element-plus/es')['ElHeader']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElImage: typeof import('element-plus/es')['ElImage']
