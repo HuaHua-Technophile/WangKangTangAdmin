@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/qs": "^6.9.16",
     "axios": "^1.7.7",
     "bootstrap": "5.3.3",
     "crypto-js": "^4.2.0",
@@ -16,6 +17,7 @@
     "lodash": "^4.17.21",
     "pinia": "^2.2.4",
     "pinia-plugin-persistedstate": "^4.1.1",
+    "qs": "^6.13.0",
     "unplugin-element-plus": "^0.8.0",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"

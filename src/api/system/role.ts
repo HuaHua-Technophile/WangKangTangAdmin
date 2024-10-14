@@ -3,7 +3,6 @@ import { PaginationParams } from "@/types/pagination";
 import { MenuTreeItem } from "@/types/system/menu";
 import { GetRoleListParams, RoleItem } from "@/types/system/role";
 import { UserItem } from "@/types/system/user";
-
 // 封装获取菜单列表的请求方法
 export const getRoleList = (params: GetRoleListParams) => {
   return customRequest<RoleItem[]>(
@@ -86,23 +85,23 @@ interface AuthUserCancelOrSelect {
   roleId: number;
   userIds: number[];
 }
-export const authUserCancel = (data: AuthUserCancelOrSelect) => {
+export const authUserCancel = (params: AuthUserCancelOrSelect) => {
   return customRequest<UserItem[]>(
     {
       method: "PUT", // 请求方法
       url: `/system/role/authUser/cancelAll`, // API 路径
-      data,
+      params,
     },
     `取消角色对于用户的授权`
   ); // 调用二次封装的请求方法
 };
-export const authUserSelect = (data: AuthUserCancelOrSelect) => {
+export const authUserSelect = (params: AuthUserCancelOrSelect) => {
   return customRequest<UserItem[]>(
     {
       method: "PUT", // 请求方法
       url: `/system/role/authUser/selectAll`, // API 路径
-      data,
+      params,
     },
-    `取消角色对于用户的授权`
+    `将角色授权用户`
   ); // 调用二次封装的请求方法
 };

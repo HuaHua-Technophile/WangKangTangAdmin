@@ -368,9 +368,9 @@
     });
     debugLog("已授权用户列表=>", res);
     if (res.code !== 200) ElMessage.error("获取已授权用户列表失败");
-    else if (res.total && res.total > 0 && res.rows && res.rows.length > 0) {
-      if (res.rows) allocatedUsers.value = res.rows;
-      if (res.total) allocatedTotal.value = res.total;
+    else if (res.total !== undefined && res.rows) {
+      allocatedUsers.value = res.rows;
+      allocatedTotal.value = res.total;
     }
   };
 
@@ -383,12 +383,15 @@
     });
     debugLog("未授权用户列表=>", res);
     if (res.code !== 200) ElMessage.error("获取未授权用户列表失败");
-    else if (res.total && res.total > 0 && res.rows && res.rows.length > 0) {
+    else if (res.total !== undefined && res.rows) {
       unallocatedTotal.value = res.total;
       unallocatedUsers.value = res.rows;
     }
   };
-
+  const resetSelection = () => {
+    selectedAllocatedUsers.value = [];
+    selectedUnallocatedUsers.value = [];
+  };
   // 取消授权
   const cancelAuthorization = async (users: UserItem[]) => {
     debugLog("勾选了这些用户:", toRaw(users));
@@ -400,9 +403,14 @@
     debugLog(`取消给ID:${currentRoleId.value}授权结果=>`, res);
     if (res.code !== 200) {
       ElMessage.error(res.msg);
+      fetchAllocatedUsers();
+      fetchUnallocatedUsers();
+    } else {
+      ElMessage.success("取消授权成功");
       await fetchAllocatedUsers();
       await fetchUnallocatedUsers();
-    } else ElMessage.success("取消授权成功");
+      resetSelection();
+    }
   };
 
   // 授权
@@ -419,6 +427,7 @@
       ElMessage.success("授权成功");
       await fetchAllocatedUsers();
       await fetchUnallocatedUsers();
+      resetSelection();
     }
   };
 </script>
