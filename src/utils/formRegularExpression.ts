@@ -20,6 +20,18 @@ export const validateAlphaNumericUnderscore = (
   else callback();
 };
 
+export const validateLowerCaseAlphaNumericUnderscore = (
+  _rule: any,
+  value: string,
+  callback: (arg0?: Error) => void
+) => {
+  const regex = /^[a-z][a-z0-9_]*$/; // 必须以小写英文字符开头，后面可以跟小写英文、数字和下划线
+  if (value === "") callback(); // 允许空字符串通过
+  else if (!regex.test(value))
+    callback(new Error("必须以小写英文字符开头，仅允许小写英文、数字和下划线"));
+  else callback();
+};
+
 export const passwordRule = [
   { required: true, message: "请输入密码", trigger: "blur" },
   { min: 6, max: 20, message: "密码长度为6~20个字符", trigger: "blur" },

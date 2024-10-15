@@ -91,15 +91,12 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      background
-      v-model:current-page="queryParams.pageNum"
-      v-model:page-size="queryParams.pageSize"
-      :page-sizes="[10, 13, 16, 19, 22, 25, 30, 50]"
-      layout="prev, pager, next, jumper,->,sizes,total"
+    <!-- 分页 -->
+    <CustomPagination
+      v-model:current-page="currentPage"
       :total="total"
-      @current-change="handlePageChange"
-      @size-change="handleSizeChange"
+      @size-change="fetchRoleList"
+      @current-change="fetchRoleList"
       class="mt-3" />
     <!-- 添加/修改弹窗 -->
     <A_EDialog
@@ -197,7 +194,7 @@
     getRoleMenuTreeselect,
   } from "@/api/system/role";
   import { MenuTreeItem } from "@/types/system/menu";
-  import { GetRoleListParams, RoleItem } from "@/types/system/role";
+  import { RoleItem } from "@/types/system/role";
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
@@ -207,34 +204,32 @@
   import { ElMessage, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, toRaw } from "vue";
   import UserListTable from "./UserListTable.vue";
+  import { usePaginationStore } from "@/stores/pagination";
 
   // 请求角色列表-----------
   const roleList = ref<RoleItem[]>([]);
-  const queryParams = ref<GetRoleListParams>({
+  const queryParams = reactive<
+    Pick<RoleItem, "roleKey" | "roleName" | "status">
+  >({
     status: "",
-    pageNum: 1,
-    pageSize: 10,
   });
+  const total = ref(0);
+  const paginationStore = usePaginationStore();
+
+  const currentPage = ref(1);
   const fetchRoleList = async () => {
-    const res = await getRoleList(queryParams.value);
-    debugLog("获取角色列表=>", res);
+    const res = await getRoleList({
+      pageNum: currentPage.value,
+      pageSize: paginationStore.pageSize,
+      ...queryParams,
+    });
+    debugLog("角色列表=>", res);
     if (res.rows) roleList.value = res.rows;
     if (res.total) total.value = res.total;
   };
   onMounted(() => {
     fetchRoleList();
   });
-  // 分页逻辑-----------
-  const total = ref(0);
-  const handlePageChange = (pageNum: number) => {
-    queryParams.value.pageNum = pageNum;
-    fetchRoleList();
-  };
-  const handleSizeChange = (pageSize: number) => {
-    queryParams.value.pageSize = pageSize;
-    queryParams.value.pageNum = 1; // 重置为第一页
-    fetchRoleList();
-  };
 
   // 添加/修改表单--------------
   const isAdd = ref(true);

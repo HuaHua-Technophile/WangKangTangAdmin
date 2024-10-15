@@ -7,8 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    1: typeof import('./src/components/DataTable/1.vue')['default']
     A_EDialog: typeof import('./src/components/A_EDialog/A_EDialog.vue')['default']
     CustomFormItemTip: typeof import('./src/components/ElForm/CustomFormItemTip.vue')['default']
+    CustomPagination: typeof import('./src/components/DataTable/CustomPagination.vue')['default']
     DataTebleColumnTime: typeof import('./src/components/DataTable/DataTebleColumnTime.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']

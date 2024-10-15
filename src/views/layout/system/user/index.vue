@@ -96,15 +96,11 @@
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination
-      background
-      v-model:current-page="pagination.pageNum"
-      v-model:page-size="pagination.pageSize"
+    <CustomPagination
+      v-model:current-page="currentPage"
       :total="total"
-      :page-sizes="[10, 13, 16, 19, 22, 25, 30, 50]"
-      layout="prev, pager, next, jumper,->,sizes,total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
+      @size-change="fetchUserList"
+      @current-change="fetchUserList"
       class="mt-3" />
 
     <!-- 添加/修改用户 -->
@@ -201,35 +197,34 @@
     delUser,
     editUser,
     getUserList,
-    UserQueryParams,
     userResetPwd,
   } from "@/api/system/user";
   import { UserFormData, UserItem } from "@/types/system/user";
-  import { PaginationParams } from "@/types/pagination";
   import { debugLog } from "@/utils/debug";
   import { formatToReadableDate } from "@/utils/formatToReadableDate";
   import { AxiosResponse } from "axios";
   import { passwordRule, userNameRule } from "@/utils/formRegularExpression";
   import { cloneDeep } from "lodash";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
+  import { usePaginationStore } from "@/stores/pagination";
 
   // 查询用户列表------------------
-  const queryForm = reactive<UserQueryParams>({
+  const queryForm = reactive<
+    Pick<UserItem, "phonenumber" | "userName" | "status">
+  >({
     status: "",
   });
-  const pagination = reactive<PaginationParams>({
-    pageNum: 1,
-    pageSize: 10,
-  });
+  const currentPage = ref(1);
+  const paginationStore = usePaginationStore();
   const total = ref(0);
   const userList = ref<UserItem[]>([]);
   // 获取用户列表
   const fetchUserList = async () => {
-    const params = {
-      ...pagination,
+    const res = await getUserList({
+      pageNum: currentPage.value,
+      pageSize: paginationStore.pageSize,
       ...queryForm,
-    };
-    const res = await getUserList(params);
+    });
     debugLog("用户列表=>", res);
     if (res.code === 200) {
       if (res.rows) userList.value = res.rows;
@@ -238,17 +233,7 @@
   };
   // 查询
   const handleQuery = () => {
-    pagination.pageNum = 1;
-    fetchUserList();
-  };
-  // 处理每页显示数量变化
-  const handleSizeChange = (val: number) => {
-    pagination.pageSize = val;
-    fetchUserList();
-  };
-  // 处理页码变化
-  const handleCurrentChange = (val: number) => {
-    pagination.pageNum = val;
+    currentPage.value = 1;
     fetchUserList();
   };
   // 组件挂载时获取用户列表
@@ -403,10 +388,3 @@
     });
   };
 </script>
-<style lang="scss" scoped>
-  ::v-deep .el-input__wrapper,
-  .el-form-item__content {
-    overflow: hidden !important;
-    transition: all 500ms !important;
-  }
-</style>

@@ -1,16 +1,7 @@
 // /system/user/list
 
-import { UserFormData, UserItem } from "@/types/system/user";
+import { GetUserListParams, UserFormData, UserItem } from "@/types/system/user";
 import { customRequest } from "../instance";
-import { PaginationParams } from "@/types/pagination";
-
-export interface UserQueryParams {
-  userName?: string;
-  phonenumber?: string;
-  status?: "" | "0" | "1";
-}
-
-type GetUserListParams = PaginationParams & UserQueryParams;
 
 export const getUserList = (params: GetUserListParams) => {
   return customRequest<UserItem[]>(

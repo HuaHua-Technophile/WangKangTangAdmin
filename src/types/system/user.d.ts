@@ -4,10 +4,10 @@ export interface UserItem {
   avatar?: string; //头像
   createTime?: string; //创建时间
   updateTime?: string; //创建时间
-  userName: string;
+  userName?: string;
   nickName: string;
   email: string;
-  phonenumber: string;
+  phonenumber?: string;
   sex: "0" | "1"; //性别：0-女，1-男
   roles?: {
     roleId: number;
@@ -22,3 +22,6 @@ export interface UserFormData extends UserItem {
   password?: string;
   confirmPassword?: string;
 }
+
+export type GetUserListParams = PaginationParams &
+  Pick<UserItem, "phonenumber" | "userName" | "status">;

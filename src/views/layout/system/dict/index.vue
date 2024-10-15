@@ -67,17 +67,12 @@
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination
-      background
+    <CustomPagination
       v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
       :total="total"
-      :page-sizes="[10, 13, 16, 19, 22, 25, 30, 50]"
-      layout="prev, pager, next, jumper,->,sizes,total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
+      @size-change="fetchDictTypeList"
+      @current-change="fetchDictTypeList"
       class="mt-3" />
-
     <!-- 新增/编辑对话框 -->
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
@@ -125,10 +120,11 @@
     editDictType,
   } from "@/api/system/dict";
   import { DictTypeData } from "@/types/system/dict";
-  import { validateAlphaNumericUnderscore } from "@/utils/formRegularExpression";
+  import { validateLowerCaseAlphaNumericUnderscore } from "@/utils/formRegularExpression";
   import { debugLog } from "@/utils/debug";
   import { cloneDeep } from "lodash";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
+  import { usePaginationStore } from "@/stores/pagination";
 
   // 搜索表单
   const queryForm = reactive<DictTypeData>({
@@ -136,13 +132,13 @@
   });
   const dictTypeList = ref<DictTypeData[]>();
   const total = ref(0);
+  const paginationStore = usePaginationStore();
   const currentPage = ref(1);
-  const pageSize = ref(10);
   // 获取字典类型列表
   const fetchDictTypeList = async () => {
     const res = await getDictTypeList({
       pageNum: currentPage.value,
-      pageSize: pageSize.value,
+      pageSize: paginationStore.pageSize,
       ...queryForm,
     });
     debugLog("字典类型列表=>", res);
@@ -154,16 +150,6 @@
   onMounted(() => {
     fetchDictTypeList();
   });
-  // 分页大小变化
-  const handleSizeChange = (val: number) => {
-    pageSize.value = val;
-    fetchDictTypeList();
-  };
-  // 当前页变化
-  const handleCurrentChange = (val: number) => {
-    currentPage.value = val;
-    fetchDictTypeList();
-  };
   // 搜索
   const handleSearch = () => {
     currentPage.value = 1;
@@ -191,7 +177,7 @@
     ],
     dictType: [
       { required: true, message: "请输入字典类型", trigger: "blur" },
-      { validator: validateAlphaNumericUnderscore, trigger: "blur" },
+      { validator: validateLowerCaseAlphaNumericUnderscore, trigger: "blur" },
     ],
     status: [{ required: true, message: "请选择状态", trigger: "change" }],
   };
