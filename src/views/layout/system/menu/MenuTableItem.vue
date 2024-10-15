@@ -2,60 +2,56 @@
   <el-table-column label="ID" prop="menuId" />
   <el-table-column label="名称" prop="menuName" />
   <el-table-column label="图标">
-    <template #default="scope">
+    <template #default="{ row }">
       <!-- effect="light/dark"是反过来的  -->
-      <el-tooltip effect="light" :content="scope.row.icon" placement="left">
-        <div><Icon :icon="scope.row.icon" /></div>
+      <el-tooltip effect="light" :content="row.icon" placement="left">
+        <div><Icon :icon="row.icon" /></div>
       </el-tooltip>
     </template>
   </el-table-column>
   <el-table-column label="路由路径" prop="path" />
   <el-table-column label="组件地址" prop="component" />
   <el-table-column label="外链" prop="isFrame">
-    <template #default="scope">
-      <el-tag :type="scope.row.isFrame == 0 ? 'primary' : 'info'">{{
-        scope.row.isFrame == 0 ? "是" : "否"
+    <template #default="{ row }">
+      <el-tag :type="row.isFrame == 0 ? 'primary' : 'info'">{{
+        row.isFrame == 0 ? "是" : "否"
       }}</el-tag>
     </template>
   </el-table-column>
   <el-table-column label="缓存" prop="isCache">
-    <template #default="scope">
-      <el-tag :type="scope.row.isFrame == 0 ? '' : 'info'">{{
-        scope.row.isFrame == 0 ? "是" : "否"
+    <template #default="{ row }">
+      <el-tag :type="row.isFrame == 0 ? '' : 'info'">{{
+        row.isFrame == 0 ? "是" : "否"
       }}</el-tag>
     </template>
   </el-table-column>
   <el-table-column label="类型" prop="menuType">
-    <template #default="scope">
+    <template #default="{ row }">
       <el-tag
         :type="
-          scope.row.menuType === 'M'
+          row.menuType === 'M'
             ? 'primary'
-            : scope.row.menuType === 'C'
+            : row.menuType === 'C'
             ? 'success'
             : 'warning'
         "
         >{{
-          scope.row.menuType === "M"
-            ? "目录"
-            : scope.row.menuType === "C"
-            ? "菜单"
-            : "按钮"
+          row.menuType === "M" ? "目录" : row.menuType === "C" ? "菜单" : "按钮"
         }}</el-tag
       >
     </template>
   </el-table-column>
   <el-table-column label="隐藏" prop="visible">
-    <template #default="scope">
-      <el-tag :type="scope.row.isFrame == 0 ? 'danger' : 'primary'">{{
-        scope.row.isFrame == 0 ? "是" : "否"
+    <template #default="{ row }">
+      <el-tag :type="row.isFrame == 0 ? 'danger' : 'primary'">{{
+        row.isFrame == 0 ? "是" : "否"
       }}</el-tag>
     </template>
   </el-table-column>
   <el-table-column label="停用" prop="status">
-    <template #default="scope">
-      <el-tag :type="scope.row.isFrame == 0 ? 'danger' : 'primary'">{{
-        scope.row.isFrame == 0 ? "停用" : "正常"
+    <template #default="{ row }">
+      <el-tag :type="row.isFrame == 0 ? 'danger' : 'primary'">{{
+        row.isFrame == 0 ? "停用" : "正常"
       }}</el-tag>
     </template>
   </el-table-column>
@@ -64,16 +60,16 @@
   <el-table-column label="子级" prop="children.length" />
   <DataTebleColumnTime />
   <el-table-column label="操作">
-    <template #default="scope">
+    <template #default="{ row }">
       <div class="d-flex justify-content-between align-items-center">
         <Icon
           icon="icon-bianji"
           class="cursor-pointer"
-          @click="toEditMenu(scope.row)" />
+          @click="toEditMenu(row)" />
         <Icon
           icon="icon-shanchu"
           class="cursor-pointer text-danger"
-          @click="toDelMenu(scope.row)" />
+          @click="toDelMenu(row)" />
       </div>
     </template>
   </el-table-column>

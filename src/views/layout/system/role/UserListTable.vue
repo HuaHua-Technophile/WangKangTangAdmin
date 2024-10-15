@@ -1,5 +1,20 @@
 <template>
   <div>
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+      <el-pagination
+        v-model:current-page="currentPage"
+        :page-size="pageSize"
+        :total="total"
+        background
+        hideOnSinglePage
+        @current-change="handleCurrentChange" />
+      <el-button
+        @click="handleAction"
+        :disabled="!selectedUsers.length"
+        type="primary">
+        {{ actionText }}
+      </el-button>
+    </div>
     <el-table
       :data="users"
       table-layout="auto"
@@ -36,21 +51,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="mt-3 d-flex justify-content-between align-items-center">
-      <el-pagination
-        v-model:current-page="currentPage"
-        :page-size="pageSize"
-        :total="total"
-        background
-        hideOnSinglePage
-        @current-change="handleCurrentChange" />
-      <el-button
-        @click="handleAction"
-        :disabled="!selectedUsers.length"
-        type="primary">
-        {{ actionText }}
-      </el-button>
-    </div>
   </div>
 </template>
 

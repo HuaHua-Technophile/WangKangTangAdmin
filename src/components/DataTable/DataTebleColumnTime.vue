@@ -1,19 +1,14 @@
 <template>
   <el-table-column label="更新时间">
-    <template #default="scope">
+    <template #default="{ row }">
       <!-- effect="light/dark"是反过来的  -->
       <el-tooltip effect="light" placement="left">
         <template #content>
-          更新: {{ formatToReadableDate(scope.row.updateTime) }} <br />
-          创建: {{ formatToReadableDate(scope.row.createTime) }}
+          更新: {{ formatToReadableDate(row.updateTime) }} <br />
+          创建: {{ formatToReadableDate(row.createTime) }}
         </template>
         <div>
-          {{
-            formatToReadableDate(
-              scope.row.updateTime || scope.row.createTime,
-              true
-            )
-          }}
+          {{ formatToReadableDate(row.updateTime || row.createTime, true) }}
         </div>
       </el-tooltip>
     </template>

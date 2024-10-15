@@ -41,39 +41,39 @@
       <el-table-column label="名称" prop="roleName" />
       <el-table-column label="排序" prop="roleSort" />
       <el-table-column label="管理员" prop="admin">
-        <template #default="scope">
-          <el-tag :type="scope.row.isAdmin ? 'danger' : 'primary'">{{
-            scope.row.isAdmin ? "否" : "是"
+        <template #default="{ row }">
+          <el-tag :type="row.isAdmin ? 'danger' : 'primary'">{{
+            row.isAdmin ? "否" : "是"
           }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="状态" prop="status">
-        <template #default="scope">
-          <el-tag :type="scope.row.isFrame == 0 ? 'danger' : 'primary'">{{
-            scope.row.isFrame == 0 ? "停用" : "正常"
+        <template #default="{ row }">
+          <el-tag :type="row.isFrame == 0 ? 'danger' : 'primary'">{{
+            row.isFrame == 0 ? "停用" : "正常"
           }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="更新时间">
-        <template #default="scope">
+        <template #default="{ row }">
           <!-- effect="light/dark"是反过来的  -->
           <el-tooltip effect="light" placement="left">
             <template #content>
-              更新: {{ scope.row.updateTime || "无" }} <br />创建:
-              {{ scope.row.createTime || "无" }}
+              更新: {{ row.updateTime || "无" }} <br />创建:
+              {{ row.createTime || "无" }}
             </template>
             <div>
-              {{ (scope.row.updateTime || scope.row.createTime).slice(5, 16) }}
+              {{ (row.updateTime || row.createTime).slice(5, 16) }}
             </div>
           </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column label="操作">
-        <template #default="scope">
+        <template #default="{ row }">
           <div class="d-flex justify-content-around align-items-center">
             <div
               class="d-flex align-items-center cursor-pointer"
-              @click="openDrawer(scope.row.roleId)">
+              @click="openDrawer(row.roleId)">
               授权角色
               <Icon
                 icon="icon-riLine-contacts-line"
@@ -82,11 +82,11 @@
             <Icon
               icon="icon-bianji"
               class="cursor-pointer"
-              @click="toEditRole(scope.row)" />
+              @click="toEditRole(row)" />
             <Icon
               icon="icon-shanchu"
               class="cursor-pointer text-danger"
-              @click="toDelRole(scope.row)" />
+              @click="toDelRole(row)" />
           </div>
         </template>
       </el-table-column>
@@ -167,7 +167,7 @@
           v-model:current-page="allocatedPageNum"
           v-model:selected-users="selectedAllocatedUsers"
           :total="allocatedTotal"
-          action-text="取消以上用户授权"
+          action-text="取消以下用户授权"
           @action="cancelAuthorization" />
       </el-scrollbar>
       <!-- 未授权用户列表 -->
@@ -178,7 +178,7 @@
           v-model:current-page="unallocatedPageNum"
           v-model:selected-users="selectedUnallocatedUsers"
           :total="unallocatedTotal"
-          action-text="授权给以上用户"
+          action-text="授权给以下用户"
           @action="grantAuthorization" />
       </el-scrollbar>
     </el-drawer>

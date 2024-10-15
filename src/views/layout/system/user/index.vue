@@ -44,7 +44,6 @@
       <el-table-column prop="nickName" label="昵称" />
       <el-table-column prop="email" label="邮箱" />
       <el-table-column prop="phonenumber" label="手机号" />
-
       <el-table-column label="性别">
         <template #default="{ row }">
           {{ row.sex === "0" ? "女" : "男" }}
@@ -66,31 +65,31 @@
       </el-table-column>
       <el-table-column prop="loginIp" label="最后登录IP" />
       <el-table-column label="最后登录时间">
-        <template #default="scope">
+        <template #default="{ row }">
           <el-tooltip effect="light" placement="left">
             <template #content>
-              最后登录: {{ formatToReadableDate(scope.row.loginDate) }}
+              最后登录: {{ formatToReadableDate(row.loginDate) }}
             </template>
             <div>
-              {{ formatToReadableDate(scope.row.loginDate, true) }}
+              {{ formatToReadableDate(row.loginDate, true) }}
             </div>
           </el-tooltip>
         </template>
       </el-table-column>
       <DataTebleColumnTime />
       <el-table-column label="操作">
-        <template #default="scope">
+        <template #default="{ row }">
           <div
             class="d-flex justify-content-around align-items-center"
-            v-if="!scope.row.admin">
+            v-if="!row.admin">
             <Icon
               icon="icon-bianji"
               class="cursor-pointer"
-              @click="toEditUser(scope.row)" />
+              @click="toEditUser(row)" />
             <Icon
               icon="icon-shanchu"
               class="cursor-pointer text-danger"
-              @click="toDelUser(scope.row)" />
+              @click="toDelUser(row)" />
           </div>
         </template>
       </el-table-column>
@@ -191,7 +190,12 @@
 
 <script setup lang="ts">
   import { ref, reactive, onMounted } from "vue";
-  import { ElMessage, FormInstance, FormRules } from "element-plus";
+  import {
+    ElMessage,
+    FormInstance,
+    FormRules,
+    TableInstance,
+  } from "element-plus";
   import {
     addUser,
     delUser,
@@ -359,7 +363,7 @@
 
   // 删除角色--------------
   const selectedUsers = ref<UserItem[]>([]);
-  const userTable = ref();
+  const userTable = ref<TableInstance>();
   // 定义选择行的条件
   const selectable = (row: any) => {
     return !row.admin; // 如果不是管理员，则可以选择
