@@ -7,7 +7,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    1: typeof import('./src/components/DataTable/1.vue')['default']
     A_EDialog: typeof import('./src/components/A_EDialog/A_EDialog.vue')['default']
     CustomFormItemTip: typeof import('./src/components/ElForm/CustomFormItemTip.vue')['default']
     CustomPagination: typeof import('./src/components/DataTable/CustomPagination.vue')['default']
@@ -51,8 +50,5 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ThemeSwitch: typeof import('./src/components/ThemeSwitch.vue')['default']
-  }
-  export interface ComponentCustomProperties {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }
