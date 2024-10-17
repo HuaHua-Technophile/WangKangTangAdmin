@@ -47,3 +47,14 @@ export const editConfig = (data: ConfigItem) => {
     "修改参数设置"
   );
 };
+
+// 5. 根据参数键名获取参数值,数据回传在msg中
+export const getConfigValueByConfigKey = (configKey: string) => {
+  return customRequest(
+    {
+      method: "GET",
+      url: `/system/config/configKey/${configKey}`,
+    },
+    `获取${configKey}参数的值`
+  );
+};

@@ -47,14 +47,14 @@ export const delUser = (userIds: number[]) => {
 };
 
 // 重置密码 /system/user/resetPwd
-export const userResetPwd = (userId: number) => {
+export const userResetPwd = (userId: number, password: string) => {
   return customRequest(
     {
       method: "PUT", // 请求方法
       url: `/system/user/resetPwd`, // API 路径
       data: {
         userId,
-        password: 123456,
+        password,
       },
     },
     `重置用户密码`

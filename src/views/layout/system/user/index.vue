@@ -133,7 +133,8 @@
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
-      :submitForm="submitForm">
+      :submitForm="submitForm"
+      :width="'610px'">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
           >ID:{{ A_EForm && A_EForm["userId"] }}</span
@@ -205,7 +206,7 @@
               >
             </el-radio-group>
           </el-form-item>
-          <el-form-item v-if="A_EForm.userId">
+          <el-form-item v-if="A_EForm.userId" class="ms-3">
             <el-button @click="toResetPassword(A_EForm.userId)">
               重置密码</el-button
             >
@@ -244,6 +245,7 @@
     getTagTypeByDictData,
     getLabelByDictData,
   } from "@/utils/dictDataToOptions";
+  import { getConfigValueByConfigKey } from "@/api/system/config";
 
   // 字典数据------------------
   const dictStore = useDictStore();
@@ -413,13 +415,21 @@
   };
 
   // 重置密码-----------------
-  const toResetPassword = (userId: number) => {
-    elMessageBoxConfirm(`重置 ID:${userId} 的密码为: 123456`, async () => {
-      const res = await userResetPwd(userId);
-      debugLog("重置密码结果=>", res);
-      if (res.code === 200) {
-        ElMessage.success("重置密码成功");
-      } else ElMessage.error(res.msg || "重置密码失败");
-    });
+  const toResetPassword = async (userId: number) => {
+    const configValueRes = await getConfigValueByConfigKey(
+      "sys.user.initPassword"
+    );
+    if (configValueRes.code == 200) {
+      elMessageBoxConfirm(
+        `重置 ID:${userId} 的密码为: ${configValueRes.msg}`,
+        async () => {
+          const res = await userResetPwd(userId, configValueRes.msg);
+          debugLog("重置密码结果=>", res);
+          if (res.code === 200) {
+            ElMessage.success("重置密码成功");
+          } else ElMessage.error(res.msg || "重置密码失败");
+        }
+      );
+    } else ElMessage.error("获取默认密码配置失败");
   };
 </script>
