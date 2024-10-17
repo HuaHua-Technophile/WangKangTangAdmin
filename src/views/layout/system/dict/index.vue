@@ -28,7 +28,16 @@
         </el-select>
       </el-form-item>
       <el-form-item class="mx-md-2">
-        <el-button type="primary" @click="handleSearch">搜索</el-button>
+        <el-button
+          type="primary"
+          @click="
+            () => {
+              currentPage = 1;
+              fetchDictTypeList();
+            }
+          "
+          >搜索</el-button
+        >
       </el-form-item>
       <el-form-item class="mx-md-2">
         <el-button type="primary" @click="toAddDictType">添加字典</el-button>
@@ -297,13 +306,7 @@
       total.value = res.total;
     } else ElMessage.error(res.msg || "获取字典类型列表失败");
   };
-  onMounted(() => {
-    fetchDictTypeList();
-  });
-  const handleSearch = () => {
-    currentPage.value = 1;
-    fetchDictTypeList();
-  };
+  onMounted(fetchDictTypeList);
 
   // 字典类型--------------------
   const A_EVisible = ref(false);

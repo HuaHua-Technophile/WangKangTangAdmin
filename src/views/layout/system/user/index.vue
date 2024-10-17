@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 查询表单 -->
+    <!-- 搜索表单 -->
     <el-form :model="queryParams" class="d-flex align-items-center">
       <el-form-item label="用户名" class="mx-md-2 flex-grow-1">
         <el-input
@@ -29,7 +29,16 @@
         </el-select>
       </el-form-item>
       <el-form-item class="mx-md-2">
-        <el-button type="primary" @click="handleQuery">查询</el-button>
+        <el-button
+          type="primary"
+          @click="
+            () => {
+              currentPage = 1;
+              fetchUserList();
+            }
+          "
+          >搜索</el-button
+        >
       </el-form-item>
       <el-form-item class="mx-md-2">
         <el-button type="primary" @click="toAddUser">添加用户</el-button>
@@ -241,7 +250,7 @@
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_normal_disable", "sys_user_sex");
   });
-  // 查询用户列表------------------
+  // 搜索用户列表------------------
   const queryParams = reactive<
     Pick<UserItem, "phonenumber" | "userName" | "status">
   >({
@@ -264,15 +273,8 @@
       if (res.total) total.value = res.total;
     } else ElMessage.error(res.msg || "获取用户列表失败");
   };
-  // 查询
-  const handleQuery = () => {
-    currentPage.value = 1;
-    fetchUserList();
-  };
   // 组件挂载时获取用户列表
-  onMounted(() => {
-    fetchUserList();
-  });
+  onMounted(fetchUserList);
 
   // 添加/修改表单--------------
   const isAdd = ref(true);
@@ -344,14 +346,14 @@
         debugLog("提交表单结果=>", res);
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
-          // A_EVisible.value = false;
+          A_EVisible.value = false;
           fetchUserList();
         } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
       }
     });
   };
 
-  // 添加角色-----------------------
+  // 添加用户-----------------------
   const toAddUser = () => {
     A_ETitle.value = "添加用户";
     isAdd.value = true;
@@ -360,7 +362,7 @@
     A_EVisible.value = true;
   };
 
-  // 修改角色------------
+  // 修改用户------------
   const toEditUser = (data: UserItem) => {
     A_ETitle.value = "修改用户";
     isAdd.value = false;
@@ -379,7 +381,7 @@
     A_EVisible.value = true;
   };
 
-  // 删除角色--------------
+  // 删除用户--------------
   const selectedUsers = ref<UserItem[]>([]);
   const userTable = ref<TableInstance>();
   // 定义选择行的条件
@@ -402,9 +404,9 @@
           .filter((id) => id !== undefined);
         const res = await delUser(userIds);
         if (res.code === 200) {
-          ElMessage.success("删除成功"); // 清空选中的用户
+          ElMessage.success("删除成功"); // 清空选中
           selectedUsers.value = [];
-          fetchUserList(); // 假设您有这个方法来刷新用户列表
+          fetchUserList();
         } else ElMessage.error(res.msg || "删除失败");
       }
     );

@@ -1,10 +1,10 @@
 // @/types/system/config.ts
 export interface ConfigItem {
-  configId: number;
-  configName: string;
-  configKey: string;
+  configId?: number;
+  configName?: string;
+  configKey?: string;
   configValue: string;
-  configType: string;
+  configType?: string;
   createBy?: string;
   createTime?: string;
   updateBy?: string;

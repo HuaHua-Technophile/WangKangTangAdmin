@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 顶部查询表单/添加按钮 -->
+    <!-- 搜索表单 -->
     <el-form
       :model="queryParams"
       class="flex-grow-1 d-flex justify-content-between align-items-center">
@@ -24,7 +24,7 @@
         </el-select>
       </el-form-item>
       <el-form-item class="mx-md-2">
-        <el-button type="primary" @click="fetchMenuList">查询</el-button>
+        <el-button type="primary" @click="fetchMenuList">搜索</el-button>
       </el-form-item>
       <el-form-item class="mx-md-2">
         <el-button type="primary" @click="toAddMenu">添加菜单</el-button>
@@ -205,7 +205,7 @@
   import MenuTableItem from "./MenuTableItem.vue";
   import { AxiosResponse } from "axios";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
-  import { ElMessage, FormInstance } from "element-plus";
+  import { ElMessage, FormInstance, FormRules } from "element-plus";
   import {
     validateAlphaNumericUnderscore,
     validateNoChineseOrSpaces,
@@ -256,9 +256,7 @@
     menuTree.value = buildTree(res);
     debugLog("转换后的菜单列表=>", toRaw(menuTree.value));
   };
-  onMounted(() => {
-    fetchMenuList();
-  });
+  onMounted(fetchMenuList);
 
   // 添加/修改弹窗----------------
   const A_EVisible = ref(false);
@@ -275,7 +273,7 @@
     status: "0", //0正常 1停用
   };
 
-  const rules = {
+  const rules: FormRules = {
     menuName: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
     orderNum: [{ required: true, message: "请输入排序", trigger: "blur" }],
     menuType: [

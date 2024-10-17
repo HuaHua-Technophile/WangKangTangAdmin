@@ -31,6 +31,17 @@ export const validateLowerCaseAlphaNumericUnderscore = (
     callback(new Error("必须以小写英文字符开头，仅允许小写英文、数字和下划线"));
   else callback();
 };
+export const validateLowerCaseAlphaNumericDot = (
+  _rule: any,
+  value: string,
+  callback: (arg0?: Error) => void
+) => {
+  const regex = /^[a-z][a-z0-9.]*$/; // 必须以小写英文字符开头，后面可以跟小写英文、数字和点符号
+  if (value === "") callback(); // 允许空字符串通过
+  else if (!regex.test(value))
+    callback(new Error("必须以小写英文字符开头，仅允许小写英文、点符号和数字"));
+  else callback();
+};
 
 export const passwordRule = [
   { required: true, message: "请输入密码", trigger: "blur" },

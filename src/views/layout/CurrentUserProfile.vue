@@ -212,9 +212,7 @@
     debugLog("详细个人信息=>", res);
     currentUserProfile.value = res;
   };
-  onMounted(() => {
-    getCurrentUserProfileFun();
-  });
+  onMounted(getCurrentUserProfileFun);
   const formattedLoginDate = computed(() => {
     return currentUserProfile.value?.loginDate
       ? new Date(currentUserProfile.value.loginDate).toLocaleString()

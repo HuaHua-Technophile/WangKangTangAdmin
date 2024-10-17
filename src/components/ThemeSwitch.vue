@@ -18,7 +18,5 @@
   const { isDark } = storeToRefs(themeStore);
   const { toggleTheme, updateHtmlClass } = themeStore;
 
-  onMounted(() => {
-    updateHtmlClass();
-  });
+  onMounted(updateHtmlClass);
 </script>

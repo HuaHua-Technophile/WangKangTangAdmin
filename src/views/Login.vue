@@ -41,7 +41,7 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from "vue";
-  import { ElMessage, FormInstance } from "element-plus";
+  import { ElMessage, FormInstance, FormRules } from "element-plus";
   import { useRoute } from "vue-router";
   import { useAuthStore } from "@/stores/auth";
   import { login } from "@/api/login"; // 引入登录 API
@@ -59,7 +59,7 @@
     password: "123456",
   });
 
-  const rules = {
+  const rules: FormRules = {
     username: userNameRule,
     password: passwordRule,
   };

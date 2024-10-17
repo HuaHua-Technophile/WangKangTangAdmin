@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 顶部查询表单/添加按钮 -->
+    <!-- 搜索表单 -->
     <el-form
       :model="queryParams"
       class="d-flex justify-content-between align-items-center">
@@ -30,7 +30,16 @@
         </el-select>
       </el-form-item>
       <el-form-item class="mx-md-2">
-        <el-button type="primary" @click="fetchRoleList">查询</el-button>
+        <el-button
+          type="primary"
+          @click="
+            () => {
+              currentPage = 1;
+              fetchRoleList();
+            }
+          "
+          >搜索</el-button
+        >
       </el-form-item>
       <el-form-item class="mx-md-2">
         <el-button type="primary" @click="toAddRole">添加角色</el-button>
@@ -212,7 +221,7 @@
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
   import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
   import { AxiosResponse } from "axios";
-  import { ElMessage, FormInstance } from "element-plus";
+  import { ElMessage, FormInstance, FormRules } from "element-plus";
   import { onBeforeMount, onMounted, reactive, ref, toRaw } from "vue";
   import UserListTable from "./UserListTable.vue";
   import { usePaginationStore } from "@/stores/pagination";
@@ -243,9 +252,7 @@
     if (res.rows) roleList.value = res.rows;
     if (res.total) total.value = res.total;
   };
-  onMounted(() => {
-    fetchRoleList();
-  });
+  onMounted(fetchRoleList);
 
   // 添加/修改表单--------------
   const isAdd = ref(true);
@@ -260,7 +267,7 @@
   };
   let A_EForm: RoleItem;
   const menuTreeSelect = ref<MenuTreeItem[]>([]);
-  const rules = {
+  const rules: FormRules = {
     roleKey: [
       { required: true, message: "请输入权限字符", trigger: "blur" },
       { max: 15, message: "权限字符长度不能超过15个字符", trigger: "blur" },
