@@ -1,12 +1,13 @@
 export interface MenuItem {
   menuId?: number;
-  menuName: string;
   menuType: "M" | "C" | "F"; //M目录 C菜单  F按钮
   orderNum: number;
   parentId: number;
   visible: "0" | "1"; //0显示 1隐藏
-  status: "0" | "1"; //0正常 1停用
+
   // 上面是必填项
+  menuName?: string;
+  status?: string;
   path?: string;
   component?: string;
   perms?: string; // 权限字符
@@ -23,7 +24,4 @@ export interface MenuTreeItem {
   value: number;
   children?: MenuTreeItem[];
 }
-export interface GetMenuListParams {
-  menuName?: string; // 可选参数
-  status: "" | "0" | "1"; // 可选参数
-}
+export type GetMenuListParams = Pick<MenuItem, "menuName" | "status">;

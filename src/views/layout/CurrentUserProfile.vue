@@ -99,13 +99,21 @@
           <template v-if="isEditing">
             <el-form-item prop="sex">
               <el-radio-group v-model="userProfileForm.sex">
-                <el-radio :value="'1'">男</el-radio>
-                <el-radio :value="'0'">女</el-radio>
+                <el-radio
+                  v-for="i in dictStore.dictData.sys_user_sex"
+                  :value="i.dictValue"
+                  >{{ i.dictLabel }}</el-radio
+                >
               </el-radio-group>
             </el-form-item>
           </template>
           <template v-else>
-            {{ currentUserProfile.sex === "1" ? "男" : "女" }}
+            {{
+              getLabelByDictData(
+                currentUserProfile.sex,
+                dictStore.dictData.sys_user_sex
+              )
+            }}
           </template>
         </el-descriptions-item>
         <el-descriptions-item label="管理员" :align="'center'">
@@ -176,6 +184,7 @@
     userProfileAvatar,
   } from "@/api/system/userProfile";
   import { useAuthStore } from "@/stores/auth";
+  import { useDictStore } from "@/stores/dictData";
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
   import { passwordRule, userNameRule } from "@/utils/formRegularExpression";
@@ -187,13 +196,20 @@
     UploadRequestOptions,
     UploadUserFile,
   } from "element-plus";
-  import { computed, onMounted, reactive, ref } from "vue";
+  import { computed, onBeforeMount, onMounted, reactive, ref } from "vue";
+  import { getLabelByDictData } from "@/utils/dictDataToOptions";
 
-  // 获取个人信息-------------------
+  // 字典数据-----------
+  const dictStore = useDictStore();
+  onBeforeMount(() => {
+    dictStore.fetchDictData("sys_user_sex");
+  });
+
+  // 获取详细个人信息-------------------
   const currentUserProfile = ref<UserItem>();
   const getCurrentUserProfileFun = async () => {
     const res = (await getUserProfile()).data;
-    debugLog("个人信息=>", res);
+    debugLog("详细个人信息=>", res);
     currentUserProfile.value = res;
   };
   onMounted(() => {

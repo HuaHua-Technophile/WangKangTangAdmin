@@ -9,7 +9,7 @@ export const getUserProfile = () => {
       url: "/system/user/profile",
       method: "GET",
     },
-    "获取个人信息"
+    "获取详细个人信息"
   );
 };
 

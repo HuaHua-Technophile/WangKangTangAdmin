@@ -4,18 +4,24 @@
     <el-form
       :model="queryParams"
       class="flex-grow-1 d-flex justify-content-between align-items-center">
-      <el-form-item label="菜单名称" class="flex-grow-1 mx-md-2">
+      <el-form-item label="菜单名称" class="mx-md-2 flex-grow-1">
         <el-input
           v-model="queryParams.menuName"
           placeholder="请输入菜单名称"
           clearable />
       </el-form-item>
       <el-form-item label="状态" class="mx-md-2">
-        <el-radio-group v-model="queryParams.status">
-          <el-radio :value="''">全部</el-radio>
-          <el-radio :value="'0'">正常</el-radio>
-          <el-radio :value="'1'">停用</el-radio>
-        </el-radio-group>
+        <el-select
+          v-model="queryParams.status"
+          placeholder="全选"
+          clearable
+          style="width: 100px">
+          <el-option
+            v-for="option in dictStore.dictData.sys_normal_disable"
+            :key="option.dictCode"
+            :label="option.dictLabel"
+            :value="option.dictValue" />
+        </el-select>
       </el-form-item>
       <el-form-item class="mx-md-2">
         <el-button type="primary" @click="fetchMenuList">查询</el-button>
@@ -162,8 +168,11 @@
             prop="status"
             tip="选择停用则路由将不会出现在侧边栏，也不能被访问">
             <el-radio-group v-model="A_EForm.status">
-              <el-radio :value="'0'">正常</el-radio>
-              <el-radio :value="'1'">停用</el-radio>
+              <el-radio
+                v-for="i in dictStore.dictData.sys_normal_disable"
+                :value="i.dictValue"
+                >{{ i.dictLabel }}</el-radio
+              >
             </el-radio-group>
           </CustomFormItemTip>
           <CustomFormItemTip
@@ -171,8 +180,11 @@
             prop="visible"
             tip="选择隐藏则路由将不会出现在侧边栏，但仍然可以访问">
             <el-radio-group v-model="A_EForm.visible">
-              <el-radio :value="'0'">显示</el-radio>
-              <el-radio :value="'1'">隐藏</el-radio>
+              <el-radio
+                v-for="i in dictStore.dictData.sys_show_hide"
+                :value="i.dictValue"
+                >{{ i.dictLabel }}</el-radio
+              >
             </el-radio-group>
           </CustomFormItemTip>
         </div>
@@ -187,7 +199,7 @@
     MenuTreeItem,
   } from "@/types/system/menu";
   import { debugLog } from "@/utils/debug";
-  import { onMounted, reactive, ref, toRaw } from "vue";
+  import { onBeforeMount, onMounted, reactive, ref, toRaw } from "vue";
   import { addMenu, getMenuTreeSelect, getMenuList } from "@/api/system/menu";
   import CustomMenuTable from "./CustomMenuTable.vue";
   import MenuTableItem from "./MenuTableItem.vue";
@@ -198,13 +210,15 @@
     validateAlphaNumericUnderscore,
     validateNoChineseOrSpaces,
   } from "@/utils/formRegularExpression";
-
+  import { useDictStore } from "@/stores/dictData";
+  // 请求字典----------------
+  const dictStore = useDictStore();
+  onBeforeMount(() => {
+    dictStore.fetchDictData("sys_normal_disable");
+  });
   // 请求菜单列表-----------
   const menuTree = ref();
-  const queryParams = ref<GetMenuListParams>({
-    menuName: undefined,
-    status: "",
-  });
+  const queryParams = ref<GetMenuListParams>({});
   const buildTree = (items: MenuItem[]) => {
     const itemMap: Map<number, MenuItem> = new Map();
     const rootItems: MenuItem[] = [];
@@ -306,4 +320,3 @@
     });
   };
 </script>
-<style lang="scss" scoped></style>

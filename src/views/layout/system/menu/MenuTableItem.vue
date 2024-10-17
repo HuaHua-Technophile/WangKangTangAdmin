@@ -41,18 +41,29 @@
       >
     </template>
   </el-table-column>
-  <el-table-column label="隐藏" prop="visible">
+  <el-table-column label="隐藏">
     <template #default="{ row }">
-      <el-tag :type="row.isFrame == 0 ? 'danger' : 'primary'">{{
-        row.isFrame == 0 ? "是" : "否"
-      }}</el-tag>
+      <el-tag
+        :type="
+          getTagTypeByDictData(row.visible, dictStore.dictData.sys_show_hide)
+        ">
+        {{ getLabelByDictData(row.visible, dictStore.dictData.sys_show_hide) }}
+      </el-tag>
     </template>
   </el-table-column>
-  <el-table-column label="停用" prop="status">
+  <el-table-column label="停用">
     <template #default="{ row }">
-      <el-tag :type="row.isFrame == 0 ? 'danger' : 'primary'">{{
-        row.isFrame == 0 ? "停用" : "正常"
-      }}</el-tag>
+      <el-tag
+        :type="
+          getTagTypeByDictData(
+            row.status,
+            dictStore.dictData.sys_normal_disable
+          )
+        ">
+        {{
+          getLabelByDictData(row.status, dictStore.dictData.sys_normal_disable)
+        }}
+      </el-tag>
     </template>
   </el-table-column>
   <el-table-column label="权限" prop="perms" />
@@ -80,14 +91,25 @@
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
+  import {
+    getTagTypeByDictData,
+    getLabelByDictData,
+  } from "@/utils/dictDataToOptions";
   import { AxiosResponse } from "axios";
   import { ElMessage } from "element-plus";
-  import { reactive } from "vue";
+  import { onBeforeMount, reactive } from "vue";
+  import { useDictStore } from "@/stores/dictData";
   const props = defineProps<{
     fetchMenuList: () => void;
   }>();
 
-  // 表单
+  // 字典数据--------------------
+  const dictStore = useDictStore();
+  onBeforeMount(() => {
+    dictStore.fetchDictData("sys_normal_disable", "sys_show_hide");
+  });
+
+  // 表单-----------------------
   const A_EVisible = defineModel<boolean>("A_EVisible");
   const A_ETitle = defineModel<string>("A_ETitle");
   const isAdd = defineModel<boolean>("isAdd");

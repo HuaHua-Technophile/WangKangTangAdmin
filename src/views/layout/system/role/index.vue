@@ -17,11 +17,17 @@
           clearable />
       </el-form-item>
       <el-form-item label="状态" class="mx-md-2">
-        <el-radio-group v-model="queryParams.status">
-          <el-radio :value="''">全部</el-radio>
-          <el-radio :value="'0'">正常</el-radio>
-          <el-radio :value="'1'">停用</el-radio>
-        </el-radio-group>
+        <el-select
+          v-model="queryParams.status"
+          placeholder="全选"
+          clearable
+          style="width: 100px">
+          <el-option
+            v-for="option in dictStore.dictData.sys_normal_disable"
+            :key="option.dictCode"
+            :label="option.dictLabel"
+            :value="option.dictValue" />
+        </el-select>
       </el-form-item>
       <el-form-item class="mx-md-2">
         <el-button type="primary" @click="fetchRoleList">查询</el-button>
@@ -47,27 +53,25 @@
           }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态" prop="status">
+      <el-table-column label="停用">
         <template #default="{ row }">
-          <el-tag :type="row.isFrame == 0 ? 'danger' : 'primary'">{{
-            row.isFrame == 0 ? "停用" : "正常"
-          }}</el-tag>
+          <el-tag
+            :type="
+              getTagTypeByDictData(
+                row.status,
+                dictStore.dictData.sys_normal_disable
+              )
+            ">
+            {{
+              getLabelByDictData(
+                row.status,
+                dictStore.dictData.sys_normal_disable
+              )
+            }}
+          </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="更新时间">
-        <template #default="{ row }">
-          <!-- effect="light/dark"是反过来的  -->
-          <el-tooltip effect="light" placement="left">
-            <template #content>
-              更新: {{ row.updateTime || "无" }} <br />创建:
-              {{ row.createTime || "无" }}
-            </template>
-            <div>
-              {{ (row.updateTime || row.createTime).slice(5, 16) }}
-            </div>
-          </el-tooltip>
-        </template>
-      </el-table-column>
+      <DataTebleColumnTime />
       <el-table-column label="操作">
         <template #default="{ row }">
           <div class="d-flex justify-content-around align-items-center">
@@ -130,8 +134,11 @@
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="A_EForm.status">
-              <el-radio :value="'0'">正常</el-radio>
-              <el-radio :value="'1'">停用</el-radio>
+              <el-radio
+                v-for="i in dictStore.dictData.sys_normal_disable"
+                :value="i.dictValue"
+                >{{ i.dictLabel }}</el-radio
+              >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="管理员" prop="admin">
@@ -197,22 +204,31 @@
   import { RoleItem } from "@/types/system/role";
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
+  import {
+    getTagTypeByDictData,
+    getLabelByDictData,
+  } from "@/utils/dictDataToOptions";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { formatTreeSelect } from "@/utils/formatTreeSelect";
   import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
   import { AxiosResponse } from "axios";
   import { ElMessage, FormInstance } from "element-plus";
-  import { onMounted, reactive, ref, toRaw } from "vue";
+  import { onBeforeMount, onMounted, reactive, ref, toRaw } from "vue";
   import UserListTable from "./UserListTable.vue";
   import { usePaginationStore } from "@/stores/pagination";
+  import { useDictStore } from "@/stores/dictData";
+
+  // 字典数据--------------
+  const dictStore = useDictStore();
+  onBeforeMount(() => {
+    dictStore.fetchDictData("sys_normal_disable");
+  });
 
   // 请求角色列表-----------
   const roleList = ref<RoleItem[]>([]);
   const queryParams = reactive<
-    Pick<RoleItem, "roleKey" | "roleName" | "status">
-  >({
-    status: "",
-  });
+    Pick<RoleItem, "roleName" | "roleKey" | "status">
+  >({});
   const total = ref(0);
   const paginationStore = usePaginationStore();
 

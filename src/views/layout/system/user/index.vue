@@ -1,26 +1,32 @@
 <template>
   <div>
     <!-- 查询表单 -->
-    <el-form :model="queryForm" class="d-flex align-items-center">
+    <el-form :model="queryParams" class="d-flex align-items-center">
       <el-form-item label="用户名" class="mx-md-2 flex-grow-1">
         <el-input
-          v-model="queryForm.userName"
+          v-model="queryParams.userName"
           placeholder="用户名(非昵称)"
           clearable />
       </el-form-item>
       <el-form-item label="手机号" class="mx-md-2 flex-grow-1">
         <el-input
-          v-model="queryForm.phonenumber"
+          v-model="queryParams.phonenumber"
           placeholder="请输入手机号"
           clearable
           class="flex-grow-1" />
       </el-form-item>
       <el-form-item label="状态" class="mx-md-2">
-        <el-radio-group v-model="queryForm.status">
-          <el-radio :value="''">全部</el-radio>
-          <el-radio :value="'0'">禁用</el-radio>
-          <el-radio :value="'1'">启用</el-radio>
-        </el-radio-group>
+        <el-select
+          v-model="queryParams.status"
+          placeholder="全选"
+          clearable
+          style="width: 100px">
+          <el-option
+            v-for="option in dictStore.dictData.sys_normal_disable"
+            :key="option.dictCode"
+            :label="option.dictLabel"
+            :value="option.dictValue" />
+        </el-select>
       </el-form-item>
       <el-form-item class="mx-md-2">
         <el-button type="primary" @click="handleQuery">查询</el-button>
@@ -46,7 +52,7 @@
       <el-table-column prop="phonenumber" label="手机号" />
       <el-table-column label="性别">
         <template #default="{ row }">
-          {{ row.sex === "0" ? "女" : "男" }}
+          {{ getLabelByDictData(row.sex, dictStore.dictData.sys_user_sex) }}
         </template>
       </el-table-column>
       <el-table-column label="管理员">
@@ -56,10 +62,21 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态">
+      <el-table-column label="停用">
         <template #default="{ row }">
-          <el-tag :type="row.status === '0' ? 'primary' : 'danger'">
-            {{ row.status === "0" ? "正常" : "停用" }}
+          <el-tag
+            :type="
+              getTagTypeByDictData(
+                row.status,
+                dictStore.dictData.sys_normal_disable
+              )
+            ">
+            {{
+              getLabelByDictData(
+                row.status,
+                dictStore.dictData.sys_normal_disable
+              )
+            }}
           </el-tag>
         </template>
       </el-table-column>
@@ -163,14 +180,20 @@
         <div class="d-flex justify-content-between align-items-center">
           <el-form-item label="性别" prop="sex">
             <el-radio-group v-model="A_EForm.sex">
-              <el-radio :value="'1'">男</el-radio>
-              <el-radio :value="'0'">女</el-radio>
+              <el-radio
+                v-for="i in dictStore.dictData.sys_user_sex"
+                :value="i.dictValue"
+                >{{ i.dictLabel }}</el-radio
+              >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="A_EForm.status">
-              <el-radio :value="'0'">正常</el-radio>
-              <el-radio :value="'1'">停用</el-radio>
+              <el-radio
+                v-for="i in dictStore.dictData.sys_normal_disable"
+                :value="i.dictValue"
+                >{{ i.dictLabel }}</el-radio
+              >
             </el-radio-group>
           </el-form-item>
           <el-form-item v-if="A_EForm.userId">
@@ -185,7 +208,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, onMounted } from "vue";
+  import { ref, reactive, onMounted, onBeforeMount } from "vue";
   import {
     ElMessage,
     FormInstance,
@@ -207,9 +230,19 @@
   import { cloneDeep } from "lodash";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { usePaginationStore } from "@/stores/pagination";
+  import { useDictStore } from "@/stores/dictData";
+  import {
+    getTagTypeByDictData,
+    getLabelByDictData,
+  } from "@/utils/dictDataToOptions";
 
+  // 字典数据------------------
+  const dictStore = useDictStore();
+  onBeforeMount(() => {
+    dictStore.fetchDictData("sys_normal_disable", "sys_user_sex");
+  });
   // 查询用户列表------------------
-  const queryForm = reactive<
+  const queryParams = reactive<
     Pick<UserItem, "phonenumber" | "userName" | "status">
   >({
     status: "",
@@ -223,7 +256,7 @@
     const res = await getUserList({
       pageNum: currentPage.value,
       pageSize: paginationStore.pageSize,
-      ...queryForm,
+      ...queryParams,
     });
     debugLog("用户列表=>", res);
     if (res.code === 200) {

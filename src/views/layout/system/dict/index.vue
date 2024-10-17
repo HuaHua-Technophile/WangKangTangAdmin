@@ -1,25 +1,31 @@
 <template>
   <div>
     <!-- 搜索区域 -->
-    <el-form :model="queryForm" class="d-flex align-items-center">
+    <el-form :model="queryParams" class="d-flex align-items-center">
       <el-form-item label="字典名称" class="mx-md-2 flex-grow-1">
         <el-input
-          v-model="queryForm.dictName"
+          v-model="queryParams.dictName"
           placeholder="请输入字典名称"
           clearable />
       </el-form-item>
       <el-form-item label="字典类型" class="mx-md-2 flex-grow-1">
         <el-input
-          v-model="queryForm.dictType"
+          v-model="queryParams.dictType"
           placeholder="请输入字典类型"
           clearable />
       </el-form-item>
       <el-form-item label="状态" class="mx-md-2">
-        <el-radio-group v-model="queryForm.status">
-          <el-radio :value="''">全部</el-radio>
-          <el-radio :value="'0'">正常</el-radio>
-          <el-radio :value="'1'">停用</el-radio>
-        </el-radio-group>
+        <el-select
+          v-model="queryParams.status"
+          placeholder="全选"
+          clearable
+          style="width: 100px">
+          <el-option
+            v-for="option in dictStore.dictData.sys_normal_disable"
+            :key="option.dictCode"
+            :label="option.dictLabel"
+            :value="option.dictValue" />
+        </el-select>
       </el-form-item>
       <el-form-item class="mx-md-2">
         <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -40,10 +46,21 @@
       <el-table-column type="selection" width="30" />
       <el-table-column prop="dictName" label="字典名称" />
       <el-table-column prop="dictType" label="字典类型" />
-      <el-table-column prop="status" label="状态">
+      <el-table-column label="停用">
         <template #default="{ row }">
-          <el-tag :type="row.status === '0' ? 'primary' : 'danger'">
-            {{ row.status === "0" ? "正常" : "停用" }}
+          <el-tag
+            :type="
+              getTagTypeByDictData(
+                row.status,
+                dictStore.dictData.sys_normal_disable
+              )
+            ">
+            {{
+              getLabelByDictData(
+                row.status,
+                dictStore.dictData.sys_normal_disable
+              )
+            }}
           </el-tag>
         </template>
       </el-table-column>
@@ -109,8 +126,11 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="A_EForm.status">
-            <el-radio :value="'0'">正常</el-radio>
-            <el-radio :value="'1'">停用</el-radio>
+            <el-radio
+              v-for="i in dictStore.dictData.sys_normal_disable"
+              :value="i.dictValue"
+              >{{ i.dictLabel }}</el-radio
+            >
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -137,8 +157,11 @@
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="dictDataForm.status">
-              <el-radio :value="'0'">正常</el-radio>
-              <el-radio :value="'1'">停用</el-radio>
+              <el-radio
+                v-for="i in dictStore.dictData.sys_normal_disable"
+                :value="i.dictValue"
+                >{{ i.dictLabel }}</el-radio
+              >
             </el-radio-group>
           </el-form-item>
         </div>
@@ -216,7 +239,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, onMounted } from "vue";
+  import { ref, reactive, onMounted, onBeforeMount } from "vue";
   import {
     ElMessage,
     FormInstance,
@@ -242,9 +265,19 @@
   import { cloneDeep } from "lodash";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { usePaginationStore } from "@/stores/pagination";
+  import { useDictStore } from "@/stores/dictData";
+  import {
+    getTagTypeByDictData,
+    getLabelByDictData,
+  } from "@/utils/dictDataToOptions";
 
+  // 字典数据---------------
+  const dictStore = useDictStore();
+  onBeforeMount(() => {
+    dictStore.fetchDictData("sys_normal_disable");
+  });
   // 搜索表单------------------------
-  const queryForm = reactive<DictTypeItem>({
+  const queryParams = reactive<DictTypeItem>({
     status: "",
   });
   const dictTypeList = ref<DictTypeItem[]>();
@@ -256,7 +289,7 @@
     const res = await getDictTypeList({
       pageNum: currentPage.value,
       pageSize: paginationStore.pageSize,
-      ...queryForm,
+      ...queryParams,
     });
     debugLog("字典类型列表=>", res);
     if (res.rows && res.total !== undefined) {

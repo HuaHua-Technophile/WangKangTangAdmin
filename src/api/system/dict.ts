@@ -99,3 +99,14 @@ export const editDictData = (data: DictDataItem) => {
     "修改字典数据"
   );
 };
+
+// 5.系统选单中，获取字典数据
+export const getDictDataByDictType = (dictType: string) => {
+  return customRequest<DictDataItem[]>(
+    {
+      method: "GET",
+      url: `/system/dict/data/type/${dictType}`,
+    },
+    `获取${dictType}的字典数据`
+  );
+};

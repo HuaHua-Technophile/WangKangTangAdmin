@@ -8,7 +8,7 @@ export interface DictTypeItem {
   status: "" | "0" | "1";
 }
 export type DictTypeParams = PaginationParams &
-  Partial<Omit<DictTypeItem, "dictId">>;
+  Pick<DictTypeItem, "status" | "dictName" | "dictType">;
 
 export interface DictDataItem {
   dictType?: string; //不可修改,表示父字典类型
@@ -21,4 +21,4 @@ export interface DictDataItem {
   status?: "0" | "1";
 }
 export type DictDataParams = PaginationParams &
-  Partial<Omit<DictDataItem, "dictCode">>;
+  Pick<DictDataItem, "status" | "dictType">;
