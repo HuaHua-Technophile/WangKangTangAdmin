@@ -7,7 +7,7 @@
   import Quill from "quill";
   import "quill/dist/quill.snow.css";
 
-  const { placeholder } = withDefaults(defineProps<{ placeholder: string }>(), {
+  const props = withDefaults(defineProps<{ placeholder: string }>(), {
     placeholder: "请输入内容......",
   });
 
@@ -20,7 +20,7 @@
     if (quillEditor.value) {
       quill = new Quill(quillEditor.value, {
         theme: "snow",
-        placeholder,
+        placeholder: props.placeholder,
         modules: {
           toolbar: [
             [{ header: "1" }, { header: "2" }, { font: [] }],
