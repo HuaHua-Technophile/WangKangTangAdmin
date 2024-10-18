@@ -45,7 +45,7 @@
     </el-form>
     <!-- 表格 -->
     <el-table
-      ref="configTable"
+      ref="noticeTable"
       :data="configList"
       table-layout="auto"
       cell-class-name="text-center"

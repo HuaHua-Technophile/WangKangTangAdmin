@@ -14,11 +14,11 @@ export const getConfigList = (params: ConfigParams) => {
 };
 
 // 2. 删除参数设置
-export const delConfigs = (params: number[]) => {
+export const delConfigs = (configIds: number[]) => {
   return customRequest(
     {
       method: "DELETE",
-      url: `/system/config/${params}`,
+      url: `/system/config/${configIds}`,
     },
     `删除参数设置`
   );

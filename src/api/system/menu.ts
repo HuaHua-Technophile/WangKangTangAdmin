@@ -47,7 +47,7 @@ export const getMenuList = (params: GetMenuListParams) => {
   ); // 调用二次封装的请求方法
 };
 
-// 封装获取菜单列表的请求方法
+// 封装获取菜单树列表的请求方法
 export const getMenuTreeSelect = () => {
   return customRequest<MenuTreeItem[]>(
     {
