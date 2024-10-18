@@ -3,8 +3,8 @@
     <div class="mb-3 d-flex justify-content-between align-items-center">
       <el-pagination
         v-model:current-page="currentPage"
-        :page-size="pageSize"
-        :total="total"
+        :page-size="props.pageSize"
+        :total="props.total"
         background
         hideOnSinglePage
         @current-change="handleCurrentChange" />
@@ -12,11 +12,11 @@
         @click="handleAction"
         :disabled="!selectedUsers.length"
         type="primary">
-        {{ actionText }}
+        {{ props.actionText }}
       </el-button>
     </div>
     <el-table
-      :data="users"
+      :data="props.users"
       table-layout="auto"
       cell-class-name="text-center"
       header-cell-class-name="text-center"
@@ -58,7 +58,7 @@
   import { UserItem } from "@/types/system/user";
   import { toRaw } from "vue";
 
-  const { users, total, pageSize, actionText } = withDefaults(
+  const props = withDefaults(
     defineProps<{
       users: UserItem[];
       total: number;
@@ -66,7 +66,6 @@
       actionText: string;
     }>(),
     {
-      users: () => [],
       total: 0,
       pageSize: 10,
       actionText: "操作",
