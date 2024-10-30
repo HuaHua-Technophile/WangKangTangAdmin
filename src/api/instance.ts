@@ -36,6 +36,8 @@ service.interceptors.request.use(
   }
 );
 
+// 在service外部定义一个标志位
+let isShowingLoginBox = false;
 // Response 拦截器
 service.interceptors.response.use(
   (response) => {
@@ -46,14 +48,25 @@ service.interceptors.response.use(
     if (response.status === 200) {
       // 开发者自定义的API业务逻辑的状态，在若依框架下，401表示验证过期
       if (response.data.code === 401) {
-        ElMessageBox.confirm("您已登出，请重新登录", "确认登出", {
-          confirmButtonText: "重新登录",
-          cancelButtonText: "取消",
-          type: "warning",
-        }).then(() => {
-          const authStore = useAuthStore(); // 获取 auth store
-          authStore.logout(); // 调用 logout 方法
-        });
+        // 检查是否已经显示登录框
+        if (!isShowingLoginBox) {
+          isShowingLoginBox = true; // 设置标志位
+          ElMessageBox.confirm("您已登出，请重新登录", "确认登出", {
+            confirmButtonText: "重新登录",
+            cancelButtonText: "取消",
+            type: "warning",
+            // queue: true, // 启用队列，防止重复弹窗
+          })
+            .then(() => {
+              const authStore = useAuthStore(); // 获取 auth store
+              authStore.logout(); // 调用 logout 方法
+            })
+            .finally(() => {
+              isShowingLoginBox = false; // 重置标志位
+            });
+        }
+        // 统一返回一个被拒绝的 Promise，这样其他请求也会进入错误处理
+        return Promise.reject(new Error("未登录或登录过期"));
       } else return response.data;
     }
     // HTTP请求异常，请求在网络或服务器层面有问题，需要进行网络错误处理
