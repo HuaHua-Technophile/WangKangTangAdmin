@@ -122,7 +122,10 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="角色" :align="'center'">
-          <el-tag v-for="role in currentUserProfile.roles" :key="role.roleId">
+          <el-tag
+            v-for="(role, index) in currentUserProfile.roles"
+            :key="role.roleId"
+            :class="[{ 'me-2': index > 0 }]">
             {{ role.roleName }}
           </el-tag>
         </el-descriptions-item>

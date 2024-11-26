@@ -289,7 +289,7 @@
     phonenumber: "",
     password: "",
     confirmPassword: "",
-    sex: "1",
+    sex: "0",
     status: "0",
   };
   let A_EForm: UserFormData;

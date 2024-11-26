@@ -8,7 +8,7 @@ export interface UserItem {
   nickName: string;
   email: string;
   phonenumber?: string;
-  sex: "0" | "1"; //性别：0-女，1-男
+  sex: "0" | "1"; //性别：0-男，1-女
   roles?: {
     roleId: number;
     roleName: string;

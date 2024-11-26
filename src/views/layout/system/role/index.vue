@@ -58,7 +58,7 @@
       <el-table-column label="管理员" prop="admin">
         <template #default="{ row }">
           <el-tag :type="row.isAdmin ? 'danger' : 'primary'">{{
-            row.isAdmin ? "否" : "是"
+            row.admin ? "否" : "是"
           }}</el-tag>
         </template>
       </el-table-column>
@@ -95,7 +95,8 @@
             <Icon
               icon="icon-bianji"
               class="cursor-pointer"
-              @click="toEditRole(row)" />
+              @click="toEditRole(row)"
+              v-if="row.roleName != '超级管理员'" />
             <Icon
               icon="icon-shanchu"
               class="cursor-pointer text-danger"
