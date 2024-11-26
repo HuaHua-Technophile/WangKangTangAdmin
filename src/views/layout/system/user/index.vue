@@ -2,10 +2,10 @@
   <div>
     <!-- 搜索表单 -->
     <el-form :model="queryParams" class="d-flex align-items-center">
-      <el-form-item label="用户名" class="mx-md-2 flex-grow-1">
+      <el-form-item label="账号" class="mx-md-2 flex-grow-1">
         <el-input
           v-model="queryParams.userName"
-          placeholder="用户名(非昵称)"
+          placeholder="账号(非昵称)"
           clearable />
       </el-form-item>
       <el-form-item label="手机号" class="mx-md-2 flex-grow-1">
@@ -55,7 +55,7 @@
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30" :selectable="selectable" />
       <el-table-column prop="userId" label="ID" />
-      <el-table-column prop="userName" label="用户名" />
+      <el-table-column prop="userName" label="账号" />
       <el-table-column prop="nickName" label="昵称" />
       <el-table-column prop="email" label="邮箱" />
       <el-table-column prop="phonenumber" label="手机号" />
@@ -146,10 +146,10 @@
         label-width="auto"
         :rules="rules"
         v-if="A_EForm">
-        <el-form-item label="用户名" prop="userName">
+        <el-form-item label="账号" prop="userName" v-if="isAdd">
           <el-input
             v-model="A_EForm.userName"
-            placeholder="请输入用户名"
+            placeholder="请输入账号"
             clearable />
         </el-form-item>
         <el-form-item label="昵称" prop="nickName">

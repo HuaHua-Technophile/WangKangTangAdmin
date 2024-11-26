@@ -49,23 +49,16 @@
             >
           </el-upload>
         </el-descriptions-item>
-        <el-descriptions-item
-          label="用户名"
-          :align="'center'"
-          class-name="py-0">
-          <template v-if="isEditing">
-            <el-form-item prop="userName">
-              <el-input v-model="userProfileForm.userName" />
-            </el-form-item>
-          </template>
-          <template v-else>
-            {{ currentUserProfile.userName }}
-          </template>
+        <el-descriptions-item label="账号" :align="'center'" class-name="py-0">
+          {{ currentUserProfile.userName }}
         </el-descriptions-item>
         <el-descriptions-item label="昵称" :align="'center'" class-name="py-0">
           <template v-if="isEditing">
             <el-form-item prop="nickName">
-              <el-input v-model="userProfileForm.nickName" />
+              <el-input
+                v-model="userProfileForm.nickName"
+                placeholder="请输入昵称"
+                clearable />
             </el-form-item>
           </template>
           <template v-else>
@@ -75,7 +68,10 @@
         <el-descriptions-item label="邮箱" :align="'center'" class-name="py-0">
           <template v-if="isEditing">
             <el-form-item prop="email">
-              <el-input v-model="userProfileForm.email" />
+              <el-input
+                v-model="userProfileForm.email"
+                placeholder="请输入邮箱"
+                clearable />
             </el-form-item>
           </template>
           <template v-else>
@@ -88,7 +84,11 @@
           class-name="py-0">
           <template v-if="isEditing">
             <el-form-item prop="phonenumber">
-              <el-input v-model="userProfileForm.phonenumber" />
+              <el-input
+                v-model="userProfileForm.phonenumber"
+                placeholder="请输入手机号码"
+                clearable
+                maxlength="11" />
             </el-form-item>
           </template>
           <template v-else>
@@ -187,7 +187,7 @@
   import { useDictStore } from "@/stores/dictData";
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
-  import { passwordRule, userNameRule } from "@/utils/formRegularExpression";
+  import { passwordRule } from "@/utils/formRegularExpression";
   import {
     ElMessage,
     FormInstance,
@@ -224,14 +224,13 @@
   const isEditing = ref(false);
   const formRef = ref<FormInstance>();
   const userProfileForm = reactive<UserItem>({
-    userName: "",
     nickName: "",
     email: "",
     phonenumber: "",
     sex: "1",
   });
   const profileRules = {
-    userName: userNameRule,
+    nickName: [{ required: true, message: "请输入昵称", trigger: "blur" }],
     email: [
       { required: true, message: "请输入邮箱地址", trigger: "blur" },
       {
@@ -259,7 +258,7 @@
             ElMessage.success("更新个人信息成功,部分信息生效需重新登录");
             getCurrentUserProfileFun();
             isEditing.value = false;
-          }
+          } else ElMessage.error(res.msg || "更新个人信息失败");
         }
       });
     } else {

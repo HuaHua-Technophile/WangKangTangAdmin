@@ -23,7 +23,7 @@
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30" />
       <el-table-column prop="userId" label="ID" />
-      <el-table-column prop="userName" label="用户名" />
+      <el-table-column prop="userName" label="账号" />
       <el-table-column prop="nickName" label="昵称" />
       <el-table-column prop="email" label="邮箱" />
       <el-table-column prop="phonenumber" label="手机号" />

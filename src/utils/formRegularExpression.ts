@@ -53,8 +53,8 @@ export const passwordRule = [
 ];
 
 export const userNameRule = [
-  { required: true, message: "请输入用户名", trigger: "blur" },
-  { min: 3, max: 15, message: "用户名长度在3~15个字符", trigger: "blur" },
+  { required: true, message: "请输入账号", trigger: "blur" },
+  { min: 3, max: 15, message: "账号长度在3~15个字符", trigger: "blur" },
   {
     validator: validateAlphaNumericUnderscore,
     trigger: "blur",

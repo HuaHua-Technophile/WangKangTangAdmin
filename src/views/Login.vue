@@ -9,12 +9,12 @@
         :rules="rules"
         ref="loginFormRef"
         label-position="top">
-        <el-form-item label="用户名" prop="username">
+        <el-form-item label="账号" prop="username">
           <el-input
             v-model.trim="loginForm.username"
             clearable
             @keyup.enter="handleLogin"
-            placeholder="请输入用户名"></el-input>
+            placeholder="请输入账号" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input
@@ -23,7 +23,7 @@
             @keyup.enter="handleLogin"
             type="password"
             show-password
-            placeholder="请输入密码"></el-input>
+            placeholder="请输入密码" />
         </el-form-item>
         <el-form-item>
           <el-button
