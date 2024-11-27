@@ -1,5 +1,11 @@
 <template>
-  <div ref="quillEditor" style="min-height: 200px" />
+  <div
+    ref="quillEditor"
+    style="
+      min-height: 200px;
+      max-height: calc(100vh - 233px);
+      overflow-y: auto;
+    " />
 </template>
 
 <script setup lang="ts">
@@ -50,5 +56,5 @@
   watch(modelValue, (newValue) => {
     if (quill && quill.root.innerHTML !== newValue)
       quill.root.innerHTML = newValue || "";
-  });
+  }); //该组件只会实例化一次,但是可能用于编辑不同的公告.因此,需要在每一次切换公告时,自动的清空编辑器并重新输入内容
 </script>

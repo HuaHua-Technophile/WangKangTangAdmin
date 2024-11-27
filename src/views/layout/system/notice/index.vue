@@ -125,7 +125,8 @@
       v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
       :submitForm="submitForm"
-      :width="'80vw'">
+      :width="'80vw'"
+      class="mt-0 mb-0">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
           >ID:{{ A_EForm && A_EForm["noticeId"] }}</span
