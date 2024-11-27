@@ -1,7 +1,8 @@
 // src/stores/history.ts
-import { ref } from "vue";
+import { ref, toRaw } from "vue";
 import { defineStore } from "pinia";
 import { useRouter } from "vue-router";
+import { debugLog } from "@/utils/debug";
 export const useHistoryStore = defineStore(
   "history",
   () => {
@@ -9,7 +10,7 @@ export const useHistoryStore = defineStore(
 
     const addRoute = (route: { path: string; title: string }) => {
       if (!historyRoutes.value.some((i) => i.path === route.path))
-        historyRoutes.value.push(route); // 检查是否已经存在
+        historyRoutes.value.push(route); // 检查是否已经存在，不存在则写入历史路由
     };
 
     const router = useRouter();
@@ -18,10 +19,11 @@ export const useHistoryStore = defineStore(
       historyRoutes.value.splice(index, 1); // 删除路由
 
       const isCurrentRoute = router.currentRoute.value.path === path; // 判断待关闭路由是否为当前激活项
-
-      if ((historyRoutes.value.length = 0))
+      // debugLog(`关闭了第${index}历史路由`, path, toRaw(historyRoutes.value));
+      if (historyRoutes.value.length == 0)
         router.push("/"); //路由被全部关掉了，跳转布局组件
-      else if (isCurrentRoute) router.go(-1); //路由还剩下，但是关闭的是当前路由，则跳回上一个
+      else if (isCurrentRoute) router.go(-1);
+      //路由还剩下，但是关闭的是当前路由，则跳回上一个
     };
     return {
       historyRoutes,

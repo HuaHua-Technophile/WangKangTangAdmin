@@ -1,7 +1,7 @@
 // src/router/index.ts
 import { createWebHistory, createRouter, RouteRecordRaw } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { debugLog } from "@/utils/debug";
+import { debugError, debugLog } from "@/utils/debug";
 import { getRouters } from "@/api/routes";
 import { useHistoryStore } from "@/stores/history";
 
@@ -21,9 +21,7 @@ const addRoute = (routes: RouteRecordRaw[]) => {
           },
           component: modules[componentPath], // 使用预加载的组件
         });
-      } else {
-        console.error(`Component not found: ${componentPath}`);
-      }
+      } else debugError(`路由未找到: ${componentPath}`);
     });
   });
 
