@@ -13,15 +13,15 @@
   <el-table-column label="组件地址" prop="component" />
   <el-table-column label="外链" prop="isFrame">
     <template #default="{ row }">
-      <el-tag :type="row.isFrame == 0 ? 'primary' : 'info'">{{
-        row.isFrame == 0 ? "是" : "否"
+      <el-tag :type="row.isFrame == '0' ? 'primary' : 'info'">{{
+        row.isFrame == "0" ? "是" : "否"
       }}</el-tag>
     </template>
   </el-table-column>
   <el-table-column label="缓存" prop="isCache">
     <template #default="{ row }">
-      <el-tag :type="row.isFrame == 0 ? '' : 'info'">{{
-        row.isFrame == 0 ? "是" : "否"
+      <el-tag :type="row.isCache == '0' ? 'primary' : 'info'">{{
+        row.isCache == "0" ? "是" : "否"
       }}</el-tag>
     </template>
   </el-table-column>

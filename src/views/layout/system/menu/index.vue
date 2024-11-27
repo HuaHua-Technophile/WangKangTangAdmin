@@ -140,16 +140,17 @@
         <el-form-item label="图标" prop="icon" v-if="A_EForm.menuType !== 'F'">
           <el-input v-model="A_EForm.icon" />
         </el-form-item>
+        <!-- <div class="d-flex align-items-center justify-content-between"> -->
         <div
           class="d-flex align-items-center justify-content-between"
-          v-if="A_EForm.menuType !== 'F'">
+          v-show="A_EForm.menuType !== 'F'">
           <CustomFormItemTip
             prop="isFrame"
             label="外链"
             tip="选择是外链则路由地址需要以`http(s)://`开头">
             <el-radio-group v-model="A_EForm.isFrame">
-              <el-radio :value="'1'">是</el-radio>
-              <el-radio :value="'0'">否</el-radio>
+              <el-radio :value="'0'">是</el-radio>
+              <el-radio :value="'1'">否</el-radio>
             </el-radio-group>
           </CustomFormItemTip>
           <CustomFormItemTip
@@ -313,7 +314,7 @@
           A_EVisible.value = false;
           ElMessage.success(`${A_ETitle.value}成功`);
           fetchMenuList();
-        }
+        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
       }
     });
   };
