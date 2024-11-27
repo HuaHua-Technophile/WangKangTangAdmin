@@ -83,11 +83,12 @@
       <DataTebleColumnTime />
       <el-table-column label="操作">
         <template #default="{ row }">
-          <div class="d-flex justify-content-around align-items-center">
+          <div
+            class="d-flex justify-content-around align-items-center"
+            v-if="row.roleName != '超级管理员'">
             <div
               class="d-flex align-items-center cursor-pointer"
-              @click="openDrawer(row.roleId)"
-              v-if="row.roleName != '超级管理员'">
+              @click="openDrawer(row.roleId)">
               授权角色
               <Icon
                 icon="icon-riLine-contacts-line"
@@ -100,8 +101,7 @@
             <Icon
               icon="icon-shanchu"
               class="cursor-pointer text-danger"
-              @click="toDelRole(row)"
-              v-if="row.roleName != '超级管理员'" />
+              @click="toDelRole(row)" />
           </div>
         </template>
       </el-table-column>
