@@ -164,7 +164,8 @@
             :data="menuTreeSelect"
             multiple
             :render-after-expand="false"
-            show-checkbox />
+            show-checkbox
+            check-strictly />
         </el-form-item>
       </el-form>
     </A_EDialog>
@@ -316,8 +317,8 @@
     if (row.roleId) {
       const res = await getRoleMenuTreeselect(row.roleId);
       if (res.code === 200 && res.menus) {
-        menuTreeSelect.value = await formatTreeSelect(res.menus);
         debugLog("已授权的菜单=>", res);
+        menuTreeSelect.value = await formatTreeSelect(res.menus);
 
         A_EForm = reactive({
           roleId: row.roleId,
