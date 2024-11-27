@@ -11,6 +11,6 @@ export const getTagTypeByDictData = (
   value: string | number,
   dictData: DictDataItem[]
 ) => {
-  const item = dictData.find((dictItem) => dictItem.dictValue == value);
+  const item = dictData?.find((dictItem) => dictItem.dictValue == value);
   return item ? item.listClass : "info";
 };

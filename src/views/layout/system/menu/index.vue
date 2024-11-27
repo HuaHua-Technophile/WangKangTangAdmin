@@ -120,14 +120,14 @@
           label="路由路径"
           prop="path"
           tip="访问的路由地址，如：`user`，如外网地址需内链访问则以`http(s)://`开头"
-          v-if="A_EForm.menuType !== 'F'">
+          v-show="A_EForm.menuType !== 'F'">
           <el-input v-model="A_EForm.path" />
         </CustomFormItemTip>
         <CustomFormItemTip
           label="组件地址"
           prop="component"
           tip="访问的组件路径，如：`system/user/index`，默认在`views`目录下"
-          v-if="A_EForm.menuType !== 'F' && A_EForm.menuType !== 'M'">
+          v-show="A_EForm.menuType !== 'F' && A_EForm.menuType !== 'M'">
           <el-input v-model="A_EForm.component" />
         </CustomFormItemTip>
         <CustomFormItemTip
@@ -137,7 +137,10 @@
           v-if="A_EForm.menuType !== 'M'">
           <el-input v-model="A_EForm.perms" />
         </CustomFormItemTip>
-        <el-form-item label="图标" prop="icon" v-if="A_EForm.menuType !== 'F'">
+        <el-form-item
+          label="图标"
+          prop="icon"
+          v-show="A_EForm.menuType !== 'F'">
           <el-input v-model="A_EForm.icon" />
         </el-form-item>
         <!-- <div class="d-flex align-items-center justify-content-between"> -->
