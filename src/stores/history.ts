@@ -1,8 +1,7 @@
 // src/stores/history.ts
-import { ref, toRaw } from "vue";
+import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useRouter } from "vue-router";
-import { debugLog } from "@/utils/debug";
 export const useHistoryStore = defineStore(
   "history",
   () => {
