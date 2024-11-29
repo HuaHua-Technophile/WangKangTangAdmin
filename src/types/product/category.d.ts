@@ -1,12 +1,14 @@
 // @/types/product/category.ts
 
 export interface CategoryItem {
-  id: number;
-  name?: string;
-  parentId: number;
-  orderNum: number;
-  status?: string;
-  // 其他必要的字段...
+  id?: number;
+  name?: string; //分类名称
+  parentId?: number; //父分类
+  ancestors?: array; //祖级列表
+  icon?: string; //分类的图片
+  sort: number; //排序
+  status?: number; //0禁用 1启用
+  children?: CategoryItem[]; //子分类
 }
 
 export type CategoryParams = PaginationParams &

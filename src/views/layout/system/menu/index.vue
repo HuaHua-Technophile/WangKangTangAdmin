@@ -143,7 +143,6 @@
           v-show="A_EForm.menuType !== 'F'">
           <el-input v-model="A_EForm.icon" />
         </el-form-item>
-        <!-- <div class="d-flex align-items-center justify-content-between"> -->
         <div
           class="d-flex align-items-center justify-content-between"
           v-show="A_EForm.menuType !== 'F'">
@@ -197,24 +196,21 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import {
-    GetMenuListParams,
-    MenuItem,
-    MenuTreeItem,
-  } from "@/types/system/menu";
+  import { GetMenuListParams, MenuItem } from "@/types/system/menu";
   import { debugLog } from "@/utils/debug";
   import { onBeforeMount, onMounted, reactive, ref, toRaw } from "vue";
   import { addMenu, getMenuTreeSelect, getMenuList } from "@/api/system/menu";
   import CustomMenuTable from "./CustomMenuTable.vue";
   import MenuTableItem from "./MenuTableItem.vue";
   import { AxiosResponse } from "axios";
-  import { formatTreeSelect } from "@/utils/formatTreeSelect";
+  import { formatTreeSelectByTree } from "@/utils/formatTreeSelectByTree";
   import { ElMessage, FormInstance, FormRules } from "element-plus";
   import {
     validateAlphaNumericUnderscore,
     validateNoChineseOrSpaces,
   } from "@/utils/formRegularExpression";
   import { useDictStore } from "@/stores/dictData";
+  import { TreeSelectItem } from "@/types/treeSelect";
   // 请求字典----------------
   const dictStore = useDictStore();
   onBeforeMount(() => {
@@ -292,7 +288,7 @@
     icon: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
   };
   let A_EForm: MenuItem;
-  const menuTreeSelect = ref<MenuTreeItem[]>();
+  const menuTreeSelect = ref<TreeSelectItem[]>();
   let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
 
   // 提交修改/添加-------------
@@ -303,7 +299,10 @@
     A_EFun = addMenu;
     A_EForm = reactive(defaultForm);
     const res = (await getMenuTreeSelect()).data;
-    menuTreeSelect.value = await formatTreeSelect(res);
+    menuTreeSelect.value = await formatTreeSelectByTree({
+      flat: res,
+      rootLabel: "根目录",
+    });
     debugLog("下拉树菜单列表=>", res, "格式化后=>", menuTreeSelect.value);
   };
   const A_EFormRef = ref<FormInstance>();

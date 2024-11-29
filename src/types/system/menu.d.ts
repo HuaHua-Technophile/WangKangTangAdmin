@@ -20,8 +20,8 @@ export interface MenuItem {
 }
 export interface MenuTreeItem {
   id: number;
-  label: string;
-  value: number;
+  label?: string;
+  value?: number;
   children?: MenuTreeItem[];
 }
 export type GetMenuListParams = Pick<MenuItem, "menuName" | "status">;

@@ -87,10 +87,10 @@
 </template>
 <script lang="ts" setup>
   import { delMenu, editMenu, getMenuTreeSelect } from "@/api/system/menu";
-  import { MenuItem, MenuTreeItem } from "@/types/system/menu";
+  import { MenuItem } from "@/types/system/menu";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
-  import { formatTreeSelect } from "@/utils/formatTreeSelect";
+  import { formatTreeSelectByTree } from "@/utils/formatTreeSelectByTree";
   import {
     getTagTypeByDictData,
     getLabelByDictData,
@@ -99,6 +99,7 @@
   import { ElMessage } from "element-plus";
   import { onBeforeMount, reactive } from "vue";
   import { useDictStore } from "@/stores/dictData";
+  import { TreeSelectItem } from "@/types/treeSelect";
   const props = defineProps<{
     fetchMenuList: () => void;
   }>();
@@ -116,7 +117,7 @@
   const A_EFun =
     defineModel<(params: MenuItem) => Promise<AxiosResponse>>("A_EFun");
   const A_EForm = defineModel<MenuItem>("A_EForm");
-  const MenuTreeSelect = defineModel<MenuTreeItem[]>("MenuTreeSelect");
+  const MenuTreeSelect = defineModel<TreeSelectItem[]>("MenuTreeSelect");
 
   // 切换编辑状态------------------
   const toEditMenu = async (row: MenuItem) => {
@@ -140,7 +141,10 @@
       icon: row.icon, //图标
     });
     const res = (await getMenuTreeSelect()).data;
-    MenuTreeSelect.value = await formatTreeSelect(res);
+    MenuTreeSelect.value = await formatTreeSelectByTree({
+      flat: res,
+      rootLabel: "根目录",
+    });
     debugLog("下拉树菜单列表=>", res, "格式化后=>", MenuTreeSelect.value);
   };
 

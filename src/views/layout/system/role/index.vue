@@ -212,7 +212,6 @@
     getRoleList,
     getRoleMenuTreeselect,
   } from "@/api/system/role";
-  import { MenuTreeItem } from "@/types/system/menu";
   import { RoleItem } from "@/types/system/role";
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
@@ -221,7 +220,7 @@
     getLabelByDictData,
   } from "@/utils/dictDataToOptions";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
-  import { formatTreeSelect } from "@/utils/formatTreeSelect";
+  import { formatTreeSelectByTree } from "@/utils/formatTreeSelectByTree";
   import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
   import { AxiosResponse } from "axios";
   import { ElMessage, FormInstance, FormRules } from "element-plus";
@@ -229,6 +228,7 @@
   import UserListTable from "./UserListTable.vue";
   import { usePaginationStore } from "@/stores/pagination";
   import { useDictStore } from "@/stores/dictData";
+  import { TreeSelectItem } from "@/types/treeSelect";
 
   // 字典数据--------------
   const dictStore = useDictStore();
@@ -269,7 +269,7 @@
     menuIds: [],
   };
   let A_EForm: RoleItem;
-  const menuTreeSelect = ref<MenuTreeItem[]>([]);
+  const menuTreeSelect = ref<TreeSelectItem[]>([]);
   const rules: FormRules = {
     roleKey: [
       { required: true, message: "请输入权限字符", trigger: "blur" },
@@ -319,7 +319,10 @@
       const res = await getRoleMenuTreeselect(row.roleId);
       if (res.code === 200 && res.menus) {
         debugLog("已授权的菜单=>", res);
-        menuTreeSelect.value = await formatTreeSelect(res.menus);
+        menuTreeSelect.value = await formatTreeSelectByTree({
+          flat: res.menus,
+          rootLabel: "根目录",
+        });
 
         A_EForm = reactive({
           roleId: row.roleId,
