@@ -105,7 +105,17 @@
           <el-input-number v-model="A_EForm.sort" :min="0" />
         </el-form-item>
         <el-form-item label="分类示意图" prop="icon" v-if="!isAdd">
-          <el-upload>此处帮我设计图像上传的组件</el-upload>
+          <el-image
+            fit="cover"
+            style="width: 100px; height: 100px"
+            :preview-src-list="previewSrcList"
+            :src="imageUrl"
+            class="me-3" />
+          <CropperUpload
+            :uploadApi="commonUpload"
+            v-model:croppedFile="croppedFile"
+            :showUploadBtn="false"
+            needThumbnail />
         </el-form-item>
         <el-form-item label="分类状态" prop="status">
           <el-radio-group v-model="A_EForm.status">
@@ -125,6 +135,7 @@
     getCategoryList,
     getCategoryListExclude,
   } from "@/api/product/category";
+  import { commonUpload } from "@/api/upload";
   import { CategoryItem } from "@/types/product/category";
   import { TreeSelectItem } from "@/types/treeSelect";
   import { debugLog } from "@/utils/debug";
@@ -136,7 +147,7 @@
     FormRules,
     TableInstance,
   } from "element-plus";
-  import { onMounted, reactive, ref, toRaw } from "vue";
+  import { computed, onMounted, reactive, ref, toRaw, watch } from "vue";
 
   // 请求参数设置------------
   const queryParams = reactive<Pick<CategoryItem, "name" | "status">>({});
@@ -222,7 +233,7 @@
     ],
     status: [{ required: true, message: "请选择分类状态", trigger: "change" }],
   };
-  const A_EForm = reactive<CategoryItem>(defaultForm);
+  let A_EForm: CategoryItem;
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
 
   // 添加/修改方法
@@ -230,7 +241,7 @@
     A_EVisible.value = true;
     A_ETitle.value = "添加药品分类";
     isAdd.value = true;
-    Object.assign(A_EForm, defaultForm); // 重置表单
+    A_EForm = reactive({ ...defaultForm }); // 重置表单
 
     const res = await getCategoryList({ name: undefined, status: 1 });
     debugLog("全部药品分类列表=>", res);
@@ -248,15 +259,18 @@
     A_ETitle.value = "修改药品分类";
     isAdd.value = false;
 
-    A_EForm.id = row.id;
-    A_EForm.name = row.name;
-    A_EForm.parentId = row.parentId;
-    A_EForm.icon = row.icon;
-    A_EForm.sort = row.sort;
-    A_EForm.status = row.status; // 复制当前行数据到表单
+    A_EForm = reactive({
+      id: row.id,
+      name: row.name,
+      parentId: row.parentId,
+      icon: row.icon,
+      sort: row.sort,
+      status: row.status,
+    }); // 复制当前行数据到表单
+
+    if (A_EForm.icon) previewSrcList.value = [A_EForm.icon]; // 初始化 previewSrcList
 
     // 获取分类树形数据
-
     const res = await getCategoryListExclude(row.id!);
     debugLog(`排除ID: ${row.id} 后的药品分类列表=>`, res);
     if (res.code == 200 && res.data)
@@ -268,6 +282,20 @@
       });
     debugLog("处理后的药品分类树形选单=>", categoryTreeSelect.value);
   };
+
+  // 裁剪图片
+  const croppedFile = ref<File>();
+  const previewSrcList = ref<string[]>([]);
+  const imageUrl = computed(() =>
+    croppedFile.value ? URL.createObjectURL(croppedFile.value) : A_EForm.icon
+  );
+  // 监听 croppedFile 的变化
+  watch(croppedFile, (newFile) => {
+    if (newFile) {
+      const fileUrl = URL.createObjectURL(newFile);
+      previewSrcList.value = [fileUrl];
+    } else if (A_EForm.icon) previewSrcList.value = [A_EForm.icon];
+  });
 
   // 提交表单
   const A_EFormRef = ref<FormInstance>();

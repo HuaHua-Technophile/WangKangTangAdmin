@@ -31,7 +31,8 @@ export const formatTreeSelectByFlat = async ({
     }
   }
 
-  return result.length > 0
+  /* return result.length > 0
     ? [{ id: rootId, label: rootLabel, value: rootValue, children: result }]
-    : [];
+    : []; */
+  return [{ id: rootId, label: rootLabel, value: rootValue, children: result }];
 };

@@ -29,11 +29,11 @@
             :hide-on-click-modal="true"
             :preview-teleported="true" />
           <el-upload
-            ref="upload"
+            ref="uploadRef"
             v-model:file-list="fileList"
             :auto-upload="false"
             :limit="1"
-            accept=".jpg,.jpeg,.png,.gif.bmp"
+            accept=".webp,.jpg,.jpeg,.png,.gif,.bmp"
             :before-upload="beforeAvatarUpload"
             :http-request="customUpload">
             <template #trigger>
@@ -44,7 +44,7 @@
             <el-button
               v-if="fileList.length"
               type="primary"
-              @click="upload?.submit()"
+              @click.stop="uploadRef?.submit()"
               >确认上传</el-button
             >
           </el-upload>
@@ -326,7 +326,7 @@
 
   // 上传头像-----------------------
   const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
-  const upload = ref<UploadInstance>();
+  const uploadRef = ref<UploadInstance>();
   const fileList = ref<UploadUserFile[]>([]);
 
   const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {

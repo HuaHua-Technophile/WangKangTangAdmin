@@ -61,6 +61,6 @@ export default defineConfig({
     },
   },
   build: {
-    target: "es2022", // 或者更高版本 'esnext'
+    target: "esnext", // 或者更高版本 'esnext'
   },
 });

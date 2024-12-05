@@ -4,8 +4,12 @@
       <!-- effect="light/dark"是反过来的  -->
       <el-tooltip effect="light" placement="left">
         <template #content>
-          更新: {{ formatToReadableDate(row.updateTime) }} <br />
-          创建: {{ formatToReadableDate(row.createTime) }}
+          创建者:
+          {{ row.createBy || "无" }} | 时间:
+          {{ formatToReadableDate(row.createTime) }}<br />
+          更新者:
+          {{ row.createBy || "无" }} | 时间:
+          {{ formatToReadableDate(row.updateTime) }}
         </template>
         <div>
           {{ formatToReadableDate(row.updateTime || row.createTime, true) }}
