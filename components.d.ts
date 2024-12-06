@@ -27,7 +27,6 @@ declare module 'vue' {
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElHeader: typeof import('element-plus/es')['ElHeader']
-    ElIcon: typeof import('element-plus/es')['ElIcon']
     ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
@@ -52,8 +51,6 @@ declare module 'vue' {
     QuillEditor: typeof import('./src/components/QuillEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    TestUp: typeof import('./src/components/testUp.vue')['default']
     ThemeSwitch: typeof import('./src/components/ThemeSwitch.vue')['default']
-    UploadImgUseCropper: typeof import('./src/components/uploadImgUseCropper.vue')['default']
   }
 }

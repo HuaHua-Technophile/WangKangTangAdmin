@@ -43,7 +43,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref, defineProps, nextTick, onUnmounted } from "vue";
+  import { ref, defineProps, nextTick } from "vue";
   import { ElMessage, UploadFile } from "element-plus";
   import Cropper from "cropperjs";
   import "cropperjs/dist/cropper.css";
@@ -62,6 +62,7 @@
       maxWidthOrHeight?: number;
       maxSize?: number;
       maxThumbnailWidthOrHeight?: number;
+      successMsg?: string;
     }>(),
     {
       showUploadBtn: true,
@@ -109,7 +110,7 @@
     }
     fileName.value = rawFile.name.split(".")[0];
 
-    debugLog(fileName.value);
+    debugLog("选择了文件=>", fileName.value);
     const reader = new FileReader();
     reader.readAsDataURL(rawFile);
     reader.onload = (e) => {
@@ -210,7 +211,7 @@
 
   // 上传裁剪图(与缩略图)
   const handleUpload = async () => {
-    if (!croppedFile.value) return;
+    if (!croppedFile.value) return { croppedRes: null, thumbnailRes: null };
     let croppedRes, thumbnailRes;
 
     croppedRes = await props.uploadApi(croppedFile.value);
@@ -223,8 +224,17 @@
       thumbnailRes
     );
 
-    if (croppedRes.code === 200 && thumbnailRes?.code === 200) resetSelection();
-    else ElMessage.error(croppedRes.msg || "上传失败");
+    if (
+      croppedRes.code === 200 &&
+      (!props.needThumbnail || thumbnailRes?.code === 200)
+    ) {
+      resetSelection();
+      if (props.successMsg) ElMessage.success(props.successMsg);
+      return { croppedRes, thumbnailRes };
+    } else {
+      ElMessage.error(croppedRes.msg || "上传失败");
+      return { croppedRes: null, thumbnailRes: null };
+    }
   };
   // 重新选择文件
   const resetSelection = () => {
@@ -236,5 +246,4 @@
   defineExpose({
     handleUpload,
   });
-  onUnmounted(cropperInstance.value?.destroy);
 </script>

@@ -108,10 +108,12 @@
           <el-image
             fit="cover"
             style="width: 100px; height: 100px"
-            :preview-src-list="previewSrcList"
             :src="imageUrl"
+            :preview-src-list="previewSrcList"
+            :preview-teleported="true"
             class="me-3" />
           <CropperUpload
+            ref="cropperUploadRef"
             :uploadApi="commonUpload"
             v-model:croppedFile="croppedFile"
             :showUploadBtn="false"
@@ -299,9 +301,26 @@
 
   // 提交表单
   const A_EFormRef = ref<FormInstance>();
+  const cropperUploadRef = ref();
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
+        // 如果有裁剪的图片，先上传图片
+        if (croppedFile.value) {
+          const { croppedRes, thumbnailRes } =
+            await cropperUploadRef.value.handleUpload();
+
+          if (!croppedRes || croppedRes.code !== 200) {
+            ElMessage.error("图片上传失败");
+            return;
+          }
+
+          // 更新表单数据中的图片URL
+          A_EForm.icon = croppedRes.fileName;
+          if (thumbnailRes?.code === 200)
+            A_EForm.miniImg = thumbnailRes.fileName;
+        }
+
         const apiMethod = isAdd.value ? addCategory : editCategory;
         const res = await apiMethod(A_EForm);
         debugLog(`${A_ETitle.value}结果=>`, res);

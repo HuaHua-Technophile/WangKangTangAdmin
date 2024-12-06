@@ -24,30 +24,13 @@
           :align="'center'">
           <el-image
             style="width: 300px; height: 300px"
-            :src="baseUrl + currentUserProfile.avatar"
-            :preview-src-list="[baseUrl + currentUserProfile.avatar]"
-            :hide-on-click-modal="true"
+            :src="imageUrl"
+            :preview-src-list="previewSrcList"
             :preview-teleported="true" />
-          <el-upload
-            ref="uploadRef"
-            v-model:file-list="fileList"
-            :auto-upload="false"
-            :limit="1"
-            accept=".webp,.jpg,.jpeg,.png,.gif,.bmp"
-            :before-upload="beforeAvatarUpload"
-            :http-request="customUpload">
-            <template #trigger>
-              <el-button v-if="!fileList.length" type="primary"
-                >修改头像(2MB)</el-button
-              >
-            </template>
-            <el-button
-              v-if="fileList.length"
-              type="primary"
-              @click.stop="uploadRef?.submit()"
-              >确认上传</el-button
-            >
-          </el-upload>
+          <CropperUpload
+            :uploadApi="userProfileAvatar"
+            v-model:croppedFile="croppedFile"
+            successMsg="头像上传成功,退出重新登录生效" />
         </el-descriptions-item>
         <el-descriptions-item label="账号" :align="'center'" class-name="py-0">
           {{ currentUserProfile.userName }}
@@ -191,15 +174,15 @@
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
   import { passwordRule } from "@/utils/formRegularExpression";
+  import { ElMessage, FormInstance } from "element-plus";
   import {
-    ElMessage,
-    FormInstance,
-    UploadInstance,
-    UploadProps,
-    UploadRequestOptions,
-    UploadUserFile,
-  } from "element-plus";
-  import { computed, onBeforeMount, onMounted, reactive, ref } from "vue";
+    computed,
+    onBeforeMount,
+    onMounted,
+    reactive,
+    ref,
+    watch,
+  } from "vue";
   import { getLabelByDictData } from "@/utils/dictDataToOptions";
 
   // 字典数据-----------
@@ -326,26 +309,23 @@
 
   // 上传头像-----------------------
   const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
-  const uploadRef = ref<UploadInstance>();
-  const fileList = ref<UploadUserFile[]>([]);
-
-  const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
-    debugLog("选择的头像文件=>", rawFile);
-    if (!rawFile.type.startsWith("image/")) {
-      ElMessage.error("格式必须为图片");
-      return false;
-    } else if (rawFile.size / 1024 / 1024 > 2) {
-      ElMessage.error("文件体积不能超出2MB!");
-      return false;
-    }
-    return true;
-  };
-  const customUpload = async (options: UploadRequestOptions) => {
-    const res = await userProfileAvatar(options.file);
-    debugLog("上传头像结果=>", res);
-    if (res.code === 200) {
-      ElMessage.success("上传成功,退出后重新登陆生效");
-      getCurrentUserProfileFun();
-    } else ElMessage.error(res.msg);
-  };
+  const croppedFile = ref<File>();
+  const previewSrcList = ref<string[]>([]);
+  const imageUrl = computed(() =>
+    croppedFile.value
+      ? URL.createObjectURL(croppedFile.value)
+      : baseUrl + currentUserProfile.value?.avatar
+  );
+  // 监听 croppedFile 的变化
+  watch(croppedFile, (newFile) => {
+    if (newFile) {
+      const fileUrl = URL.createObjectURL(newFile);
+      previewSrcList.value = [fileUrl];
+    } else if (currentUserProfile.value?.avatar)
+      previewSrcList.value = [baseUrl + currentUserProfile.value.avatar];
+  });
+  onMounted(() => {
+    if (currentUserProfile.value?.avatar)
+      previewSrcList.value = [baseUrl + currentUserProfile.value.avatar]; // 初始化 previewSrcList
+  });
 </script>
