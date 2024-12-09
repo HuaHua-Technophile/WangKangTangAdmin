@@ -7,9 +7,9 @@ import { useHistoryStore } from "@/stores/history";
 
 // 预加载所有可能的组件
 const modules = import.meta.glob("/src/views/layout/**/*.vue");
-const addRoute = (routes: RouteRecordRaw[]) => {
+const addRoute = (routeList: RouteRecordRaw[]) => {
   // 动态添加路由
-  routes.forEach((i) => {
+  routeList.forEach((i) => {
     i.children?.forEach((j) => {
       const componentPath = `/src/views/layout/${j.component}.vue`;
       if (modules[componentPath]) {

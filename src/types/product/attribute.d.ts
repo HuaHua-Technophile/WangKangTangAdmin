@@ -1,6 +1,6 @@
-// 商品属性接口
-interface AttributeItem {
-  id: number;
+// 药品属性接口
+export interface AttributeItem {
+  id?: number;
   productAttributeCategoryId: number;
   name: string;
   selectType: 0 | 1 | 2; // 唯一/单选/多选
@@ -11,10 +11,20 @@ interface AttributeItem {
   handAddStatus: 0 | 1; // 是否支持手动新增
   type: 0 | 1; // 规格/参数
 }
+export type GetAttributeListParams = Pick<
+  AttributeItem,
+  | "name"
+  | "selectType"
+  | "inputType"
+  | "relatedStatus"
+  | "handAddStatus"
+  | "type"
+> &
+  PaginationParams;
 
-// 商品属性值接口
-interface AttributeValueItem {
-  id: number;
+// 药品属性值接口
+export interface AttributeValueItem {
+  id?: number;
   productId: number;
   productAttributeId: number;
   value: string;

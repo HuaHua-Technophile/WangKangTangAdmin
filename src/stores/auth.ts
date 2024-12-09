@@ -1,10 +1,11 @@
 // src/stores/auth.ts
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { RouteRecordRaw } from "vue-router";
+
 import CryptoJS from "crypto-js"; // 引入加密库
 import router from "@/router/router";
 import { useHistoryStore } from "./history";
+import { RouteRecordRaw } from "vue-router";
 
 // 密钥，可以根据需要修改为更复杂的
 const SECRET_KEY = "my-secret-key";

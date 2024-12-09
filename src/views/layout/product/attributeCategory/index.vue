@@ -37,10 +37,28 @@
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30" />
       <el-table-column prop="id" label="ID" />
-      <el-table-column prop="name" label="分类名称" />
-      <el-table-column prop="attributeCount" label="属性数量" />
+      <el-table-column prop="name" label="属性分类名称" />
+      <el-table-column prop="attributeCount" label="规格数量" />
       <el-table-column prop="paramCount" label="参数数量" />
       <DataTebleColumnTime />
+      <el-table-column label="规格/参数">
+        <template #default="{ row }">
+          <div
+            class="d-flex justify-content-around align-items-center"
+            v-if="!row.admin">
+            <el-button
+              class="cursor-pointer"
+              @click="handleViewAttribute(row, 0)">
+              查看规格
+            </el-button>
+            <el-button
+              class="cursor-pointer"
+              @click="handleViewAttribute(row, 0)">
+              查看参数
+            </el-button>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }">
           <div class="d-flex justify-content-around align-items-center">
@@ -113,6 +131,7 @@
   } from "element-plus";
   import { cloneDeep } from "lodash";
   import { onMounted, reactive, ref } from "vue";
+  import { useRouter } from "vue-router";
 
   // 搜索参数-------------------------
   const queryParams = reactive<Pick<AttributeCategoryItem, "name">>({
@@ -230,5 +249,17 @@
         } else ElMessage.error(res.msg || "删除失败");
       }
     );
+  };
+
+  // 跳转查看具体的规格/参数
+  const router = useRouter();
+  const handleViewAttribute = (row: any, type: 0 | 1) => {
+    router.push({
+      name: "Attribute",
+      query: {
+        cid: row.id,
+        type,
+      },
+    });
   };
 </script>

@@ -5,7 +5,7 @@
       <el-scrollbar>
         <el-menu router :default-active="activePath" class="border-0">
           <el-sub-menu
-            v-for="(i, index) in authStore.dynamicRoutes"
+            v-for="(i, index) in filteredRoutes"
             :key="i.meta?.title"
             :index="index.toString()">
             <template #title>
@@ -13,7 +13,7 @@
               <span class="ms-2">{{ i.meta?.title }}</span>
             </template>
             <el-menu-item
-              v-for="j in i.children"
+              v-for="j in getVisibleChildren(i)"
               :key="j.meta?.title"
               :index="i.path + '/' + j.path"
               class="transition1000">
@@ -93,6 +93,14 @@
   import { computed, onMounted, ref, toRaw } from "vue";
 
   const authStore = useAuthStore();
+  // 过滤显示的路由
+  const filteredRoutes = computed(() => {
+    return authStore.dynamicRoutes.filter((route: any) => !route.hidden);
+  });
+  // 获取子路由的方法
+  const getVisibleChildren = (route: any) => {
+    return route.children?.filter((child: any) => !child.hidden) || [];
+  };
   // 个人信息不持久化存储--------------------
   const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
 

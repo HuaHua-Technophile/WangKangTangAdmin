@@ -1,6 +1,5 @@
 // src/types/axios.d.ts
 import { AxiosResponse } from "axios";
-import { RoleItem } from "./system/role";
 
 // 扩展 AxiosResponse 接口
 declare module "axios" {
