@@ -1,175 +1,234 @@
 <template>
   <div>
     <!-- 搜索表单 -->
-    <el-form :model="queryParams" class="d-flex align-items-center mb-3">
-      <el-form-item label="属性分类名称" class="flex-grow-1">
+    <el-form :model="queryParams" class="d-flex align-items-center">
+      <el-form-item label="属性分类名称" class="mx-md-2 flex-grow-1">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入属性名称"
+          placeholder="请输入属性分类名称"
           clearable />
       </el-form-item>
-      <el-form-item class="mb-0">
-        <el-button type="primary" @click="fetchList">搜索</el-button>
-        <el-button type="primary" @click="toAdd">新增属性</el-button>
+      <el-form-item class="mx-md-2">
+        <el-button
+          type="primary"
+          @click="
+            () => {
+              currentPage = 1;
+              fetchAttributeCategoryList();
+            }
+          "
+          >搜索</el-button
+        >
+      </el-form-item>
+      <el-form-item class="mx-md-2">
+        <el-button type="primary" @click="toAddAttributeCategory"
+          >添加属性分类</el-button
+        >
       </el-form-item>
     </el-form>
 
-    <!-- 数据表格 -->
+    <!-- 药品属性分类表格 -->
     <el-table
-      ref="tableRef"
-      :data="tableData"
+      ref="attributeCategoryTable"
+      :data="attributeCategoryList"
+      table-layout="auto"
+      cell-class-name="text-center"
+      header-cell-class-name="text-center"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="id" label="ID" width="80" />
+      <el-table-column type="selection" width="30" />
+      <el-table-column prop="id" label="ID" />
       <el-table-column prop="name" label="分类名称" />
       <el-table-column prop="attributeCount" label="属性数量" />
       <el-table-column prop="paramCount" label="参数数量" />
-      <el-table-column label="操作" width="200">
+      <DataTebleColumnTime />
+      <el-table-column label="操作">
         <template #default="{ row }">
-          <el-button type="primary" link @click="toEdit(row)"> 编辑 </el-button>
-          <el-button type="danger" link @click="toDelete(row)">
-            删除
-          </el-button>
+          <div class="d-flex justify-content-around align-items-center">
+            <Icon
+              icon="icon-bianji"
+              class="cursor-pointer"
+              @click="toEditAttributeCategory(row)" />
+            <Icon
+              icon="icon-shanchu"
+              class="cursor-pointer text-danger"
+              @click="toDelAttributeCategory(row)" />
+          </div>
         </template>
       </el-table-column>
     </el-table>
 
-    <!-- 分页器 -->
-    <el-pagination
-      v-model:current-page="queryParams.pageNum"
-      v-model:page-size="queryParams.pageSize"
+    <!-- 分页 -->
+    <CustomPagination
+      v-model:current-page="currentPage"
       :total="total"
-      @current-change="fetchList"
-      @size-change="fetchList"
+      @size-change="fetchAttributeCategoryList"
+      @current-change="fetchAttributeCategoryList"
       class="mt-3" />
 
-    <!-- 添加/编辑弹窗 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isEdit ? '编辑分类' : '新增分类'"
-      width="500px">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="分类名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入分类名称" />
+    <!-- 添加/修改属性分类 -->
+    <A_EDialog
+      v-model:A_EVisible="A_EVisible"
+      :A_ETitle="A_ETitle"
+      :submitForm="submitForm"
+      :width="'500px'">
+      <template #headerBtn>
+        <span class="ms-2" v-if="!isAdd"
+          >ID:{{ A_EForm && A_EForm["id"] }}</span
+        >
+      </template>
+      <el-form
+        :model="A_EForm"
+        ref="A_EFormRef"
+        label-width="auto"
+        :rules="rules"
+        v-if="A_EForm">
+        <el-form-item label="属性分类名称" prop="name">
+          <el-input
+            v-model="A_EForm.name"
+            placeholder="请输入属性分类名称"
+            clearable />
         </el-form-item>
       </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitForm">确定</el-button>
-      </template>
-    </el-dialog>
+    </A_EDialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from "vue";
-  import type { FormInstance, FormRules } from "element-plus";
-  import { ElMessage, ElMessageBox } from "element-plus";
   import {
-    getAttributeCategoryList,
     addAttributeCategory,
-    editAttributeCategory,
     delAttributeCategories,
+    editAttributeCategory,
+    getAttributeCategoryList,
   } from "@/api/product/attributeCategory";
-  import type { AttributeCategoryItem } from "@/types/product/attributeCategory";
+  import { usePaginationStore } from "@/stores/pagination";
+  import { AttributeCategoryItem } from "@/types/product/attributeCategory";
+  import { debugLog } from "@/utils/debug";
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
+  import { AxiosResponse } from "axios";
+  import {
+    ElMessage,
+    FormInstance,
+    FormRules,
+    TableInstance,
+  } from "element-plus";
+  import { cloneDeep } from "lodash";
+  import { onMounted, reactive, ref } from "vue";
 
-  // 查询参数
-  const queryParams = reactive({
-    pageNum: 1,
-    pageSize: 10,
+  // 搜索参数-------------------------
+  const queryParams = reactive<Pick<AttributeCategoryItem, "name">>({
     name: "",
   });
-
-  // 表格数据
-  const tableData = ref<AttributeCategoryItem[]>([]);
+  const currentPage = ref(1);
+  const paginationStore = usePaginationStore();
   const total = ref(0);
-  const selectedRows = ref<AttributeCategoryItem[]>([]);
+  const attributeCategoryList = ref<AttributeCategoryItem[]>([]);
 
-  // 获取列表数据
-  const fetchList = async () => {
-    try {
-      const res = await getAttributeCategoryList(queryParams);
-      if (res.code === 200) {
-        tableData.value = res.data;
-        total.value = res.total || 0;
-      }
-    } catch (error) {
-      console.error("获取列表失败:", error);
-    }
+  // 获取药品属性分类列表--------------------
+  const fetchAttributeCategoryList = async () => {
+    const res = await getAttributeCategoryList({
+      pageNum: currentPage.value,
+      pageSize: paginationStore.pageSize,
+      ...queryParams,
+    });
+    debugLog("药品属性分类列表=>", res);
+    if (res.code === 200) {
+      if (res.rows) attributeCategoryList.value = res.rows;
+      if (res.total) total.value = res.total;
+    } else ElMessage.error(res.msg || "获取药品属性分类列表失败");
+  };
+  onMounted(fetchAttributeCategoryList);
+
+  // 添加/修改表单相关逻辑-----------------------
+  const isAdd = ref(true);
+  const A_EVisible = ref(false);
+  const A_ETitle = ref("");
+  const defaultForm: AttributeCategoryItem = {
+    name: "",
   };
 
-  // 表单相关
-  const dialogVisible = ref(false);
-  const isEdit = ref(false);
-  const formRef = ref<FormInstance>();
-  const form = reactive<Partial<AttributeCategoryItem>>({
-    name: "",
-  });
+  let A_EForm: AttributeCategoryItem;
+  let A_EFun: (data: AttributeCategoryItem) => Promise<AxiosResponse>;
 
   const rules: FormRules = {
     name: [
-      { required: true, message: "请输入分类名称", trigger: "blur" },
-      { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" },
+      { required: true, message: "请输入属性分类名称", trigger: "blur" },
+      { min: 2, max: 50, message: "长度在 2 到 50 个字符", trigger: "blur" },
     ],
   };
 
-  // 新增
-  const toAdd = () => {
-    isEdit.value = false;
-    form.name = "";
-    dialogVisible.value = true;
-  };
-
-  // 编辑
-  const toEdit = (row: AttributeCategoryItem) => {
-    isEdit.value = true;
-    Object.assign(form, row);
-    dialogVisible.value = true;
-  };
-
-  // 提交表单
+  // 提交表单----------------------
+  const A_EFormRef = ref<FormInstance>();
   const submitForm = async () => {
-    if (!formRef.value) return;
-
-    await formRef.value.validate(async (valid) => {
+    A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
-        try {
-          const apiMethod = isEdit.value
-            ? editAttributeCategory
-            : addAttributeCategory;
-          const res = await apiMethod(form as AttributeCategoryItem);
-
-          if (res.code === 200) {
-            ElMessage.success(`${isEdit.value ? "编辑" : "新增"}成功`);
-            dialogVisible.value = false;
-            fetchList();
-          }
-        } catch (error) {
-          console.error("提交失败:", error);
-        }
+        const res = await A_EFun(A_EForm);
+        debugLog(`${A_ETitle.value}结果=>`, res);
+        if (res.code === 200) {
+          ElMessage.success(`${A_ETitle.value}成功`);
+          A_EVisible.value = false;
+          // 刷新列表
+          fetchAttributeCategoryList();
+        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
       }
     });
   };
 
-  // 删除
-  const toDelete = async (row: AttributeCategoryItem) => {
-    try {
-      await ElMessageBox.confirm("确认删除该分类吗？");
-      const res = await delAttributeCategories([row.id]);
-      if (res.code === 200) {
-        ElMessage.success("删除成功");
-        fetchList();
-      }
-    } catch (error) {
-      console.error("删除失败:", error);
-    }
+  // 添加属性分类------------------------
+  const toAddAttributeCategory = () => {
+    A_ETitle.value = "添加属性分类";
+    isAdd.value = true;
+    A_EFun = addAttributeCategory; // 需要您提供对应的API函数
+    A_EForm = reactive(cloneDeep(defaultForm));
+    A_EVisible.value = true;
   };
 
-  // 表格多选
+  // 修改属性分类-------------------
+  const toEditAttributeCategory = (data: AttributeCategoryItem) => {
+    A_ETitle.value = "修改属性分类";
+    isAdd.value = false;
+    A_EFun = editAttributeCategory; // 需要您提供对应的API函数
+
+    // 只提取需要的属性
+    A_EForm = reactive({
+      id: data.id,
+      name: data.name,
+    });
+    A_EVisible.value = true;
+  };
+
+  // 删除属性分类--------------
+  const selectedAttributes = ref<AttributeCategoryItem[]>([]);
+  const attributeCategoryTable = ref<TableInstance>();
+
+  // 选择变化时的处理函数
   const handleSelectionChange = (selection: AttributeCategoryItem[]) => {
-    selectedRows.value = selection;
+    selectedAttributes.value = selection;
   };
 
-  // 初始化
-  fetchList();
+  // 删除操作
+  const toDelAttributeCategory = (row: AttributeCategoryItem) => {
+    // 勾选被点击的行
+    attributeCategoryTable.value?.toggleRowSelection(row, true);
+
+    elMessageBoxConfirm(
+      `删除以下${
+        selectedAttributes.value.length
+      }个属性分类: ${selectedAttributes.value.map((attr) => attr.id)}`,
+      async () => {
+        const attributeCategoryIds = selectedAttributes.value
+          .map((attr) => attr.id)
+          .filter((id) => id !== undefined);
+
+        const res = await delAttributeCategories(attributeCategoryIds);
+        debugLog("删除属性分类结果=>", res);
+        if (res.code === 200) {
+          ElMessage.success("删除成功");
+          // 清空选中
+          selectedAttributes.value = [];
+          // 重新获取列表数据
+          fetchAttributeCategoryList();
+        } else ElMessage.error(res.msg || "删除失败");
+      }
+    );
+  };
 </script>

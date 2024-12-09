@@ -6,26 +6,24 @@ import {
 } from "@/types/product/attributeCategory";
 
 // 1. 新增药品属性分类
-export const addAttributeCategory = (
-  data: Omit<AttributeCategoryItem, "id">
-) => {
+export const addAttributeCategory = (params: AttributeCategoryItem) => {
   return customRequest(
     {
       method: "POST",
       url: "/product/attribute/category/add",
-      data,
+      params,
     },
     "新增药品属性分类"
   );
 };
 
 // 2. 修改药品属性分类
-export const editAttributeCategory = (data: AttributeCategoryItem) => {
+export const editAttributeCategory = (params: AttributeCategoryItem) => {
   return customRequest(
     {
       method: "PUT",
-      url: `/product/attribute/category/edit/${data.id}`,
-      data,
+      url: `/product/attribute/category/edit/${params.id}`,
+      params,
     },
     "修改药品属性分类"
   );
