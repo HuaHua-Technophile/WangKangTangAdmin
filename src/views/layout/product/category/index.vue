@@ -27,6 +27,7 @@
         <el-button type="primary" @click="toAddCategory">添加分类</el-button>
       </el-form-item>
     </el-form>
+    <!-- 数据展示表格 -->
     <el-table
       ref="categoryTable"
       :data="categoryTree"
@@ -48,7 +49,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="icon" label="示意图">
-        <!-- <template #default="scope"></template> -->
+        <template #default="scope">
+          <el-image
+            v-if="scope.row.icon != '#'"
+            :src="baseUrl + scope.row.icon"
+            :preview-src-list="[baseUrl + scope.row.icon]"
+            :preview-teleported="true"
+            style="width: 60px; height: 60px" />
+        </template>
       </el-table-column>
       <el-table-column prop="status" label="状态">
         <template #default="scope">
@@ -75,7 +83,6 @@
         </template>
       </el-table-column>
     </el-table>
-
     <!-- 添加/修改弹窗 -->
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
@@ -151,10 +158,11 @@
   } from "element-plus";
   import { computed, onMounted, reactive, ref, toRaw, watch } from "vue";
 
+  const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+
   // 请求参数设置------------
   const queryParams = reactive<Pick<CategoryItem, "name" | "status">>({});
   const categoryTree = ref<CategoryItem[]>();
-  const total = ref(0);
   const formatCategoryTreeByFlat = async (
     flat: CategoryItem[]
   ): Promise<CategoryItem[]> => {
@@ -175,11 +183,11 @@
       const currentNode = nodeMap.get(item.id!);
 
       if (currentNode) {
-        // 如果当前节点的父ID是1，直接将其作为根节点
+        // 情况1：父ID为1的节点，直接作为根节点
         if (item.parentId === 1) {
           result.push(currentNode);
         }
-        // 对于其他节点，如果父节点存在且不是ID为1的节点，则添加到对应父节点的children中
+        // 情况2：有父节点且父节点存在于nodeMap中，则添加到对应父节点的children中
         else if (
           item.parentId !== undefined &&
           item.parentId !== 0 &&
@@ -189,11 +197,14 @@
           const parentNode = nodeMap.get(item.parentId);
           parentNode?.children?.push(currentNode);
         }
-        // 如果是真正的根节点（parentId为0或undefined）且不是ID为1的节点
+        // 情况3：真正的根节点（parentId为0或undefined）且不是ID为1的节点
         else if (
           (item.parentId === undefined || item.parentId === 0) &&
           item.id !== 1
         )
+          result.push(currentNode);
+        // 新增情况4：处理孤立节点（父节点不在当前数据集中）
+        else if (!nodeMap.has(item.parentId!) && item.id !== 1)
           result.push(currentNode);
       }
     }
@@ -210,7 +221,6 @@
     if (res.rows && res.total !== undefined) {
       categoryTree.value = await formatCategoryTreeByFlat(res.rows);
       debugLog("处理后的药品分类=>", toRaw(categoryTree.value));
-      total.value = res.total;
     } else ElMessage.error(res.msg || "获取药品分类列表失败");
   };
   onMounted(fetchCategoryList);
