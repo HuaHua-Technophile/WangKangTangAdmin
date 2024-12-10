@@ -261,7 +261,7 @@
 
   // 跳转查看具体的规格/参数
   const router = useRouter();
-  const handleViewAttribute = (row: any, type: 0 | 1) => {
+  const handleViewAttribute = (row: AttributeCategoryItem, type: 0 | 1) => {
     router.push({
       name: "Attribute",
       query: {
