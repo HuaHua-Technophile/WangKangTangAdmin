@@ -82,7 +82,7 @@
           <template v-if="isEditing">
             <el-form-item prop="sex">
               <el-radio-group v-model="userProfileForm.sex">
-                <el-radio
+                <el-radio-button 
                   v-for="i in dictStore.dictData.sys_user_sex"
                   :value="i.dictValue"
                   >{{ i.dictLabel }}</el-radio

@@ -135,7 +135,7 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="A_EForm.status">
-            <el-radio
+            <el-radio-button 
               v-for="i in dictStore.dictData.sys_normal_disable"
               :value="i.dictValue"
               >{{ i.dictLabel }}</el-radio
@@ -166,7 +166,7 @@
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="dictDataForm.status">
-              <el-radio
+              <el-radio-button 
                 v-for="i in dictStore.dictData.sys_normal_disable"
                 :value="i.dictValue"
                 >{{ i.dictLabel }}</el-radio

@@ -190,19 +190,19 @@
         <div class="d-flex justify-content-between align-items-center">
           <el-form-item label="性别" prop="sex">
             <el-radio-group v-model="A_EForm.sex">
-              <el-radio
+              <el-radio-button
                 v-for="i in dictStore.dictData.sys_user_sex"
                 :value="i.dictValue"
-                >{{ i.dictLabel }}</el-radio
+                >{{ i.dictLabel }}</el-radio-button
               >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="A_EForm.status">
-              <el-radio
+              <el-radio-button
                 v-for="i in dictStore.dictData.sys_normal_disable"
                 :value="i.dictValue"
-                >{{ i.dictLabel }}</el-radio
+                >{{ i.dictLabel }}</el-radio-button
               >
             </el-radio-group>
           </el-form-item>

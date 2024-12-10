@@ -171,7 +171,7 @@
             prop="status"
             tip="选择停用则路由将不会出现在侧边栏，也不能被访问">
             <el-radio-group v-model="A_EForm.status">
-              <el-radio
+              <el-radio-button 
                 v-for="i in dictStore.dictData.sys_normal_disable"
                 :value="i.dictValue"
                 >{{ i.dictLabel }}</el-radio
@@ -183,7 +183,7 @@
             prop="visible"
             tip="选择隐藏则路由将不会出现在侧边栏，但仍然可以访问">
             <el-radio-group v-model="A_EForm.visible">
-              <el-radio
+              <el-radio-button 
                 v-for="i in dictStore.dictData.sys_show_hide"
                 :value="i.dictValue"
                 >{{ i.dictLabel }}</el-radio
