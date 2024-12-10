@@ -1,93 +1,130 @@
-// useRouteParamsValidation.ts
+// composables/useRouteParamsValidation.ts
+import { ElMessageBox } from "element-plus";
+import { onMounted, onUnmounted } from "vue";
 import {
-  onBeforeRouteUpdate,
   useRouter,
   useRoute,
-  RouteLocationNormalized,
+  LocationQuery,
+  onBeforeRouteLeave,
 } from "vue-router";
-import { onMounted } from "vue";
-import { ElMessageBox } from "element-plus";
 
-interface ValidationOptions {
-  requiredParams: string[];
-  customValidation?: (route: RouteLocationNormalized) => boolean | string;
-  fallbackPath?: string;
-  errorMessage?: string;
-  // 新增：自定义标题
-  errorTitle?: string;
+interface ValidateOptions {
+  requiredParams: string[]; // 必需的参数列表
+  redirectPath?: string | -1; // 参数缺失时的重定向路径，不传则返回上一页
+  customValidation?: (params: LocationQuery) => boolean; // 可选的自定义验证函数
 }
 
-export const useRouteParamsValidation = (options: ValidationOptions) => {
+export const useRouteParamsValidation = (options: ValidateOptions) => {
   const router = useRouter();
-  const currentRoute = useRoute();
+  const route = useRoute();
 
-  // 显示错误提示
-  const showError = async (message: string) => {
-    try {
-      await ElMessageBox.alert(message, options.errorTitle || "参数验证失败", {
-        confirmButtonText: "返回",
-        type: "error",
-        draggable: true, // 是否可以通过点击遮罩关闭
-        closeOnClickModal: false, // 是否可以通过按下 ESC 关闭
-        closeOnPressEscape: false, // 是否显示关闭按钮
-        showClose: false, // 回调函数
-        callback: handleValidationFail,
-      });
-    } catch (err) {
-      handleValidationFail(); // 处理关闭对话框的情况
-    }
+  // 处理重定向
+  const handleRedirect = () => {
+    if (!options.redirectPath || options.redirectPath === -1) router.go(-1);
+    else router.replace(options.redirectPath);
   };
 
-  // 验证函数
-  const validateRoute = async (
-    route: RouteLocationNormalized
-  ): Promise<boolean> => {
-    // 检查必需参数
-    const missingParams = options.requiredParams.filter((param) => {
-      return !route.params[param] && !route.query[param];
+  // 使用路由路径作为存储key的一部分
+  const getStorageKey = (param: string) =>
+    `route_${route.path}_${param}`.replace(/\//g, "_");
+
+  const saveParamsToStorage = () => {
+    options.requiredParams.forEach((param) => {
+      const value = route.query[param];
+      if (value) {
+        localStorage.setItem(getStorageKey(param), value.toString());
+      }
+    });
+  };
+
+  // 改进后的恢复参数逻辑
+  const restoreParamsFromStorage = () => {
+    const restoredParams: Record<string, string> = {};
+    // 检查是否所有必需参数都能从localStorage中恢复
+    const hasRestoredParams = options.requiredParams.every((param) => {
+      const value = localStorage.getItem(getStorageKey(param));
+      if (value) {
+        restoredParams[param] = value;
+        return true;
+      }
+      return false;
     });
 
+    return {
+      restoredParams,
+      hasRestoredParams,
+    };
+  };
+
+  const validateParams = async () => {
+    const missingParams = options.requiredParams.filter(
+      (param) => !route.query[param]
+    );
+
     if (missingParams.length > 0) {
-      await showError(
-        options.errorMessage || `缺少必要参数: ${missingParams.join(", ")}`
-      );
-      return false;
-    }
+      const { restoredParams, hasRestoredParams } = restoreParamsFromStorage();
 
-    // 执行自定义验证
-    if (options.customValidation) {
-      const customResult = options.customValidation(route);
-      if (typeof customResult === "string") {
-        await showError(customResult);
-        return false;
+      if (hasRestoredParams) {
+        router.replace({
+          path: route.path,
+          query: {
+            ...route.query,
+            ...restoredParams,
+          },
+        });
+      } else {
+        try {
+          await ElMessageBox.alert(
+            `缺少必要的参数：${missingParams.join(", ")}`,
+            "参数错误",
+            {
+              confirmButtonText: "返回",
+              type: "error",
+              callback: () => {
+                handleRedirect();
+              },
+            }
+          );
+        } catch {
+          // 用户关闭对话框时也执行重定向
+          handleRedirect();
+        }
       }
-      if (!customResult) {
-        await showError(options.errorMessage || "参数验证失败");
-        return false;
+    } else if (
+      options.customValidation &&
+      !options.customValidation(route.query)
+    ) {
+      try {
+        await ElMessageBox.alert("参数验证失败", "验证错误", {
+          confirmButtonText: "返回",
+          type: "error",
+          callback: () => {
+            handleRedirect();
+          },
+        });
+      } catch {
+        // 用户关闭对话框时也执行重定向
+        handleRedirect();
       }
+    } else {
+      saveParamsToStorage();
     }
-
-    return true;
   };
 
-  // 处理验证失败的跳转
-  const handleValidationFail = () => {
-    const fallback = options.fallbackPath || -1;
-    if (typeof fallback === "number") router.go(fallback);
-    else router.push(fallback);
-  };
-
-  // 组件挂载时验证当前路由
-  onMounted(async () => {
-    if (!(await validateRoute(currentRoute))) return;
+  onMounted(() => {
+    validateParams();
+    window.addEventListener("beforeunload", saveParamsToStorage);
   });
 
-  // 路由更新时验证
-  onBeforeRouteUpdate(async (to, _from, next) => {
-    if (!(await validateRoute(to))) {
-      next(false);
-      return;
-    }
-    next();
+  onUnmounted(() => {
+    window.removeEventListener("beforeunload", saveParamsToStorage);
+  });
+
+  // 在路由变化前清理存储
+  onBeforeRouteLeave((_to, from) => {
+    options.requiredParams.forEach((param) => {
+      const key = `route_${from.path}_${param}`.replace(/\//g, "_");
+      localStorage.removeItem(key);
+    });
   });
 };

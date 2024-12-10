@@ -49,16 +49,24 @@
             <el-button-group>
               <el-button
                 plain
-                :color="row.attributeCount > 0 ? '#0DCAF0' : '#E6A23C'"
+                :color="
+                  row.attributeCount > 0 || row.attributeCount > 0
+                    ? '#0DCAF0'
+                    : '#E6A23C'
+                "
                 :dark="isDark"
                 @click="handleViewAttribute(row, 0)">
-                {{ row.attributeCount > 0 ? "查看规格" : "添加规格" }}
+                {{
+                  row.attributeCount > 0 || row.attributeCount > 0
+                    ? "查看规格"
+                    : "添加规格"
+                }}
               </el-button>
               <el-button
                 plain
                 :color="row.attributeCount > 0 ? '#0DCAF0' : '#E6A23C'"
                 :dark="isDark"
-                @click="handleViewAttribute(row, 0)">
+                @click="handleViewAttribute(row, 1)">
                 {{ row.paramCount > 0 ? "查看参数" : "添加参数" }}
               </el-button>
             </el-button-group>
