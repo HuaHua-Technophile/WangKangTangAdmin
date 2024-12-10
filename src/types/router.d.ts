@@ -1,6 +1,9 @@
 // types/router.ts
-import { RouteRecordRaw as _RouteRecordRaw } from "vue-router";
+import "vue-router";
 
-export interface CustomRouteRecordRaw extends _RouteRecordRaw {
-  hidden?: boolean;
+// 扩展 vue-router 模块
+declare module "vue-router" {
+  interface RouteRecordRaw {
+    hidden?: boolean;
+  }
 }
