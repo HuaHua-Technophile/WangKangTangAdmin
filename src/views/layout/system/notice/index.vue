@@ -147,19 +147,19 @@
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="类型" prop="noticeType">
             <el-radio-group v-model="A_EForm.noticeType">
-              <el-radio-button 
+              <el-radio-button
                 v-for="i in dictStore.dictData.sys_notice_type"
                 :value="i.dictValue"
-                >{{ i.dictLabel }}</el-radio
+                >{{ i.dictLabel }}</el-radio-button
               >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="A_EForm.status">
-              <el-radio-button 
+              <el-radio-button
                 v-for="i in dictStore.dictData.sys_notice_status"
                 :value="i.dictValue"
-                >{{ i.dictLabel }}</el-radio
+                >{{ i.dictLabel }}</el-radio-button
               >
             </el-radio-group>
           </el-form-item>

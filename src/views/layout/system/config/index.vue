@@ -133,10 +133,10 @@
         </el-form-item>
         <el-form-item label="系统内置" prop="configType">
           <el-radio-group v-model="A_EForm.configType">
-            <el-radio-button 
+            <el-radio-button
               v-for="i in dictStore.dictData.sys_yes_no"
               :value="i.dictValue"
-              >{{ i.dictLabel }}</el-radio
+              >{{ i.dictLabel }}</el-radio-button
             >
           </el-radio-group>
         </el-form-item>

@@ -145,17 +145,17 @@
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="A_EForm.status">
-              <el-radio-button 
+              <el-radio-button
                 v-for="i in dictStore.dictData.sys_normal_disable"
                 :value="i.dictValue"
-                >{{ i.dictLabel }}</el-radio
+                >{{ i.dictLabel }}</el-radio-button
               >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="管理员" prop="admin">
             <el-radio-group v-model="A_EForm.admin">
-              <el-radio-button :value="true">是</el-radio>
-              <el-radio-button :value="false">否</el-radio>
+              <el-radio-button :value="true">是</el-radio-button>
+              <el-radio-button :value="false">否</el-radio-button>
             </el-radio-group>
           </el-form-item>
         </div>
