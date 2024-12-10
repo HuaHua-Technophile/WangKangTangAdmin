@@ -12,7 +12,7 @@ import { customRequest } from "../instance";
  * @param params 查询参数
  */
 export const getAttributeList = (
-  cid: number,
+  cid: string,
   params: GetAttributeListParams
 ) => {
   return customRequest<AttributeItem[]>(
@@ -45,7 +45,7 @@ export const addAttribute = (data: AttributeItem) => {
  * @param id 属性ID
  * @param data 属性数据
  */
-export const editAttribute = (id: number, data: AttributeItem) => {
+export const editAttribute = (data: AttributeItem, id: number) => {
   return customRequest(
     {
       method: "PUT",

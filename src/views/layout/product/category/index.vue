@@ -128,8 +128,8 @@
         </el-form-item>
         <el-form-item label="分类状态" prop="status">
           <el-radio-group v-model="A_EForm.status">
-            <el-radio :label="'禁用'" :value="0" />
-            <el-radio :label="'启用'" :value="1" />
+            <el-radio-button :label="'禁用'" :value="0" />
+            <el-radio-button :label="'启用'" :value="1" />
           </el-radio-group>
         </el-form-item>
       </el-form>

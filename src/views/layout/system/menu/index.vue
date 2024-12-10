@@ -96,9 +96,9 @@
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="菜单类型" prop="menuType">
             <el-radio-group v-model="A_EForm.menuType">
-              <el-radio :value="'M'">目录</el-radio>
-              <el-radio :value="'C'">菜单</el-radio>
-              <el-radio :value="'F'">按钮</el-radio>
+              <el-radio-button :value="'M'">目录</el-radio>
+              <el-radio-button :value="'C'">菜单</el-radio>
+              <el-radio-button :value="'F'">按钮</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="排序" prop="orderNum">
@@ -151,8 +151,8 @@
             label="外链"
             tip="选择是外链则路由地址需要以`http(s)://`开头">
             <el-radio-group v-model="A_EForm.isFrame">
-              <el-radio :value="'0'">是</el-radio>
-              <el-radio :value="'1'">否</el-radio>
+              <el-radio-button :value="'0'">是</el-radio>
+              <el-radio-button :value="'1'">否</el-radio>
             </el-radio-group>
           </CustomFormItemTip>
           <CustomFormItemTip
@@ -160,8 +160,8 @@
             prop="isCache"
             tip="选择是则会被`keep-alive`缓存，需要匹配组件的`name`和地址保持一致">
             <el-radio-group v-model="A_EForm.isCache">
-              <el-radio :value="'0'">缓存</el-radio>
-              <el-radio :value="'1'">不缓存</el-radio>
+              <el-radio-button :value="'0'">缓存</el-radio>
+              <el-radio-button :value="'1'">不缓存</el-radio>
             </el-radio-group>
           </CustomFormItemTip>
         </div>

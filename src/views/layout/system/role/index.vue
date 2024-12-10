@@ -154,8 +154,8 @@
           </el-form-item>
           <el-form-item label="管理员" prop="admin">
             <el-radio-group v-model="A_EForm.admin">
-              <el-radio :value="true">是</el-radio>
-              <el-radio :value="false">否</el-radio>
+              <el-radio-button :value="true">是</el-radio>
+              <el-radio-button :value="false">否</el-radio>
             </el-radio-group>
           </el-form-item>
         </div>

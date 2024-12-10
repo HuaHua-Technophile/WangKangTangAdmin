@@ -94,21 +94,14 @@ export const useRouteParamsValidation = (options: ValidateOptions) => {
       options.customValidation &&
       !options.customValidation(route.query)
     ) {
-      try {
-        await ElMessageBox.alert("参数验证失败", "验证错误", {
-          confirmButtonText: "返回",
-          type: "error",
-          callback: () => {
-            handleRedirect();
-          },
-        });
-      } catch {
-        // 用户关闭对话框时也执行重定向
-        handleRedirect();
-      }
-    } else {
-      saveParamsToStorage();
-    }
+      await ElMessageBox.alert("参数验证失败", "验证错误", {
+        confirmButtonText: "返回",
+        type: "error",
+        callback: () => {
+          handleRedirect();
+        },
+      });
+    } else saveParamsToStorage();
   };
 
   onMounted(() => {
