@@ -48,24 +48,12 @@
             v-if="!row.admin">
             <el-button-group>
               <el-button
-                plain
-                :color="
-                  row.attributeCount > 0 || row.attributeCount > 0
-                    ? '#0DCAF0'
-                    : '#E6A23C'
-                "
-                :dark="isDark"
+                :type="row.attributeCount > 0 ? 'primary' : 'warning'"
                 @click="handleViewAttribute(row, 0)">
-                {{
-                  row.attributeCount > 0 || row.attributeCount > 0
-                    ? "查看规格"
-                    : "添加规格"
-                }}
+                {{ row.attributeCount > 0 ? "查看规格" : "添加规格" }}
               </el-button>
               <el-button
-                plain
-                :color="row.attributeCount > 0 ? '#0DCAF0' : '#E6A23C'"
-                :dark="isDark"
+                :type="row.paramCount > 0 ? 'primary' : 'warning'"
                 @click="handleViewAttribute(row, 1)">
                 {{ row.paramCount > 0 ? "查看参数" : "添加参数" }}
               </el-button>
@@ -132,7 +120,6 @@
     getAttributeCategoryList,
   } from "@/api/product/attributeCategory";
   import { usePaginationStore } from "@/stores/pagination";
-  import { useThemeStore } from "@/stores/theme";
   import { AttributeCategoryItem } from "@/types/product/attributeCategory";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
@@ -147,7 +134,6 @@
   import { onMounted, reactive, ref } from "vue";
   import { useRouter } from "vue-router";
 
-  const { isDark } = useThemeStore();
   // 搜索参数-------------------------
   const queryParams = reactive<Pick<AttributeCategoryItem, "name">>({
     name: "",
@@ -274,6 +260,7 @@
       query: {
         cid: row.id,
         type,
+        father: row.name,
       },
     });
   };

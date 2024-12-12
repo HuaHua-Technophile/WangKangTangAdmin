@@ -433,11 +433,10 @@
 
   // 删除字典数据
   const selectedDictData = ref<DictDataItem[]>([]);
+  const dictDataTable = ref<TableInstance>();
   const handleDictDataSelectionChange = (selection: DictDataItem[]) => {
     selectedDictData.value = selection;
   };
-  const dictDataTable = ref<TableInstance>();
-
   const toDelDictData = (row: DictDataItem) => {
     dictDataTable.value?.toggleRowSelection(row, true);
     elMessageBoxConfirm(
