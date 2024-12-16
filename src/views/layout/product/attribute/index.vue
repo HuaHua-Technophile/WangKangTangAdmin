@@ -1,87 +1,18 @@
 <template>
   <div>
     <!-- 搜索表单 -->
-    <el-form :model="queryParams" class="d-flex align-items-center">
-      <el-form-item>
-        <el-radio-group
-          v-model="queryParams.type"
-          class="flex-shrink-0 mx-md-2"
-          @change="handleTypeChange">
-          <el-radio-button label="规格" :value="'0'" />
-          <el-radio-button label="参数" :value="'1'" />
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item
-        :label="`${queryParams.type == 0 ? '规格' : '参数'}名称`"
-        class="mx-md-2 flex-grow-1">
-        <el-input
-          v-model="queryParams.name"
-          :placeholder="`请输入${
-            queryParams.type == 0 ? '规格' : '参数'
-          }的名称`"
-          clearable />
-      </el-form-item>
-      <el-form-item label="选择类型" class="mx-md-2">
-        <el-select
-          v-model="queryParams.selectType"
-          placeholder=""
-          clearable
-          style="width: 80px">
-          <el-option label="唯一" :value="0" />
-          <el-option label="单选" :value="1" />
-          <el-option label="多选" :value="2" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="录入方式" class="mx-md-2">
-        <el-select
-          v-model="queryParams.inputType"
-          placeholder=""
-          clearable
-          style="width: 110px">
-          <el-option label="手工录入" :value="0" />
-          <el-option label="列表选择" :value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="是否关联" class="mx-md-2">
-        <el-select
-          v-model="queryParams.relatedStatus"
-          placeholder=""
-          clearable
-          style="width: 70px">
-          <el-option label="否" :value="0" />
-          <el-option label="是" :value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="支持手动新增" class="mx-md-2">
-        <el-select
-          v-model="queryParams.handAddStatus"
-          placeholder=""
-          clearable
-          style="width: 70px">
-          <el-option label="否" :value="0" />
-          <el-option label="是" :value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="mx-md-2">
-        <el-button
-          type="primary"
-          @click="
-            () => {
-              currentPage = 1;
-              fetchAttributeList();
-            }
-          "
-          >搜索</el-button
-        >
-      </el-form-item>
-
-      <el-form-item class="mx-md-2">
-        <el-button type="primary" @click="toAddAttribute"
-          >添加{{ queryParams.type == 0 ? "规格" : "参数" }}</el-button
-        >
-      </el-form-item>
-    </el-form>
-
+    <div class="d-flex align-items-center">
+      <el-radio-group
+        v-model="type"
+        class="flex-flow-1 mx-md-2"
+        @change="handleTypeChange">
+        <el-radio-button label="规格" :value="'0'" />
+        <el-radio-button label="参数" :value="'1'" />
+      </el-radio-group>
+      <el-button type="primary" @click="toAddAttribute"
+        >添加{{ type === "0" ? "规格" : "参数" }}</el-button
+      >
+    </div>
     <!-- 属性列表表格 -->
     <el-table
       ref="attributeTable"
@@ -94,18 +25,32 @@
       <el-table-column prop="id" label="ID" />
       <el-table-column
         prop="name"
-        :label="`${queryParams.type == 0 ? '参数名称' : '参数名称'}`" />
+        :label="`${type == '0' ? '参数名称' : '参数名称'}`" />
       <el-table-column prop="selectType" label="选择类型">
-        <template #default="scope: { row: RowData }">
-          {{ selectTypeMap[scope.row.selectType] }}
+        <template #default="{ row }">
+          {{ row.selectType == 0 ? "唯一" : 1 ? "单选" : "多选" }}
         </template>
       </el-table-column>
       <el-table-column prop="inputType" label="录入方式">
-        <template #default="scope: { row: RowData }">
-          {{ inputTypeMap[scope.row.inputType] }}
+        <template #default="{ row }">
+          {{ row.inputType == 0 ? "手工录入" : "列表选择" }}
         </template>
       </el-table-column>
       <el-table-column prop="inputList" label="可选值(列表)" />
+      <el-table-column prop="handAddStatus" label="支持手动新增">
+        <template #default="{ row }">
+          <el-tag :type="row.handAddStatus == 0 ? 'danger' : 'primary'">
+            {{ row.handAddStatus == 0 ? "否" : "是" }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="relatedStatus" label="药品属性关联">
+        <template #default="{ row }">
+          <el-tag :type="row.relatedStatus == 0 ? 'danger' : 'primary'">
+            {{ row.relatedStatus == 0 ? "否" : "是" }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="sort" label="排序" />
       <DataTebleColumnTime />
       <el-table-column label="操作">
@@ -159,18 +104,16 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          :label="`${queryParams.type == 0 ? '规格' : '参数'}名称`"
+          :label="`${type == '0' ? '规格' : '参数'}名称`"
           prop="name">
           <el-input
             v-model="A_EForm.name"
-            :placeholder="`请输入${
-              queryParams.type == 0 ? '规格' : '参数'
-            }名称`"
+            :placeholder="`请输入${type == '0' ? '规格' : '参数'}名称`"
             clearable />
         </el-form-item>
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item
-            :label="`${queryParams.type == 0 ? '规格' : '参数'}选择类型`"
+            :label="`${type == '0' ? '规格' : '参数'}选择类型`"
             prop="selectType">
             <el-radio-group v-model="A_EForm.selectType">
               <el-radio-button label="唯一" :value="0" />
@@ -197,7 +140,7 @@
           </el-form-item>
         </div>
         <el-form-item
-          :label="`${queryParams.type == 0 ? '规格' : '参数'}录入方式`"
+          :label="`${type == '0' ? '规格' : '参数'}录入方式`"
           prop="inputType">
           <el-radio-group v-model="A_EForm.inputType">
             <el-radio-button label="手工录入" :value="0" />
@@ -228,10 +171,7 @@
   import { ref, reactive, watch, computed } from "vue";
   import { useRoute, useRouter } from "vue-router";
   import { useRouteParamsValidation } from "@/utils/router/useRouteParamsValidation";
-  import {
-    AttributeItem,
-    GetAttributeListParams,
-  } from "@/types/product/attribute";
+  import { AttributeItem } from "@/types/product/attribute";
   import { usePaginationStore } from "@/stores/pagination";
   import {
     ElMessage,
@@ -256,35 +196,13 @@
   const route = useRoute();
   const router = useRouter();
 
-  // 获取数据------------------------------
-  interface RowData {
-    selectType: 0 | 1 | 2;
-    inputType: 0 | 1;
-  }
-  const selectTypeMap = {
-    0: "唯一",
-    1: "单选",
-    2: "多选",
-  };
-  const inputTypeMap = {
-    0: "手工录入",
-    1: "列表选择",
-  };
-
   // 表格数据
   const attributeList = ref<AttributeItem[]>([]);
   const currentPage = ref(1);
   const total = ref(0);
   const paginationStore = usePaginationStore();
   // 查询参数
-  const queryParams = reactive<GetAttributeListParams>({
-    type: undefined,
-    name: "",
-    selectType: undefined,
-    inputType: undefined,
-    relatedStatus: undefined,
-    handAddStatus: undefined,
-  });
+  const type = ref<"0" | "1">();
   const defaultForm: AttributeItem = {
     productAttributeCategoryId: 0, // 需要从父组件传入
     type: 0,
@@ -307,12 +225,9 @@
     const res = await getAttributeList(cid, {
       pageNum: currentPage.value,
       pageSize: paginationStore.pageSize,
-      ...queryParams,
+      type: type.value,
     });
-    debugLog(
-      `查询属性分类cid:${cid}的${queryParams.type ? "规格" : "参数"}=>`,
-      res
-    );
+    debugLog(`查询属性分类cid:${cid}的${type.value ? "规格" : "参数"}=>`, res);
 
     if (res.code === 200) {
       attributeList.value = res.rows || [];
@@ -322,7 +237,7 @@
   watch(
     () => route.query.type,
     (newType) => {
-      queryParams.type = newType as string;
+      type.value = newType as "0" | "1";
       defaultForm.type = Number(newType) as 0 | 1;
       fetchAttributeList();
     },
@@ -391,7 +306,7 @@
   // 添加属性
   const toAddAttribute = () => {
     isAdd.value = true;
-    A_ETitle.value = queryParams.type == 0 ? "添加规格" : "添加参数";
+    A_ETitle.value = type.value == "0" ? "添加规格" : "添加参数";
     A_EForm = reactive({
       ...cloneDeep(defaultForm),
       productAttributeCategoryId: Number(route.query.cid),
@@ -400,7 +315,7 @@
   };
   // 修改属性
   const toEditAttribute = (data: AttributeItem) => {
-    A_ETitle.value = queryParams.type == 0 ? "修改规格" : "修改参数";
+    A_ETitle.value = type.value == "0" ? "修改规格" : "修改参数";
     isAdd.value = false;
     A_EForm = reactive(cloneDeep(data));
     A_EVisible.value = true;

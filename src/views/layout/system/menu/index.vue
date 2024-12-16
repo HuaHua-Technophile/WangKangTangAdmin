@@ -271,6 +271,8 @@
     orderNum: 0,
     visible: "0", //0显示 1隐藏
     status: "0", //0正常 1停用
+    isFrame: "1", //是否外链
+    isCache: "0", //是否缓存
   };
 
   const rules: FormRules = {

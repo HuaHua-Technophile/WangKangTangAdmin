@@ -11,15 +11,7 @@ export interface AttributeItem {
   relatedStatus: 0 | 1; // 是否关联
   handAddStatus: 0 | 1; // 是否支持手动新增
 }
-export type GetAttributeListParams = Pick<
-  AttributeItem,
-  | "name"
-  | "selectType"
-  | "inputType"
-  | "relatedStatus"
-  | "handAddStatus"
-  | "type"
-> &
+export type GetAttributeListParams = Pick<AttributeItem, "type"> &
   PaginationParams;
 
 // 药品属性值接口
