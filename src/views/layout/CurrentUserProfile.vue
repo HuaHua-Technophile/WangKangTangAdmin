@@ -175,14 +175,7 @@
   import { debugLog } from "@/utils/debug";
   import { passwordRule } from "@/utils/formRegularExpression";
   import { ElMessage, FormInstance } from "element-plus";
-  import {
-    computed,
-    onBeforeMount,
-    onMounted,
-    reactive,
-    ref,
-    watch,
-  } from "vue";
+  import { computed, onBeforeMount, onMounted, reactive, ref } from "vue";
   import { getLabelByDictData } from "@/utils/dictDataToOptions";
 
   // 字典数据-----------
