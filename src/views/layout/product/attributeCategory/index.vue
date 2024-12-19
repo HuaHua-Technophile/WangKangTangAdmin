@@ -200,6 +200,7 @@
     A_EFun = addAttributeCategory; // 需要您提供对应的API函数
     A_EForm = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 修改属性分类-------------------
@@ -214,6 +215,7 @@
       name: data.name,
     });
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 删除属性分类--------------

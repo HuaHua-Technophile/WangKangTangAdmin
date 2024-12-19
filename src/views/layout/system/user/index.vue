@@ -362,6 +362,7 @@
     A_EFun = addUser;
     A_EForm = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 修改用户------------
@@ -381,6 +382,7 @@
       status: data.status,
     });
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 删除用户--------------

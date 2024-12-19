@@ -121,7 +121,6 @@
 
   // 切换编辑状态------------------
   const toEditMenu = async (row: MenuItem) => {
-    A_EVisible.value = true;
     A_ETitle.value = "修改菜单";
     isAdd.value = false;
     A_EFun.value = editMenu;
@@ -140,6 +139,7 @@
       status: row.status, //0正常 1停用
       icon: row.icon, //图标
     });
+    A_EVisible.value = true;
     const res = (await getMenuTreeSelect()).data;
     MenuTreeSelect.value = await formatTreeSelectByTree({
       flat: res,

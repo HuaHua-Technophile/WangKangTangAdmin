@@ -310,6 +310,7 @@
     A_EFun = addRole;
     A_EForm = reactive(defaultForm);
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
   // 修改角色--------------
   const toEditRole = async (row: RoleItem) => {
@@ -338,6 +339,7 @@
 
     A_EFun = editRole;
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
   // 删除角色--------------
   const toDelRole = (row: RoleItem) => {

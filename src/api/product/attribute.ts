@@ -69,17 +69,3 @@ export const delAttribute = (ids: number[]) => {
     "删除属性"
   );
 };
-
-/**
- * 获取单个属性详情
- * @param id 属性ID
- */
-export const getAttributeDetail = (id: number) => {
-  return customRequest<AttributeItem>(
-    {
-      method: "GET",
-      url: `/product/attribute/${id}`,
-    },
-    "获取属性详情"
-  );
-};

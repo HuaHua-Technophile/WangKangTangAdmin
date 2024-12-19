@@ -286,6 +286,7 @@
   };
   const toEditPwdFun = () => {
     A_EVisible.value = true;
+
     passwordForm.value = {
       oldPassword: "",
       newPassword: "",
@@ -310,22 +311,14 @@
   // 上传头像-----------------------
   const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
   const croppedFile = ref<File>();
-  const previewSrcList = ref<string[]>([]);
   const imageUrl = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
       : baseUrl + currentUserProfile.value?.avatar
   );
-  // 监听 croppedFile 的变化
-  watch(croppedFile, (newFile) => {
-    if (newFile) {
-      const fileUrl = URL.createObjectURL(newFile);
-      previewSrcList.value = [fileUrl];
-    } else if (currentUserProfile.value?.avatar)
-      previewSrcList.value = [baseUrl + currentUserProfile.value.avatar];
-  });
-  onMounted(() => {
-    if (currentUserProfile.value?.avatar)
-      previewSrcList.value = [baseUrl + currentUserProfile.value.avatar]; // 初始化 previewSrcList
-  });
+  const previewSrcList = computed(() =>
+    croppedFile.value
+      ? [URL.createObjectURL(croppedFile.value)]
+      : [baseUrl + currentUserProfile.value?.avatar]
+  );
 </script>

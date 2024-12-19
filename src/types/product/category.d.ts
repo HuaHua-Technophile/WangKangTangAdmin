@@ -1,5 +1,5 @@
+import { PaginationParams } from "@/types/pagination";
 // @/types/product/category.ts
-
 export interface CategoryItem {
   id?: number;
   name?: string; //分类名称

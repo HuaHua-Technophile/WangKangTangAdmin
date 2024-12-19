@@ -273,6 +273,7 @@
     A_EFun = addNotice;
     A_EForm = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 打开编辑通知/公告对话框-------------
@@ -288,6 +289,7 @@
       status: row.status,
     });
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 删除通知/公告--------------

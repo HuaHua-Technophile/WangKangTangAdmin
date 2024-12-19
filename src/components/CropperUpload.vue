@@ -4,7 +4,7 @@
       :show-file-list="false"
       :on-change="handleFileChange"
       :auto-upload="false"
-      :accept="acceptImageTypes">
+      :accept="IMAGE_FORMATS">
       <template #trigger>
         <el-button type="primary" v-show="!croppedFile"
           >选择图片({{ maxSize }}MB)</el-button
@@ -76,7 +76,8 @@
   );
 
   // 常量和响应式变量
-  const acceptImageTypes = ".webp,.jpg,.jpeg,.png,.gif,.bmp";
+  const IMAGE_FORMATS = import.meta.env.VITE_APP_IMAGE_FORMATS;
+
   const showCropperDialog = ref(false);
   const previewImageUrl = ref("");
   const cropperImageRef = ref<HTMLImageElement>();
@@ -99,11 +100,9 @@
     }
     //图片类型判断
     if (
-      !acceptImageTypes
-        .split(",")
-        .some((type) =>
-          rawFile.type.toLowerCase().includes(type.replace(".", ""))
-        )
+      !IMAGE_FORMATS.split(",").some((type: string) =>
+        rawFile.type.toLowerCase().includes(type.replace(".", ""))
+      )
     ) {
       ElMessage.error("请上传正确的图片格式");
       return false;

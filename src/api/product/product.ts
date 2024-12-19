@@ -4,6 +4,7 @@ import {
   UpdateStatusParams,
 } from "@/types/product/product";
 import { customRequest } from "../instance";
+import { AttributeCategoryItem } from "@/types/product/attributeCategory";
 
 /**
  * 添加药品
@@ -17,6 +18,22 @@ export const addProduct = (data: ProductItem) => {
       data,
     },
     "添加药品"
+  );
+};
+
+/**
+ * 更新药品信息
+ * @param id 药品ID
+ * @param data 药品数据
+ */
+export const editProduct = (id: number, data: ProductItem) => {
+  return customRequest(
+    {
+      method: "PUT",
+      url: `/product/update/${id}`,
+      data,
+    },
+    "修改药品"
   );
 };
 
@@ -66,22 +83,6 @@ export const updateRecommendStatus = (data: UpdateStatusParams) => {
 };
 
 /**
- * 更新药品信息
- * @param id 药品ID
- * @param data 药品数据
- */
-export const updateProduct = (id: number, data: ProductItem) => {
-  return customRequest(
-    {
-      method: "PUT",
-      url: `/product/update/${id}`,
-      data,
-    },
-    "更新药品信息"
-  );
-};
-
-/**
  * 获取药品编辑信息
  * @param id 药品ID
  */
@@ -106,5 +107,16 @@ export const searchProduct = (productName: string) => {
       url: `/product/${productName}`,
     },
     "搜索药品"
+  );
+};
+
+// 6. 查询药品选择了哪个属性分类
+export const getAttributeCategoryByProduct = (id: number) => {
+  return customRequest<AttributeCategoryItem>(
+    {
+      method: "GET",
+      url: `/product/attribute/category/${id}`,
+    },
+    `查询ID:${id}药品选择了哪个属性分类`
   );
 };

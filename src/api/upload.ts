@@ -1,6 +1,6 @@
 import { customRequest } from "./instance";
 
-export const commonUpload = (file: File, fileKey: string = "file") => {
+export const allFileUpload = (file: File, fileKey: string = "file") => {
   const formData = new FormData();
   formData.append(fileKey, file);
 

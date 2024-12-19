@@ -295,11 +295,12 @@
 
   // 提交修改/添加-------------
   const toAddMenu = async () => {
-    A_EVisible.value = true;
     A_ETitle.value = "添加菜单";
     isAdd.value = true;
     A_EFun = addMenu;
     A_EForm = reactive(defaultForm);
+    A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
     const res = (await getMenuTreeSelect()).data;
     menuTreeSelect.value = await formatTreeSelectByTree({
       flat: res,

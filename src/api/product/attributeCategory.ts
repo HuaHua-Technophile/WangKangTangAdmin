@@ -1,5 +1,6 @@
 // api/product/attributeCategory.ts
 import { customRequest } from "@/api/instance";
+import { AttributeItem } from "@/types/product/attribute";
 import {
   AttributeCategoryItem,
   AttributeCategoryParams,
@@ -63,13 +64,16 @@ export const delAttributeCategories = (ids: number[]) => {
   );
 };
 
-// 6. 查询单个药品属性分类
+/**
+ * 获取单个属性分类详情
+ * @param id 属性ID
+ */
 export const getAttributeCategoryDetail = (id: number) => {
-  return customRequest<AttributeCategoryItem>(
+  return customRequest<AttributeItem[]>(
     {
       method: "GET",
-      url: `/product/attribute/category/${id}`,
+      url: `/product/attribute/${id}`,
     },
-    "获取药品属性分类详细信息"
+    `获取ID:${id}属性分类详情`
   );
 };

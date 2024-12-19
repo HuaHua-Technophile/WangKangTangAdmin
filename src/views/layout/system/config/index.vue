@@ -252,6 +252,7 @@
     A_EFun = addConfig;
     A_EForm = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 打开编辑参数对话框-------------
@@ -267,6 +268,7 @@
       configType: row.configType,
     });
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 删除参数设置--------------

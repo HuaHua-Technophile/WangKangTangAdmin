@@ -52,8 +52,8 @@
         <template #default="scope">
           <el-image
             v-if="scope.row.icon != '#'"
-            :src="baseUrl + scope.row.icon"
-            :preview-src-list="[baseUrl + scope.row.icon]"
+            :src="BASEURL + scope.row.miniImg"
+            :preview-src-list="[BASEURL + scope.row.icon]"
             :preview-teleported="true"
             style="width: 60px; height: 60px" />
         </template>
@@ -115,13 +115,13 @@
           <el-image
             fit="cover"
             style="width: 100px; height: 100px"
-            :src="imageUrl"
-            :preview-src-list="previewSrcList"
+            :src="A_EImgUrl"
+            :preview-src-list="A_EImgPreviewSrcList"
             :preview-teleported="true"
             class="me-3" />
           <CropperUpload
             ref="cropperUploadRef"
-            :uploadApi="commonUpload"
+            :uploadApi="allFileUpload"
             v-model:croppedFile="croppedFile"
             :showUploadBtn="false"
             needThumbnail />
@@ -144,73 +144,26 @@
     getCategoryList,
     getCategoryListExclude,
   } from "@/api/product/category";
-  import { commonUpload } from "@/api/upload";
+  import { allFileUpload } from "@/api/upload";
   import { CategoryItem } from "@/types/product/category";
   import { TreeSelectItem } from "@/types/treeSelect";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { formatTreeSelectByFlat } from "@/utils/formatTreeSelectByFlat";
+  import { formatCategoryTreeByFlat } from "@/utils/product/category/format";
   import {
     ElMessage,
     FormInstance,
     FormRules,
     TableInstance,
   } from "element-plus";
-  import { computed, onMounted, reactive, ref, toRaw, watch } from "vue";
+  import { computed, onMounted, reactive, ref, toRaw } from "vue";
 
-  const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+  const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
 
   // 请求参数设置------------
   const queryParams = reactive<Pick<CategoryItem, "name" | "status">>({});
   const categoryTree = ref<CategoryItem[]>();
-  const formatCategoryTreeByFlat = async (
-    flat: CategoryItem[]
-  ): Promise<CategoryItem[]> => {
-    const nodeMap = new Map<number, CategoryItem>();
-
-    // 第一次遍历：创建节点映射
-    for (const item of flat) {
-      nodeMap.set(item.id!, {
-        ...item,
-        children: [],
-      });
-    }
-
-    const result: CategoryItem[] = [];
-
-    // 第二次遍历：构建树形结构
-    for (const item of flat) {
-      const currentNode = nodeMap.get(item.id!);
-
-      if (currentNode) {
-        // 情况1：父ID为1的节点，直接作为根节点
-        if (item.parentId === 1) {
-          result.push(currentNode);
-        }
-        // 情况2：有父节点且父节点存在于nodeMap中，则添加到对应父节点的children中
-        else if (
-          item.parentId !== undefined &&
-          item.parentId !== 0 &&
-          item.parentId !== 1 &&
-          nodeMap.has(item.parentId)
-        ) {
-          const parentNode = nodeMap.get(item.parentId);
-          parentNode?.children?.push(currentNode);
-        }
-        // 情况3：真正的根节点（parentId为0或undefined）且不是ID为1的节点
-        else if (
-          (item.parentId === undefined || item.parentId === 0) &&
-          item.id !== 1
-        )
-          result.push(currentNode);
-        // 新增情况4：处理孤立节点（父节点不在当前数据集中）
-        else if (!nodeMap.has(item.parentId!) && item.id !== 1)
-          result.push(currentNode);
-      }
-    }
-
-    return result;
-  };
   const fetchCategoryList = async () => {
     const res = await getCategoryList({
       pageNum: 1,
@@ -250,12 +203,17 @@
 
   // 添加/修改方法
   const toAddCategory = async () => {
-    A_EVisible.value = true;
     A_ETitle.value = "添加药品分类";
     isAdd.value = true;
     A_EForm = reactive({ ...defaultForm }); // 重置表单
+    A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
 
-    const res = await getCategoryList({ name: undefined, status: 1 });
+    const res = await getCategoryList({
+      pageNum: 1,
+      pageSize: 99999,
+      status: 1,
+    });
     debugLog("全部药品分类列表=>", res);
     if (res.code == 200 && res.rows)
       categoryTreeSelect.value = await formatTreeSelectByFlat({
@@ -267,20 +225,20 @@
     debugLog("处理后的药品分类树形选单=>", categoryTreeSelect.value);
   };
   const toEditCategory = async (row: CategoryItem) => {
-    A_EVisible.value = true;
     A_ETitle.value = "修改药品分类";
     isAdd.value = false;
+    A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
 
     A_EForm = reactive({
       id: row.id,
       name: row.name,
       parentId: row.parentId,
       icon: row.icon,
+      miniImg: row.miniImg,
       sort: row.sort,
       status: row.status,
     }); // 复制当前行数据到表单
-
-    if (A_EForm.icon) previewSrcList.value = [A_EForm.icon]; // 初始化 previewSrcList
 
     // 获取分类树形数据
     const res = await getCategoryListExclude(row.id!);
@@ -295,21 +253,20 @@
     debugLog("处理后的药品分类树形选单=>", categoryTreeSelect.value);
   };
 
-  // 裁剪图片
+  // 裁剪图片-------------------------
   const croppedFile = ref<File>();
-  const previewSrcList = ref<string[]>([]);
-  const imageUrl = computed(() =>
-    croppedFile.value ? URL.createObjectURL(croppedFile.value) : A_EForm.icon
+  const A_EImgUrl = computed(() =>
+    croppedFile.value
+      ? URL.createObjectURL(croppedFile.value)
+      : BASEURL + A_EForm.miniImg
   );
-  // 监听 croppedFile 的变化
-  watch(croppedFile, (newFile) => {
-    if (newFile) {
-      const fileUrl = URL.createObjectURL(newFile);
-      previewSrcList.value = [fileUrl];
-    } else if (A_EForm.icon) previewSrcList.value = [A_EForm.icon];
-  });
+  const A_EImgPreviewSrcList = computed(() =>
+    croppedFile.value
+      ? [URL.createObjectURL(croppedFile.value)]
+      : [BASEURL + A_EForm.icon]
+  );
 
-  // 提交表单
+  // 提交表单---------------------
   const A_EFormRef = ref<FormInstance>();
   const cropperUploadRef = ref();
   const submitForm = () => {

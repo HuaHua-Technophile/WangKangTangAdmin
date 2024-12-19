@@ -2,7 +2,7 @@
   <div
     ref="quillEditor"
     style="
-      min-height: 200px;
+      min-height: 50px;
       max-height: calc(100vh - 233px);
       overflow-y: auto;
     " />

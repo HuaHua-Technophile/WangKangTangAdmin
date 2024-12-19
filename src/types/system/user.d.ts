@@ -1,3 +1,4 @@
+import { PaginationParams } from "@/types/pagination";
 export interface UserItem {
   userId?: number;
   admin?: boolean; //是否管理员

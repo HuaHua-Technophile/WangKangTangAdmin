@@ -1,3 +1,4 @@
+import { PaginationParams } from "@/types/pagination";
 // @/types/system/config.ts
 export interface ConfigItem {
   configId?: number;

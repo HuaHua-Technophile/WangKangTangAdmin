@@ -323,8 +323,9 @@
   const toAddDictType = () => {
     isEditingDictType.value = true;
     A_ETitle.value = "新增字典类型";
-    A_EVisible.value = true;
     A_EForm = reactive(cloneDeep(defaultForm));
+    A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 编辑字典类型-----------------------
@@ -339,6 +340,7 @@
       status: row.status,
     });
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 删除字典类型--------------------
@@ -407,11 +409,12 @@
   const toAddDictData = () => {
     isEditingDictType.value = false;
     A_ETitle.value = "新增字典数据";
-    A_EVisible.value = true;
     dictDataForm = reactive({
       dictType: currentDictType.value?.dictType,
       ...dictDatadefaultForm,
     });
+    A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 编辑字典数据
@@ -429,6 +432,7 @@
       status: row.status,
     });
     A_EVisible.value = true;
+    A_EFormRef.value?.clearValidate();
   };
 
   // 删除字典数据

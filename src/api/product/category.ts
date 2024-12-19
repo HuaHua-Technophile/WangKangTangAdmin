@@ -58,14 +58,3 @@ export const delCategories = (ids: number[]) => {
     "删除药品分类"
   );
 };
-
-// 6. 获取药品分类详细信息
-export const getCategoryDetail = (id: number) => {
-  return customRequest<CategoryItem>(
-    {
-      method: "GET",
-      url: `/product/category/${id}`,
-    },
-    "获取药品分类详细信息"
-  );
-};
