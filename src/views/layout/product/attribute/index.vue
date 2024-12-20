@@ -87,27 +87,27 @@
       width="630">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
-          >ID:{{ A_EForm && A_EForm["id"] }}</span
+          >ID:{{ A_EFormData && A_EFormData["id"] }}</span
         >
       </template>
       <el-form
-        :model="A_EForm"
+        :model="A_EFormData"
         ref="A_EFormRef"
         label-width="auto"
         :rules="rules"
-        v-if="A_EForm">
+        v-if="A_EFormData">
         <el-form-item label="父级属性分类">
           <el-input v-model="route.query.father" disabled />
         </el-form-item>
         <el-form-item label="属性类型" prop="type">
-          <el-radio-group v-model="A_EForm.type" disabled>
+          <el-radio-group v-model="A_EFormData.type" disabled>
             <el-radio-button label="规格" :value="0" />
             <el-radio-button label="参数" :value="1" />
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="`${type == 0 ? '规格' : '参数'}名称`" prop="name">
           <el-input
-            v-model="A_EForm.name"
+            v-model="A_EFormData.name"
             :placeholder="`请输入${type == 0 ? '规格' : '参数'}名称`"
             clearable />
         </el-form-item>
@@ -115,27 +115,27 @@
           <el-form-item
             :label="`${type == 0 ? '规格' : '参数'}选择类型`"
             prop="selectType">
-            <el-radio-group v-model="A_EForm.selectType">
+            <el-radio-group v-model="A_EFormData.selectType">
               <el-radio-button label="唯一" :value="0" />
               <el-radio-button label="单选" :value="1" />
               <el-radio-button label="多选" :value="2" />
             </el-radio-group>
           </el-form-item>
           <el-form-item label="排序" prop="sort">
-            <el-input-number v-model="A_EForm.sort" :min="0" />
+            <el-input-number v-model="A_EFormData.sort" :min="0" />
           </el-form-item>
         </div>
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="是否支持手动新增" prop="handAddStatus">
             <el-switch
-              v-model="A_EForm.handAddStatus"
+              v-model="A_EFormData.handAddStatus"
               :active-value="1"
               :inactive-value="0"
-              :disabled="A_EForm.selectType == 0 && type == 0" />
+              :disabled="A_EFormData.selectType == 0 && type == 0" />
           </el-form-item>
           <el-form-item label="药品属性关联" prop="relatedStatus">
             <el-switch
-              v-model="A_EForm.relatedStatus"
+              v-model="A_EFormData.relatedStatus"
               :active-value="1"
               :inactive-value="0" />
           </el-form-item>
@@ -144,8 +144,8 @@
           :label="`${type == 0 ? '规格' : '参数'}录入方式`"
           prop="inputType">
           <el-radio-group
-            v-model="A_EForm.inputType"
-            :disabled="A_EForm.selectType == 0">
+            v-model="A_EFormData.inputType"
+            :disabled="A_EFormData.selectType == 0">
             <el-radio-button label="手工录入" :value="0" />
             <el-radio-button label="列表选择" :value="1" />
           </el-radio-group>
@@ -153,7 +153,7 @@
         <el-form-item
           label="可选值列表"
           prop="inputList"
-          v-show="A_EForm.inputType === 1">
+          v-show="A_EFormData.inputType === 1">
           <el-input-tag
             v-model="inputListArray"
             placeholder="请添加可选值选项，'回车键'/'Tab键'添加输入内容" />
@@ -161,9 +161,9 @@
         <el-form-item
           label="可选值手动录入"
           prop="inputList"
-          v-show="A_EForm.inputType != 1">
+          v-show="A_EFormData.inputType != 1">
           <el-input
-            v-model="A_EForm.inputList"
+            v-model="A_EFormData.inputList"
             type="textarea"
             :autosize="{ minRows: 1, maxRows: 10 }"
             placeholder="请自行录入" />
@@ -265,13 +265,13 @@
   const isAdd = ref(true);
   const A_EVisible = ref(false);
   const A_ETitle = ref("");
-  let A_EForm: AttributeItem = reactive(cloneDeep(defaultForm));
+  let A_EFormData: AttributeItem = reactive(cloneDeep(defaultForm));
 
   // 计算属性：将字符串转换为数组
   const inputListArray = computed({
-    get: () => (A_EForm.inputList ? A_EForm.inputList.split(",") : []),
+    get: () => (A_EFormData.inputList ? A_EFormData.inputList.split(",") : []),
     set: (newValue: string[]) => {
-      A_EForm.inputList = newValue.join(",");
+      A_EFormData.inputList = newValue.join(",");
     },
   });
   const rules: FormRules = {
@@ -285,8 +285,8 @@
         validator: (_rule, value, callback) => {
           // 当选择类型为唯一值(0)时
           if (value === 0) {
-            A_EForm.inputType = 0; // 强制设置为手工录入
-            if (type.value == 0) A_EForm.handAddStatus = 0; // 强制禁止手动新增
+            A_EFormData.inputType = 0; // 强制设置为手工录入
+            if (type.value == 0) A_EFormData.handAddStatus = 0; // 强制禁止手动新增
           }
           callback();
         },
@@ -295,11 +295,14 @@
     ],
     inputList: [
       {
-        message: `必须在该页面完成添加${type.value == 0 ? "规格" : "参数"}`,
         trigger: "blur",
         validator: (_rule, value, callback) => {
-          if (!A_EForm.handAddStatus && !value)
-            callback(new Error(`必须在该页面完成添加`));
+          if (!A_EFormData.handAddStatus && !value)
+            callback(
+              new Error(
+                `必须在该页面完成添加${type.value == 0 ? "规格" : "参数"}`
+              )
+            );
           else callback();
         },
       },
@@ -312,8 +315,8 @@
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
         const res = isAdd.value
-          ? await addAttribute(A_EForm)
-          : await editAttribute(A_EForm, A_EForm.id!);
+          ? await addAttribute(A_EFormData)
+          : await editAttribute(A_EFormData, A_EFormData.id!);
         debugLog(`${A_ETitle.value}结果=>`, res);
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
@@ -328,7 +331,7 @@
   const toAddAttribute = () => {
     isAdd.value = true;
     A_ETitle.value = type.value == 0 ? "添加规格" : "添加参数";
-    Object.assign(A_EForm, {
+    Object.assign(A_EFormData, {
       ...cloneDeep(defaultForm),
       productAttributeCategoryId: Number(route.query.cid),
     });
@@ -339,7 +342,7 @@
   const toEditAttribute = (data: AttributeItem) => {
     A_ETitle.value = type.value == 0 ? "修改规格" : "修改参数";
     isAdd.value = false;
-    Object.assign(A_EForm, cloneDeep(data));
+    Object.assign(A_EFormData, cloneDeep(data));
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };

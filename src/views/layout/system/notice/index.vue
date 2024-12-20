@@ -129,24 +129,24 @@
       class="mt-0 mb-0">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
-          >ID:{{ A_EForm && A_EForm["noticeId"] }}</span
+          >ID:{{ A_EFormData && A_EFormData["noticeId"] }}</span
         >
       </template>
       <el-form
-        :model="A_EForm"
+        :model="A_EFormData"
         ref="A_EFormRef"
         label-width="auto"
         :rules="rules"
-        v-if="A_EForm">
+        v-if="A_EFormData">
         <el-form-item label="标题" prop="noticeTitle">
           <el-input
-            v-model="A_EForm.noticeTitle"
+            v-model="A_EFormData.noticeTitle"
             placeholder="请输入通知/公告标题"
             clearable />
         </el-form-item>
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="类型" prop="noticeType">
-            <el-radio-group v-model="A_EForm.noticeType">
+            <el-radio-group v-model="A_EFormData.noticeType">
               <el-radio-button
                 v-for="i in dictStore.dictData.sys_notice_type"
                 :value="i.dictValue"
@@ -155,7 +155,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状态" prop="status">
-            <el-radio-group v-model="A_EForm.status">
+            <el-radio-group v-model="A_EFormData.status">
               <el-radio-button
                 v-for="i in dictStore.dictData.sys_notice_status"
                 :value="i.dictValue"
@@ -167,7 +167,7 @@
         <el-form-item label="内容" prop="noticeContent">
           <div class="w-100">
             <QuillEditor
-              v-model="A_EForm.noticeContent"
+              v-model="A_EFormData.noticeContent"
               placeholder="请输入通知/公告内容" />
           </div>
         </el-form-item>
@@ -234,7 +234,7 @@
     noticeContent: "",
     status: "",
   };
-  let A_EForm: NoticeItem;
+  let A_EFormData: NoticeItem;
   let A_EFun: (data: NoticeItem) => Promise<AxiosResponse>;
   const rules: FormRules = {
     noticeTitle: [
@@ -255,7 +255,7 @@
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
-        const res = await A_EFun(A_EForm);
+        const res = await A_EFun(A_EFormData);
         debugLog(`${A_ETitle.value}结果=>`, res);
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
@@ -271,7 +271,7 @@
     A_ETitle.value = "新增通知/公告";
     isAdd.value = true;
     A_EFun = addNotice;
-    A_EForm = reactive(cloneDeep(defaultForm));
+    A_EFormData = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
@@ -281,7 +281,7 @@
     A_ETitle.value = "修改通知/公告";
     isAdd.value = false;
     A_EFun = editNotice;
-    A_EForm = reactive({
+    A_EFormData = reactive({
       noticeId: row.noticeId,
       noticeTitle: row.noticeTitle,
       noticeType: row.noticeType,

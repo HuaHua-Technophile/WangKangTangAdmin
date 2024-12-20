@@ -116,7 +116,7 @@
   const isAdd = defineModel<boolean>("isAdd");
   const A_EFun =
     defineModel<(params: MenuItem) => Promise<AxiosResponse>>("A_EFun");
-  const A_EForm = defineModel<MenuItem>("A_EForm");
+  const A_EFormData = defineModel<MenuItem>("A_EFormData");
   const MenuTreeSelect = defineModel<TreeSelectItem[]>("MenuTreeSelect");
 
   // 切换编辑状态------------------
@@ -125,7 +125,7 @@
     isAdd.value = false;
     A_EFun.value = editMenu;
     debugLog("点击了这一行=>", row);
-    A_EForm.value = reactive<MenuItem>({
+    A_EFormData.value = reactive<MenuItem>({
       menuId: row.menuId,
       menuName: row.menuName,
       parentId: row.parentId,

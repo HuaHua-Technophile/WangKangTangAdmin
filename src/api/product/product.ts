@@ -10,7 +10,7 @@ import { AttributeCategoryItem } from "@/types/product/attributeCategory";
  * 添加药品
  * @param data 药品数据
  */
-export const addProduct = (data: ProductItem) => {
+export const addProduct = (data: ProductItem & { delFlag: 0 }) => {
   return customRequest(
     {
       method: "POST",

@@ -92,18 +92,18 @@
       :submitForm="submitForm">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
-          >ID:{{ A_EForm && A_EForm["id"] }}</span
+          >ID:{{ A_EFormData && A_EFormData["id"] }}</span
         >
       </template>
       <el-form
-        :model="A_EForm"
+        :model="A_EFormData"
         ref="A_EFormRef"
         label-width="auto"
         :rules="rules"
-        v-if="A_EForm">
+        v-if="A_EFormData">
         <el-form-item label="属性分类名称" prop="name">
           <el-input
-            v-model="A_EForm.name"
+            v-model="A_EFormData.name"
             placeholder="请输入属性分类名称"
             clearable />
         </el-form-item>
@@ -166,7 +166,7 @@
     name: "",
   };
 
-  let A_EForm: AttributeCategoryItem;
+  let A_EFormData: AttributeCategoryItem;
   let A_EFun: (data: AttributeCategoryItem) => Promise<AxiosResponse>;
 
   const rules: FormRules = {
@@ -181,7 +181,7 @@
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
-        const res = await A_EFun(A_EForm);
+        const res = await A_EFun(A_EFormData);
         debugLog(`${A_ETitle.value}结果=>`, res);
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
@@ -198,7 +198,7 @@
     A_ETitle.value = "添加属性分类";
     isAdd.value = true;
     A_EFun = addAttributeCategory; // 需要您提供对应的API函数
-    A_EForm = reactive(cloneDeep(defaultForm));
+    A_EFormData = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
@@ -210,7 +210,7 @@
     A_EFun = editAttributeCategory; // 需要您提供对应的API函数
 
     // 只提取需要的属性
-    A_EForm = reactive({
+    A_EFormData = reactive({
       id: data.id,
       name: data.name,
     });

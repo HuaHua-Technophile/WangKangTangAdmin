@@ -48,7 +48,7 @@
                       v-model:A_ETitle="A_ETitle"
                       v-model:isAdd="isAdd"
                       v-model:A_EFun="A_EFun"
-                      v-model:A_EForm="A_EForm"
+                      v-model:A_EFormData="A_EFormData"
                       v-model:MenuTreeSelect="menuTreeSelect" />
                   </CustomMenuTable>
                 </div>
@@ -60,7 +60,7 @@
               v-model:A_ETitle="A_ETitle"
               v-model:isAdd="isAdd"
               v-model:A_EFun="A_EFun"
-              v-model:A_EForm="A_EForm"
+              v-model:A_EFormData="A_EFormData"
               v-model:MenuTreeSelect="menuTreeSelect" />
           </CustomMenuTable>
         </template>
@@ -71,7 +71,7 @@
         v-model:A_ETitle="A_ETitle"
         v-model:isAdd="isAdd"
         v-model:A_EFun="A_EFun"
-        v-model:A_EForm="A_EForm"
+        v-model:A_EFormData="A_EFormData"
         v-model:MenuTreeSelect="menuTreeSelect" />
     </CustomMenuTable>
     <!-- 添加/修改弹窗 -->
@@ -81,21 +81,21 @@
       :submitForm="submitForm">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
-          >ID:{{ A_EForm && A_EForm["menuId"] }}</span
+          >ID:{{ A_EFormData && A_EFormData["menuId"] }}</span
         >
       </template>
       <el-form
-        :model="A_EForm"
+        :model="A_EFormData"
         ref="A_EFormRef"
         label-width="auto"
         :rules="rules"
-        v-if="A_EForm">
+        v-if="A_EFormData">
         <el-form-item label="菜单名称" prop="menuName">
-          <el-input v-model="A_EForm.menuName" />
+          <el-input v-model="A_EFormData.menuName" />
         </el-form-item>
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="菜单类型" prop="menuType">
-            <el-radio-group v-model="A_EForm.menuType">
+            <el-radio-group v-model="A_EFormData.menuType">
               <el-radio-button :value="'M'">目录</el-radio-button>
               <el-radio-button :value="'C'">菜单</el-radio-button>
               <el-radio-button :value="'F'">按钮</el-radio-button>
@@ -103,7 +103,7 @@
           </el-form-item>
           <el-form-item label="排序" prop="orderNum">
             <el-input-number
-              v-model.number="A_EForm.orderNum"
+              v-model.number="A_EFormData.orderNum"
               :min="0"
               :max="99"
               placeholder="排序号" />
@@ -111,7 +111,7 @@
         </div>
         <el-form-item label="上级目录" prop="parentId">
           <el-tree-select
-            v-model="A_EForm.parentId"
+            v-model="A_EFormData.parentId"
             :data="menuTreeSelect"
             check-strictly
             :render-after-expand="false" />
@@ -120,37 +120,37 @@
           label="路由路径"
           prop="path"
           tip="访问的路由地址，如：`user`，如外网地址需内链访问则以`http(s)://`开头"
-          v-show="A_EForm.menuType !== 'F'">
-          <el-input v-model="A_EForm.path" />
+          v-show="A_EFormData.menuType !== 'F'">
+          <el-input v-model="A_EFormData.path" />
         </CustomFormItemTip>
         <CustomFormItemTip
           label="组件地址"
           prop="component"
           tip="访问的组件路径，如：`system/user/index`，默认在`views`目录下"
-          v-show="A_EForm.menuType !== 'F' && A_EForm.menuType !== 'M'">
-          <el-input v-model="A_EForm.component" />
+          v-show="A_EFormData.menuType !== 'F' && A_EFormData.menuType !== 'M'">
+          <el-input v-model="A_EFormData.component" />
         </CustomFormItemTip>
         <CustomFormItemTip
           label="权限字符"
           prop="perms"
           tip="控制器中定义的权限字符，如：@PreAuthorize(`@ss.hasPermi('system:user:list')`)"
-          v-if="A_EForm.menuType !== 'M'">
-          <el-input v-model="A_EForm.perms" />
+          v-if="A_EFormData.menuType !== 'M'">
+          <el-input v-model="A_EFormData.perms" />
         </CustomFormItemTip>
         <el-form-item
           label="图标"
           prop="icon"
-          v-show="A_EForm.menuType !== 'F'">
-          <el-input v-model="A_EForm.icon" />
+          v-show="A_EFormData.menuType !== 'F'">
+          <el-input v-model="A_EFormData.icon" />
         </el-form-item>
         <div
           class="d-flex align-items-center justify-content-between"
-          v-show="A_EForm.menuType !== 'F'">
+          v-show="A_EFormData.menuType !== 'F'">
           <CustomFormItemTip
             prop="isFrame"
             label="外链"
             tip="选择是外链则路由地址需要以`http(s)://`开头">
-            <el-radio-group v-model="A_EForm.isFrame">
+            <el-radio-group v-model="A_EFormData.isFrame">
               <el-radio-button :value="'0'">是</el-radio-button>
               <el-radio-button :value="'1'">否</el-radio-button>
             </el-radio-group>
@@ -159,7 +159,7 @@
             label="缓存"
             prop="isCache"
             tip="选择是则会被`keep-alive`缓存，需要匹配组件的`name`和地址保持一致">
-            <el-radio-group v-model="A_EForm.isCache">
+            <el-radio-group v-model="A_EFormData.isCache">
               <el-radio-button :value="'0'">缓存</el-radio-button>
               <el-radio-button :value="'1'">不缓存</el-radio-button>
             </el-radio-group>
@@ -170,7 +170,7 @@
             label="状态"
             prop="status"
             tip="选择停用则路由将不会出现在侧边栏，也不能被访问">
-            <el-radio-group v-model="A_EForm.status">
+            <el-radio-group v-model="A_EFormData.status">
               <el-radio-button
                 v-for="i in dictStore.dictData.sys_normal_disable"
                 :value="i.dictValue"
@@ -182,7 +182,7 @@
             label="显示隐藏"
             prop="visible"
             tip="选择隐藏则路由将不会出现在侧边栏，但仍然可以访问">
-            <el-radio-group v-model="A_EForm.visible">
+            <el-radio-group v-model="A_EFormData.visible">
               <el-radio-button
                 v-for="i in dictStore.dictData.sys_show_hide"
                 :value="i.dictValue"
@@ -289,7 +289,7 @@
     perms: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
     icon: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
   };
-  let A_EForm: MenuItem;
+  let A_EFormData: MenuItem;
   const menuTreeSelect = ref<TreeSelectItem[]>();
   let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
 
@@ -298,7 +298,7 @@
     A_ETitle.value = "添加菜单";
     isAdd.value = true;
     A_EFun = addMenu;
-    A_EForm = reactive(defaultForm);
+    A_EFormData = reactive(defaultForm);
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
     const res = (await getMenuTreeSelect()).data;
@@ -313,7 +313,7 @@
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
-        const res = await A_EFun(A_EForm);
+        const res = await A_EFun(A_EFormData);
         debugLog(`${A_ETitle.value}结果`, res);
         if (res.code === 200) {
           A_EVisible.value = false;

@@ -89,27 +89,31 @@
       :A_ETitle="A_ETitle"
       :submitForm="submitForm">
       <template #headerBtn>
-        <span class="ms-2" v-if="!isAdd">ID: {{ A_EForm && A_EForm.id }}</span>
+        <span class="ms-2" v-if="!isAdd"
+          >ID: {{ A_EFormData && A_EFormData.id }}</span
+        >
       </template>
       <el-form
-        :model="A_EForm"
+        :model="A_EFormData"
         ref="A_EFormRef"
         label-width="auto"
         :rules="rules"
-        v-if="A_EForm">
+        v-if="A_EFormData">
         <el-form-item label="分类名称" prop="name">
-          <el-input v-model="A_EForm.name" placeholder="请输入药品分类名称" />
+          <el-input
+            v-model="A_EFormData.name"
+            placeholder="请输入药品分类名称" />
         </el-form-item>
         <el-form-item label="上级分类" prop="parentId">
           <el-tree-select
-            v-model="A_EForm.parentId"
+            v-model="A_EFormData.parentId"
             :data="categoryTreeSelect"
             check-strictly
             placeholder="选择上级分类"
             clearable />
         </el-form-item>
         <el-form-item label="分类排序" prop="sort">
-          <el-input-number v-model="A_EForm.sort" :min="0" />
+          <el-input-number v-model="A_EFormData.sort" :min="0" />
         </el-form-item>
         <el-form-item label="分类示意图" prop="icon" v-if="!isAdd">
           <el-image
@@ -127,7 +131,7 @@
             needThumbnail />
         </el-form-item>
         <el-form-item label="分类状态" prop="status">
-          <el-radio-group v-model="A_EForm.status">
+          <el-radio-group v-model="A_EFormData.status">
             <el-radio-button :label="'禁用'" :value="0" />
             <el-radio-button :label="'启用'" :value="1" />
           </el-radio-group>
@@ -198,14 +202,14 @@
     ],
     status: [{ required: true, message: "请选择分类状态", trigger: "change" }],
   };
-  let A_EForm: CategoryItem;
+  let A_EFormData: CategoryItem;
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
 
   // 添加/修改方法
   const toAddCategory = async () => {
     A_ETitle.value = "添加药品分类";
     isAdd.value = true;
-    A_EForm = reactive({ ...defaultForm }); // 重置表单
+    A_EFormData = reactive({ ...defaultForm }); // 重置表单
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
 
@@ -230,7 +234,7 @@
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
 
-    A_EForm = reactive({
+    A_EFormData = reactive({
       id: row.id,
       name: row.name,
       parentId: row.parentId,
@@ -258,12 +262,12 @@
   const A_EImgUrl = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
-      : BASEURL + A_EForm.miniImg
+      : BASEURL + A_EFormData.miniImg
   );
   const A_EImgPreviewSrcList = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
-      : [BASEURL + A_EForm.icon]
+      : [BASEURL + A_EFormData.icon]
   );
 
   // 提交表单---------------------
@@ -283,13 +287,13 @@
           }
 
           // 更新表单数据中的图片URL
-          A_EForm.icon = croppedRes.fileName;
+          A_EFormData.icon = croppedRes.fileName;
           if (thumbnailRes?.code === 200)
-            A_EForm.miniImg = thumbnailRes.fileName;
+            A_EFormData.miniImg = thumbnailRes.fileName;
         }
 
         const apiMethod = isAdd.value ? addCategory : editCategory;
-        const res = await apiMethod(A_EForm);
+        const res = await apiMethod(A_EFormData);
         debugLog(`${A_ETitle.value}结果=>`, res);
 
         if (res.code === 200) {

@@ -137,43 +137,43 @@
       :width="'610px'">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
-          >ID:{{ A_EForm && A_EForm["userId"] }}</span
+          >ID:{{ A_EFormData && A_EFormData["userId"] }}</span
         >
       </template>
       <el-form
-        :model="A_EForm"
+        :model="A_EFormData"
         ref="A_EFormRef"
         label-width="auto"
         :rules="rules"
-        v-if="A_EForm">
+        v-if="A_EFormData">
         <el-form-item label="账号" prop="userName" v-if="isAdd">
           <el-input
-            v-model="A_EForm.userName"
+            v-model="A_EFormData.userName"
             placeholder="请输入账号"
             clearable />
         </el-form-item>
         <el-form-item label="昵称" prop="nickName">
           <el-input
-            v-model="A_EForm.nickName"
+            v-model="A_EFormData.nickName"
             placeholder="请输入昵称"
             clearable />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input
-            v-model="A_EForm.email"
+            v-model="A_EFormData.email"
             placeholder="请输入邮箱"
             clearable />
         </el-form-item>
         <el-form-item label="手机号码" prop="phonenumber">
           <el-input
-            v-model="A_EForm.phonenumber"
+            v-model="A_EFormData.phonenumber"
             placeholder="请输入手机号码"
             clearable
             maxlength="11" />
         </el-form-item>
         <el-form-item label="密码" prop="password" v-if="isAdd">
           <el-input
-            v-model="A_EForm.password"
+            v-model="A_EFormData.password"
             placeholder="密码为6~20位数,不能包含空格与中文"
             clearable
             type="password"
@@ -181,7 +181,7 @@
         </el-form-item>
         <el-form-item label="确认密码" prop="confirmPassword" v-if="isAdd">
           <el-input
-            v-model="A_EForm.confirmPassword"
+            v-model="A_EFormData.confirmPassword"
             placeholder="请再次输入密码"
             clearable
             type="password"
@@ -189,7 +189,7 @@
         </el-form-item>
         <div class="d-flex justify-content-between align-items-center">
           <el-form-item label="性别" prop="sex">
-            <el-radio-group v-model="A_EForm.sex">
+            <el-radio-group v-model="A_EFormData.sex">
               <el-radio-button
                 v-for="i in dictStore.dictData.sys_user_sex"
                 :value="i.dictValue"
@@ -198,7 +198,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状态" prop="status">
-            <el-radio-group v-model="A_EForm.status">
+            <el-radio-group v-model="A_EFormData.status">
               <el-radio-button
                 v-for="i in dictStore.dictData.sys_normal_disable"
                 :value="i.dictValue"
@@ -206,8 +206,8 @@
               >
             </el-radio-group>
           </el-form-item>
-          <el-form-item v-if="A_EForm.userId" class="ms-3">
-            <el-button @click="toResetPassword(A_EForm.userId)">
+          <el-form-item v-if="A_EFormData.userId" class="ms-3">
+            <el-button @click="toResetPassword(A_EFormData.userId)">
               重置密码</el-button
             >
           </el-form-item>
@@ -292,7 +292,7 @@
     sex: "0",
     status: "0",
   };
-  let A_EForm: UserFormData;
+  let A_EFormData: UserFormData;
   let A_EFun: (data: UserItem) => Promise<AxiosResponse>;
 
   const rules: FormRules = {
@@ -327,7 +327,7 @@
           value: string,
           callback: (arg0?: Error) => void
         ) => {
-          if (value !== A_EForm.password)
+          if (value !== A_EFormData.password)
             callback(new Error("两次输入密码不一致"));
           else callback();
         },
@@ -344,7 +344,7 @@
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
-        const res = await A_EFun(A_EForm);
+        const res = await A_EFun(A_EFormData);
         debugLog("提交表单结果=>", res);
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
@@ -360,7 +360,7 @@
     A_ETitle.value = "添加用户";
     isAdd.value = true;
     A_EFun = addUser;
-    A_EForm = reactive(cloneDeep(defaultForm));
+    A_EFormData = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
@@ -372,7 +372,7 @@
     A_EFun = editUser;
 
     // 只提取需要的属性
-    A_EForm = reactive({
+    A_EFormData = reactive({
       userId: data.userId,
       userName: data.userName,
       nickName: data.nickName,

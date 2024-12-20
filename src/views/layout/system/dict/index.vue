@@ -112,8 +112,8 @@
       :A_ETitle="A_ETitle"
       :submitForm="handleSubmit">
       <template #headerBtn>
-        <span class="ms-2" v-if="isEditingDictType && A_EForm.dictId">
-          ID:{{ A_EForm.dictId }}
+        <span class="ms-2" v-if="isEditingDictType && A_EFormData.dictId">
+          ID:{{ A_EFormData.dictId }}
         </span>
         <span class="ms-2" v-if="!isEditingDictType && dictDataForm.dictCode">
           ID:{{ dictDataForm.dictCode }}
@@ -123,18 +123,18 @@
       <!-- 字典类型表单 -->
       <el-form
         v-if="isEditingDictType"
-        :model="A_EForm"
+        :model="A_EFormData"
         label-width="auto"
         :rules="rules"
         ref="A_EFormRef">
         <el-form-item label="字典名称" prop="dictName">
-          <el-input v-model="A_EForm.dictName" clearable />
+          <el-input v-model="A_EFormData.dictName" clearable />
         </el-form-item>
         <el-form-item label="字典类型" prop="dictType">
-          <el-input v-model="A_EForm.dictType" clearable />
+          <el-input v-model="A_EFormData.dictType" clearable />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="A_EForm.status">
+          <el-radio-group v-model="A_EFormData.status">
             <el-radio-button
               v-for="i in dictStore.dictData.sys_normal_disable"
               :value="i.dictValue"
@@ -312,7 +312,7 @@
   const A_EVisible = ref(false);
   const A_ETitle = ref("");
   const isEditingDictType = ref(true);
-  let A_EForm: DictTypeItem;
+  let A_EFormData: DictTypeItem;
   const defaultForm: DictTypeItem = {
     dictName: "",
     dictType: "",
@@ -323,7 +323,7 @@
   const toAddDictType = () => {
     isEditingDictType.value = true;
     A_ETitle.value = "新增字典类型";
-    A_EForm = reactive(cloneDeep(defaultForm));
+    A_EFormData = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
@@ -333,7 +333,7 @@
     isEditingDictType.value = true;
     A_ETitle.value = "编辑字典类型";
     // 只复制需要的属性
-    A_EForm = reactive({
+    A_EFormData = reactive({
       dictId: row.dictId,
       dictName: row.dictName,
       dictType: row.dictType,
@@ -506,7 +506,9 @@
       if (valid) {
         let res;
         if (isEditingDictType.value)
-          res = await (A_EForm.dictId ? editDictType : addDictType)(A_EForm);
+          res = await (A_EFormData.dictId ? editDictType : addDictType)(
+            A_EFormData
+          );
         else
           res = await (dictDataForm.dictCode ? editDictData : addDictData)(
             dictDataForm

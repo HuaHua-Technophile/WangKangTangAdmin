@@ -120,31 +120,31 @@
       :submitForm="submitForm">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
-          >ID:{{ A_EForm && A_EForm["roleId"] }}</span
+          >ID:{{ A_EFormData && A_EFormData["roleId"] }}</span
         >
       </template>
       <el-form
-        :model="A_EForm"
+        :model="A_EFormData"
         ref="A_EFormRef"
         label-width="auto"
         :rules="rules"
-        v-if="A_EForm">
+        v-if="A_EFormData">
         <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="A_EForm.roleName" clearable />
+          <el-input v-model="A_EFormData.roleName" clearable />
         </el-form-item>
         <el-form-item label="权限字符" prop="roleKey">
-          <el-input v-model="A_EForm.roleKey" clearable />
+          <el-input v-model="A_EFormData.roleKey" clearable />
         </el-form-item>
         <el-form-item label="排序" prop="roleSort">
           <el-input-number
-            v-model.number="A_EForm.roleSort"
+            v-model.number="A_EFormData.roleSort"
             :min="0"
             :max="99"
             placeholder="排序号" />
         </el-form-item>
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="状态" prop="status">
-            <el-radio-group v-model="A_EForm.status">
+            <el-radio-group v-model="A_EFormData.status">
               <el-radio-button
                 v-for="i in dictStore.dictData.sys_normal_disable"
                 :value="i.dictValue"
@@ -153,7 +153,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="管理员" prop="admin">
-            <el-radio-group v-model="A_EForm.admin">
+            <el-radio-group v-model="A_EFormData.admin">
               <el-radio-button :value="true">是</el-radio-button>
               <el-radio-button :value="false">否</el-radio-button>
             </el-radio-group>
@@ -161,7 +161,7 @@
         </div>
         <el-form-item label="授权菜单" prop="menuIds" v-if="!isAdd">
           <el-tree-select
-            v-model="A_EForm.menuIds"
+            v-model="A_EFormData.menuIds"
             :data="menuTreeSelect"
             multiple
             :render-after-expand="false"
@@ -268,7 +268,7 @@
     status: "0",
     menuIds: [],
   };
-  let A_EForm: RoleItem;
+  let A_EFormData: RoleItem;
   const menuTreeSelect = ref<TreeSelectItem[]>([]);
   const rules: FormRules = {
     roleKey: [
@@ -293,7 +293,7 @@
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
-        const res = await A_EFun(A_EForm);
+        const res = await A_EFun(A_EFormData);
         debugLog(`${A_ETitle.value}结果=>`, res);
         if (res.code === 200) {
           A_EVisible.value = false;
@@ -308,7 +308,7 @@
     A_ETitle.value = "添加角色";
     isAdd.value = true;
     A_EFun = addRole;
-    A_EForm = reactive(defaultForm);
+    A_EFormData = reactive(defaultForm);
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
@@ -325,7 +325,7 @@
           rootLabel: "根目录",
         });
 
-        A_EForm = reactive({
+        A_EFormData = reactive({
           roleId: row.roleId,
           roleKey: row.roleKey,
           roleName: row.roleName,

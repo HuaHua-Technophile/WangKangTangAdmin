@@ -104,35 +104,35 @@
       :submitForm="submitForm">
       <template #headerBtn>
         <span class="ms-2" v-if="!isAdd"
-          >ID:{{ A_EForm && A_EForm["configId"] }}</span
+          >ID:{{ A_EFormData && A_EFormData["configId"] }}</span
         >
       </template>
       <el-form
-        :model="A_EForm"
+        :model="A_EFormData"
         ref="A_EFormRef"
         label-width="auto"
         :rules="rules"
-        v-if="A_EForm">
+        v-if="A_EFormData">
         <el-form-item label="参数名称" prop="configName">
           <el-input
-            v-model="A_EForm.configName"
+            v-model="A_EFormData.configName"
             placeholder="请输入参数名称"
             clearable />
         </el-form-item>
         <el-form-item label="参数键名" prop="configKey">
           <el-input
-            v-model="A_EForm.configKey"
+            v-model="A_EFormData.configKey"
             placeholder="请输入参数键名"
             clearable />
         </el-form-item>
         <el-form-item label="参数值" prop="configValue">
           <el-input
-            v-model="A_EForm.configValue"
+            v-model="A_EFormData.configValue"
             placeholder="请输入参数值"
             clearable />
         </el-form-item>
         <el-form-item label="系统内置" prop="configType">
-          <el-radio-group v-model="A_EForm.configType">
+          <el-radio-group v-model="A_EFormData.configType">
             <el-radio-button
               v-for="i in dictStore.dictData.sys_yes_no"
               :value="i.dictValue"
@@ -207,7 +207,7 @@
     configKey: "",
     configValue: "",
   };
-  let A_EForm: ConfigItem;
+  let A_EFormData: ConfigItem;
   let A_EFun: (data: ConfigItem) => Promise<AxiosResponse>;
   const rules: FormRules = {
     configName: [
@@ -234,7 +234,7 @@
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
-        const res = await A_EFun(A_EForm);
+        const res = await A_EFun(A_EFormData);
         debugLog(`${A_ETitle.value}结果=>`, res);
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
@@ -250,7 +250,7 @@
     A_ETitle.value = "新增参数设置";
     isAdd.value = true;
     A_EFun = addConfig;
-    A_EForm = reactive(cloneDeep(defaultForm));
+    A_EFormData = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
@@ -260,7 +260,7 @@
     A_ETitle.value = "修改参数";
     isAdd.value = false;
     A_EFun = editConfig;
-    A_EForm = reactive({
+    A_EFormData = reactive({
       configId: row.configId,
       configName: row.configName,
       configKey: row.configKey,

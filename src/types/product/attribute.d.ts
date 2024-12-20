@@ -12,13 +12,13 @@ export interface AttributeItem {
   relatedStatus: 0 | 1; // 是否关联 0不关联 1关联
   handAddStatus: 0 | 1; // 是否支持手动新增 0不支持 1支持
 }
-export interface SpecificationItem extends AttributeItem {
+export interface AttributeItemUsing extends AttributeItem {
   // 新增的可选属性
-  newValue?: string; // 新值
-  currentValue?: string; // 当前值
-  selectedValues?: string[]; // 选中的值列表
-  valueList?: string[]; // 值列表
-  originalValueList?: string[]; // 原始值列表
+  newValue?: string; // 新增的可选项
+  currentValue?: string; // 当前选项
+  selectedValues?: string[]; // 选中项列表
+  valueList?: string[]; // 选项列表
+  originalValueList?: string[]; // 原始选项列表
 }
 export type GetAttributeListParams = Pick<AttributeItem, "type"> &
   PaginationParams;

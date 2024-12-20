@@ -52,9 +52,7 @@
 
   const props = withDefaults(
     defineProps<{
-      uploadApi: (
-        file: File
-      ) => Promise<AxiosResponse<{ fileName?: string; imgUrl?: string }>>;
+      uploadApi: (file: File) => Promise<AxiosResponse>;
       showUploadBtn?: boolean;
       needThumbnail?: boolean;
       aspectRatio?: number;

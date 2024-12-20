@@ -4,7 +4,7 @@ export const allFileUpload = (file: File, fileKey: string = "file") => {
   const formData = new FormData();
   formData.append(fileKey, file);
 
-  return customRequest<{ fileName: string }>(
+  return customRequest(
     {
       url: "/common/upload",
       method: "POST",

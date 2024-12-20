@@ -114,7 +114,7 @@
       fullscreen
       append-to-body>
       <template #headerBtn>
-        <span class="ms-2" v-if="!isAdd">ID: {{ A_EForm?.id }}</span>
+        <span class="ms-2" v-if="!isAdd">ID: {{ A_EFormData?.id }}</span>
       </template>
       <el-scrollbar
         style="
@@ -124,27 +124,27 @@
           ) !important;
         ">
         <el-form
-          :model="A_EForm"
+          :model="A_EFormData"
           ref="A_EFormRef"
           label-width="auto"
           :rules="rules"
-          v-if="A_EForm">
+          v-if="A_EFormData">
           <el-form-item label="商品分类" prop="categoryId">
             <el-tree-select
-              v-model="A_EForm.categoryId"
+              v-model="A_EFormData.categoryId"
               :data="categoryTreeSelect"
               placeholder="请选择商品分类"
               clearable />
           </el-form-item>
           <el-form-item label="商品名称" prop="name">
             <el-input
-              v-model="A_EForm.name"
+              v-model="A_EFormData.name"
               placeholder="请输入商品名称"
               clearable />
           </el-form-item>
           <el-form-item label="备注" prop="note">
             <el-input
-              v-model="A_EForm.note"
+              v-model="A_EFormData.note"
               type="textarea"
               placeholder="请输入备注(选填)"
               clearable />
@@ -167,19 +167,19 @@
             </el-form-item>
             <el-form-item label="运费金额" prop="freightTemplateId">
               <el-input-number
-                v-model="A_EForm.freightTemplateId"
+                v-model="A_EFormData.freightTemplateId"
                 :min="0"
                 :precision="2"
                 :step="0.1" />
             </el-form-item>
             <el-form-item label="是否推荐" prop="recommendStatus">
-              <el-radio-group v-model="A_EForm.recommendStatus">
+              <el-radio-group v-model="A_EFormData.recommendStatus">
                 <el-radio-button :value="0" label="否" />
                 <el-radio-button :value="1" label="是" />
               </el-radio-group>
             </el-form-item>
             <el-form-item label="是否处方药" prop="isPrescription">
-              <el-radio-group v-model="A_EForm.isPrescription">
+              <el-radio-group v-model="A_EFormData.isPrescription">
                 <el-radio-button :value="0" label="否" />
                 <el-radio-button :value="1" label="是" />
               </el-radio-group>
@@ -188,7 +188,7 @@
           <el-form-item label="药品介绍" prop="illustrate">
             <div class="w-100">
               <QuillEditor
-                v-model="A_EForm.illustrate"
+                v-model="A_EFormData.illustrate"
                 placeholder="请输入药品介绍(选填)" />
             </div>
           </el-form-item>
@@ -215,7 +215,7 @@
           </el-form-item>
           <el-form-item label="属性分类">
             <el-select
-              v-model="A_EForm.attributeCategoryId"
+              v-model="A_EFormData.attributeCategoryId"
               placeholder="请选择属性分类"
               @change="fetchAttributeList">
               <el-option
@@ -226,7 +226,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="规格">
-            <el-card class="w-100">
+            <div class="w-100 border rounded-4 shadow-sm p-2">
               <div
                 v-for="(spec, index) in specificationList"
                 :key="spec.id"
@@ -263,7 +263,7 @@
                   v-model="spec.newValue"
                   class="ms-3"
                   style="width: 150px"
-                  @keyup.enter="addSpecValue(spec, spec.newValue)">
+                  @keyup.enter="addAttrValue(spec, spec.newValue)">
                   <template #append>
                     <el-button
                       v-if="spec.handAddStatus == 1"
@@ -280,21 +280,22 @@
                   取消选择
                 </el-button>
               </div>
-            </el-card>
+            </div>
           </el-form-item>
-          <el-form-item label="SKU列表">
+          <el-form-item label="SKU列表" prop="skuStockList">
             <el-button
               type="primary"
               @click="generateSKUList"
-              :disabled="!A_EForm.attributeCategoryId">
+              :disabled="!A_EFormData.attributeCategoryId">
               生成SKU列表
             </el-button>
             <el-table
-              :data="SKUList"
-              v-if="SKUList.length"
+              :data="A_EFormData.skuStockList"
+              v-if="A_EFormData.skuStockList.length"
               table-layout="auto"
               cell-class-name="text-center"
-              header-cell-class-name="text-center">
+              header-cell-class-name="text-center"
+              class="border rounded-4 shadow-sm mt-2">
               <el-table-column label="SKU编码" prop="skuCode" />
               <el-table-column label="价格" prop="price">
                 <template #default="{ row }">
@@ -315,7 +316,62 @@
               </el-table-column>
             </el-table>
           </el-form-item>
-          <el-form-item label="参数"></el-form-item>
+          <el-form-item label="参数">
+            <div class="w-100 border rounded-4 shadow-sm p-2">
+              <div
+                v-for="(para, index) in parameterList"
+                class="d-flex flex-warp align-items-center"
+                :class="[
+                  index < parameterList.length - 1
+                    ? 'border-bottom pb-1 mb-1'
+                    : '',
+                ]">
+                <span class="me-3">{{ para.name }}：</span>
+                <!-- 多选 -->
+                <el-checkbox-group
+                  v-model="para.selectedValues"
+                  v-if="para.selectType === 2">
+                  <el-checkbox
+                    v-for="(value, valueIndex) in para.valueList"
+                    :key="valueIndex"
+                    :label="value"
+                    :value="value" />
+                </el-checkbox-group>
+                <!-- 唯一/单选 -->
+                <el-radio-group v-model="para.currentValue" v-else>
+                  <el-radio
+                    v-for="(value, valueIndex) in para.valueList"
+                    :key="valueIndex"
+                    :label="value"
+                    :value="value" />
+                </el-radio-group>
+                <!-- 可以新增 -->
+                <el-input
+                  v-if="para.handAddStatus == 1"
+                  size="small"
+                  placeholder="回车添加选项"
+                  v-model="para.newValue"
+                  class="ms-3"
+                  style="width: 150px"
+                  @keyup.enter="addAttrValue(para, para.newValue)">
+                  <template #append>
+                    <el-button
+                      v-if="para.handAddStatus == 1"
+                      size="small"
+                      @click="resetValueList(para)">
+                      清除
+                    </el-button>
+                  </template>
+                </el-input>
+                <el-button
+                  size="small"
+                  class="ms-3"
+                  @click="clearSelection(para)">
+                  取消选择
+                </el-button>
+              </div>
+            </div>
+          </el-form-item>
         </el-form>
       </el-scrollbar>
     </A_EDialog>
@@ -336,9 +392,13 @@
   } from "@/api/product/product";
   import { allFileUpload } from "@/api/upload";
   import { usePaginationStore } from "@/stores/pagination";
-  import { AttributeItem, SpecificationItem } from "@/types/product/attribute";
+  import {
+    AttributeItem,
+    AttributeItemUsing,
+    AttributeValueItem,
+  } from "@/types/product/attribute";
   import { AttributeCategoryItem } from "@/types/product/attributeCategory";
-  import { ProductItem, SKUItem } from "@/types/product/product";
+  import { ProductItem } from "@/types/product/product";
   import { TreeSelectItem } from "@/types/treeSelect";
   import { debugLog } from "@/utils/debug";
   import { formatTreeSelectByFlat } from "@/utils/formatTreeSelectByFlat";
@@ -351,7 +411,7 @@
     UploadFiles,
     UploadRawFile,
   } from "element-plus";
-  import { debounce } from "lodash";
+  import { cloneDeep, debounce } from "lodash";
   import { computed, onMounted, reactive, ref, toRaw, watch } from "vue";
 
   // 查询参数-----------------------
@@ -446,7 +506,7 @@
       {
         required: true,
         validator: (_rule: any, _value: any, callback: any) => {
-          if (!croppedFile.value && !A_EForm.imageUrl) {
+          if (!croppedFile.value && !A_EFormData.imageUrl) {
             callback(new Error("请上传商品封面"));
           } else callback();
         },
@@ -456,8 +516,19 @@
     freightTemplateId: [
       { required: true, message: "请输入运费金额", trigger: "blur" },
     ],
+    skuStockList: [
+      {
+        required: true,
+        validator: (_rule: any, _value: any, callback: any) => {
+          if (A_EFormData.skuStockList.length === 0)
+            callback(new Error("请添加至少一条商品规格"));
+          else callback();
+        },
+        trigger: "change",
+      },
+    ],
   };
-  let A_EForm: ProductItem;
+  const A_EFormData = reactive(cloneDeep(defaultForm));
 
   // 规格-----------------------------------
   const attributeCategoryList = ref<AttributeCategoryItem[]>([]); //所有属性分类
@@ -467,10 +538,11 @@
     debugLog(`ID:${id}的属性分类详情=>`, res);
     if (res.code === 200 && res.data.length > 0) attributeList.value = res.data;
     initSpecifications();
+    initParameters();
   };
   // 使用响应式数据替代计算属性
-  const specificationList = ref<SpecificationItem[]>([]);
-  // 修改获取规格的方法
+  const specificationList = ref<AttributeItemUsing[]>([]);
+  // 获取规格的方法
   const initSpecifications = () => {
     specificationList.value = attributeList.value
       .filter((attr) => attr.type === 0)
@@ -483,28 +555,27 @@
         selectedValues: [],
       }));
   };
-  // 添加新选项的方法
-  const addSpecValue = (spec: SpecificationItem, newValue?: string) => {
-    if (newValue && !spec.valueList?.includes(newValue)) {
-      spec.valueList?.push(newValue); // 添加到可选列表
-      spec.newValue = ""; // 清空输入框
-      if (spec.selectType === 1) spec.currentValue = newValue; // 如果是单选，自动选中新值
-      if (spec.selectType === 2) spec.selectedValues?.push(newValue); // 如果是多选，自动勾选新值
+  // 添加新规格选项/参数选项的方法
+  const addAttrValue = (attr: AttributeItemUsing, newValue?: string) => {
+    if (newValue && !attr.valueList?.includes(newValue)) {
+      attr.valueList?.push(newValue); // 添加到可选列表
+      attr.newValue = ""; // 清空输入框
+      if (attr.selectType === 1) attr.currentValue = newValue; // 如果是单选，自动选中新值
+      if (attr.selectType === 2) attr.selectedValues?.push(newValue); // 如果是多选，自动勾选新值
     }
   };
   // 清除选择
-  const clearSelection = (spec: SpecificationItem) => {
+  const clearSelection = (spec: AttributeItemUsing) => {
     if (spec.selectType === 2) spec.selectedValues = []; // 清除多选
     else spec.currentValue = ""; // 清除单选
   };
-  // 恢复原始选项列表
-  const resetValueList = (spec: SpecificationItem) => {
+  // 恢复原始规格选项
+  const resetValueList = (spec: AttributeItemUsing) => {
     spec.valueList = [...(spec.originalValueList || [])]; // 使用展开运算符创建新数组
     clearSelection(spec); // 同时清除选择
   };
 
   // SKU列表--------------------------------
-  const SKUList = ref<SKUItem[]>([]);
   const generateSKUList = () => {
     // 检查是否有任何规格被选择
     const hasSelectedSpecs = specificationList.value.some((spec) => {
@@ -548,7 +619,7 @@
     const skuCombinations = cartesianProduct(specValues); //笛卡尔积算法
 
     // 更新SKU列表
-    SKUList.value = skuCombinations.map((combination) => {
+    A_EFormData.skuStockList = skuCombinations.map((combination) => {
       // 构建 spData 字符串
       const spData = JSON.stringify(
         combination.reduce((acc: { [key: string]: string }, item) => {
@@ -563,7 +634,7 @@
         spData, // 规格数据
       };
     });
-    debugLog("生成了SKU列表", toRaw(SKUList.value));
+    debugLog("生成了SKU列表", toRaw(A_EFormData.skuStockList));
   };
   // 辅助函数：生成笛卡尔积
   const cartesianProduct = <T>(arrays: T[][]): T[][] => {
@@ -583,10 +654,26 @@
   };
   // 解析 spData 的所有规格名
   const specNames = computed(() => {
-    if (!SKUList.value.length) return [];
-    const firstSpData = JSON.parse(SKUList.value[0].spData);
+    if (!A_EFormData.skuStockList.length) return [];
+    const firstSpData = JSON.parse(A_EFormData.skuStockList[0].spData);
     return Object.keys(firstSpData); // 获取规格字段名
   });
+
+  // 参数列表----------------------------------
+  const parameterList = ref<AttributeItemUsing[]>([]);
+  // 获取参数的方法
+  const initParameters = async () => {
+    parameterList.value = attributeList.value
+      .filter((attr) => attr.type === 1)
+      .map((attr) => ({
+        ...attr,
+        newValue: undefined,
+        valueList: attr.inputList ? attr.inputList.split(",") : [],
+        originalValueList: attr.inputList ? attr.inputList.split(",") : [], // 添加一个用于存储原始值列表的属性
+        currentValue: undefined,
+        selectedValues: [],
+      }));
+  };
 
   // 裁剪图片相关------------------
   const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
@@ -594,12 +681,12 @@
   const A_EFirstImgUrl = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
-      : BASEURL + A_EForm?.miniImg
+      : BASEURL + A_EFormData?.miniImg
   );
   const A_EFirstImgPreviewSrcList = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
-      : [BASEURL + A_EForm?.imageUrl]
+      : [BASEURL + A_EFormData?.imageUrl]
   );
 
   // 多选图片上传----------------------
@@ -659,6 +746,29 @@
   const handleChange = async (_file: UploadFile, files: UploadFiles) => {
     debouncedValidateFiles(files);
   };
+  // 处理文件上传
+  const instructionImgUpload = async () => {
+    // 确保有文件要上传
+    if (!fileList.value?.length) return;
+
+    // 依次上传所有文件
+    const uploadPromises = fileList.value.map(async (file, index) => {
+      const res = await allFileUpload(file.raw as File);
+      debugLog(`上传${file.name}结果=>`, res);
+      if (res.code == 200 && res.fileName)
+        return {
+          imageUrl: res.fileName,
+          sort: index + 1,
+        };
+      else return { imageUrl: "", sort: index + 1 };
+    });
+
+    // 等待所有文件上传完成
+    const results = await Promise.all(uploadPromises);
+    // 更新表单数据
+    A_EFormData.instructionImagesList = results;
+  };
+
   // 图片预览------------------
   const showViewer = ref(false); // 控制图片预览显示/隐藏
   const currentIndex = ref(0); // 当前预览的图片索引
@@ -675,8 +785,13 @@
   const toAddProduct = async () => {
     A_ETitle.value = "添加药品";
     isAdd.value = true;
-    A_EForm = reactive({ ...defaultForm });
+    // 清空表单
+    croppedFile.value = undefined;
+    Object.assign(A_EFormData, defaultForm);
     fileList.value = [];
+    specificationList.value = [];
+    parameterList.value = [];
+
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
     const res = await getAttributeCategoryWithAttr();
@@ -701,6 +816,7 @@
   const A_EFormRef = ref<FormInstance>();
   const cropperUploadRef = ref();
   const submitForm = () => {
+    debugLog(toRaw(specificationList.value), attributeList.value);
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
         // 如果有裁剪的图片，先上传图片
@@ -713,14 +829,46 @@
             return;
           }
 
-          A_EForm.imageUrl = croppedRes.fileName;
+          A_EFormData.imageUrl = croppedRes.fileName;
           if (thumbnailRes?.code === 200)
-            A_EForm.miniImg = thumbnailRes.fileName;
+            A_EFormData.miniImg = thumbnailRes.fileName;
         }
+        // 如果有详情图片,先上传详情图片
+        instructionImgUpload();
+
+        // 合并规格和参数列表中的所有属性值
+        const attributeValues: AttributeValueItem[] = [];
+        // 处理规格列表
+        specificationList.value.forEach((spec) => {
+          if (spec.currentValue)
+            attributeValues.push({
+              productAttributeId: spec.id,
+              value: spec.currentValue,
+            });
+          if (spec.selectedValues && spec.selectedValues.length > 0)
+            attributeValues.push({
+              productAttributeId: spec.id,
+              value: spec.selectedValues.join(","),
+            });
+        });
+        // 处理参数列表
+        parameterList.value.forEach((param) => {
+          if (param.currentValue)
+            attributeValues.push({
+              productAttributeId: param.id,
+              value: param.currentValue,
+            });
+          if (param.selectedValues && param.selectedValues.length > 0)
+            attributeValues.push({
+              productAttributeId: param.id,
+              value: param.selectedValues.join(","),
+            });
+        });
+        A_EFormData.productAttributeValueList = attributeValues;
 
         const res = isAdd.value
-          ? await addProduct(A_EForm)
-          : await editProduct(A_EForm.id!, A_EForm);
+          ? await addProduct({ ...A_EFormData, delFlag: 0 })
+          : await editProduct(A_EFormData.id!, A_EFormData);
         debugLog("药品添加结果=>", res);
 
         if (res.code === 200) {

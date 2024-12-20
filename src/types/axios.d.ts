@@ -12,5 +12,6 @@ declare module "axios" {
     rows?: T;
     menus?: T;
     checkedKeys?: number[];
+    fileName?: string;
   }
 }
