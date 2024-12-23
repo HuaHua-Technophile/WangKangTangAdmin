@@ -63,13 +63,18 @@
             :src="BASEURL + row.miniImg"
             :preview-src-list="[BASEURL + row.imageUrl]"
             fit="cover"
-            style="width: 50px; height: 50px" />
+            style="width: 1.7rem; height: 1.7rem"
+            preview-teleported />
         </template>
       </el-table-column>
       <el-table-column prop="freightTemplateId" label="运费(元)">
         <template #default="{ row }">￥{{ row.freightTemplateId }}</template>
       </el-table-column>
-      <el-table-column prop="categoryId" label="分类ID" />
+      <el-table-column prop="categoryId" label="分类ID">
+        <template #default="{ row }">{{
+          categoryMap.get(row.categoryId) || "未知分类"
+        }}</template>
+      </el-table-column>
       <el-table-column prop="sale" label="销量" />
       <el-table-column prop="recommendStatus" label="推荐状态">
         <template #default="{ row }">
@@ -80,19 +85,47 @@
       </el-table-column>
       <el-table-column prop="isPrescription" label="处方药">
         <template #default="{ row }">
-          <el-tag :type="row.isPrescription === 1 ? 'warning' : 'success'">
+          <el-tag :type="row.isPrescription === 1 ? 'warning' : 'info'">
             {{ row.isPrescription === 1 ? "是" : "否" }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="note" label="备注" show-overflow-tooltip />
+      <el-table-column prop="note" label="备注">
+        <template #default="{ row }">
+          <el-tooltip
+            effect="light"
+            raw-content
+            :content="row.note"
+            v-if="row.note">
+            <el-text style="max-width: 100px" truncated>
+              {{ row.note }}
+            </el-text>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column prop="illustrate" label="介绍富文本">
+        <template #default="{ row }">
+          <el-tooltip
+            effect="light"
+            raw-content
+            :content="row.illustrate"
+            style="max-width: 100px !important"
+            trigger="click"
+            v-if="row.illustrate">
+            <el-text style="max-width: 100px" truncated class="cursor-pointer">
+              {{ row.illustrate }}
+            </el-text>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <DataTebleColumnTime />
       <el-table-column label="操作">
         <template #default="{ row }">
           <div class="d-flex justify-content-around align-items-center">
             <Icon
               icon="icon-bianji"
               class="cursor-pointer"
-              @click="toEditProduct(row.id)" />
+              @click="toEditProduct(row)" />
             <Icon
               icon="icon-shuoming"
               class="cursor-pointer text-primary"
@@ -386,7 +419,6 @@
   import {
     addProduct,
     editProduct,
-    getAttributeCategoryByProduct,
     getProductInfo,
     getProductList,
   } from "@/api/product/product";
@@ -403,6 +435,7 @@
   import { debugLog } from "@/utils/debug";
   import { formatTreeSelectByFlat } from "@/utils/formatTreeSelectByFlat";
   import { generateCode } from "@/utils/generateCode";
+  import { decodeArray, encodeArray } from "@/utils/arrayToString";
   import {
     ElMessage,
     FormInstance,
@@ -410,6 +443,7 @@
     UploadFile,
     UploadFiles,
     UploadRawFile,
+    UploadStatus,
   } from "element-plus";
   import { cloneDeep, debounce } from "lodash";
   import { computed, onMounted, reactive, ref, toRaw, watch } from "vue";
@@ -451,7 +485,9 @@
   });
 
   // 获取分类选项数据------------------------
+  const categoryMap = ref<Map<number, string>>(new Map());
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
+
   const fetchCategoryOptions = async () => {
     const res = await getCategoryList({
       pageNum: 1,
@@ -461,6 +497,10 @@
     debugLog("全部药品分类列表=>", res);
 
     if (res.code === 200 && res.rows) {
+      res.rows.forEach((category) => {
+        if (category.id && category.name)
+          categoryMap.value.set(category.id, category.name);
+      });
       categoryTreeSelect.value = await formatTreeSelectByFlat({
         flat: res.rows,
         rootLabel: "顶级分类",
@@ -532,6 +572,12 @@
 
   // 规格-----------------------------------
   const attributeCategoryList = ref<AttributeCategoryItem[]>([]); //所有属性分类
+  const initAttributeCategoryList = async () => {
+    const res = await getAttributeCategoryWithAttr();
+    debugLog("属性分类列表=>", res);
+    attributeCategoryList.value = res.data;
+  };
+  onMounted(initAttributeCategoryList);
   const attributeList = ref<AttributeItem[]>([]); // 当前分类下的属性
   const fetchAttributeList = async (id: number) => {
     const res = await getAttributeCategoryDetail(id);
@@ -540,9 +586,8 @@
     initSpecifications();
     initParameters();
   };
-  // 使用响应式数据替代计算属性
-  const specificationList = ref<AttributeItemUsing[]>([]);
   // 获取规格的方法
+  const specificationList = ref<AttributeItemUsing[]>([]);
   const initSpecifications = () => {
     specificationList.value = attributeList.value
       .filter((attr) => attr.type === 0)
@@ -661,7 +706,6 @@
 
   // 参数列表----------------------------------
   const parameterList = ref<AttributeItemUsing[]>([]);
-  // 获取参数的方法
   const initParameters = async () => {
     parameterList.value = attributeList.value
       .filter((attr) => attr.type === 1)
@@ -695,7 +739,12 @@
   const MAX_FILE_SIZE = 3 * 1024 * 1024;
   const MAX_RESOLUTION = 3840;
   // 验证文件------------------
-  const validateImage = async (file: UploadRawFile): Promise<boolean> => {
+  const validateImage = async (
+    status: UploadStatus,
+    file: UploadRawFile
+  ): Promise<boolean> => {
+    if (status === "success") return true;
+
     // 验证类型
     const allowedFormats = IMAGE_FORMATS.split(",").map((format: string) =>
       format.trim().toLowerCase()
@@ -732,35 +781,54 @@
       };
     });
   };
+
+  // 修改验证函数
   const debouncedValidateFiles = debounce(async (files: UploadFiles) => {
-    const newFileList: UploadFile[] = [];
+    const validatedFiles: UploadFile[] = [];
+
     for (const file of files) {
-      if (file.raw) {
-        const isValid = await validateImage(file.raw);
-        if (isValid) newFileList.push(file);
+      // 如果是已存在的文件（编辑状态的原有图片），直接保留
+      if (file.status === "success") validatedFiles.push(file);
+      // 对新上传的文件进行验证
+      else if (file.raw) {
+        const isValid = await validateImage(file.status, file.raw);
+        if (isValid) validatedFiles.push(file);
       }
     }
 
-    fileList.value = newFileList;
-  }, 100); // 100ms的延迟
+    fileList.value = validatedFiles;
+  }, 100);
   const handleChange = async (_file: UploadFile, files: UploadFiles) => {
     debouncedValidateFiles(files);
   };
   // 处理文件上传
   const instructionImgUpload = async () => {
-    // 确保有文件要上传
-    if (!fileList.value?.length) return;
+    if (!fileList) return;
 
     // 依次上传所有文件
     const uploadPromises = fileList.value.map(async (file, index) => {
-      const res = await allFileUpload(file.raw as File);
-      debugLog(`上传${file.name}结果=>`, res);
-      if (res.code == 200 && res.fileName)
+      // 如果是已经上传的图片（编辑状态），直接使用现有URL
+      if (file.status === "success") {
         return {
-          imageUrl: res.fileName,
+          imageUrl: file.url?.replace(BASEURL, "") || "", // 添加空字符串作为默认值,
           sort: index + 1,
         };
-      else return { imageUrl: "", sort: index + 1 };
+      } else if (file.raw) {
+        // 新上传的图片需要调用上传接口
+        const res = await allFileUpload(file.raw);
+        debugLog(`上传${file.name}结果=>`, res);
+        if (res.code == 200 && res.fileName) {
+          return {
+            imageUrl: res.fileName,
+            sort: index + 1,
+          };
+        }
+        // 上传失败时返回默认值
+        return {
+          imageUrl: "",
+          sort: index + 1,
+        };
+      } else return { imageUrl: "", sort: index + 1 };
     });
 
     // 等待所有文件上传完成
@@ -780,43 +848,88 @@
     currentIndex.value = index !== -1 ? index : 0;
     showViewer.value = true;
   };
-
-  // 打开添加弹窗------------
-  const toAddProduct = async () => {
-    A_ETitle.value = "添加药品";
-    isAdd.value = true;
+  const resetA_EformData = () => {
     // 清空表单
     croppedFile.value = undefined;
     Object.assign(A_EFormData, defaultForm);
     fileList.value = [];
     specificationList.value = [];
     parameterList.value = [];
-
+  };
+  // 打开添加弹窗------------
+  const toAddProduct = async () => {
+    A_ETitle.value = "添加药品";
+    isAdd.value = true;
+    resetA_EformData(); // 清空表单
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
-    const res = await getAttributeCategoryWithAttr();
-    debugLog("属性分类列表=>", res);
-    attributeCategoryList.value = res.data;
   };
 
   // 打开编辑弹窗
-  const toEditProduct = async (id: number) => {
+  const toEditProduct = async (item: ProductItem) => {
     A_ETitle.value = "修改药品";
     isAdd.value = false;
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
-    const res = await getProductInfo(id);
-    debugLog(`药品${id}的详情=>`, res);
-    const res2 = await getAttributeCategoryByProduct(id);
-    debugLog(`药品${id}选择了属性分类=>`, res2);
-    // A_EForm = reactive(res.data);
+    if (!item.id) return;
+    resetA_EformData(); //先清空内容，再重新赋值
+    Object.assign(A_EFormData, item); //此处合并基础信息
+    const res = await getProductInfo(item.id);
+    debugLog(`药品${item.name}的补充信息=>`, res);
+    if (res.code == 200) {
+      A_EFormData.attributeCategoryId =
+        res.data.productAttributeCategoryList[0].id;
+      await fetchAttributeList(res.data.productAttributeCategoryList[0].id);
+      A_EFormData.skuStockList = res.data.skuStockList;
+
+      res.data.productAttributeValueList.forEach((item) => {
+        const attributeConfig = attributeList.value.find(
+          (attr) => attr.id === item.productAttributeId
+        ); // 在attributeList中找到对应的属性配置
+
+        if (!attributeConfig) return;
+
+        const targetList =
+          attributeConfig.type === 0 ? specificationList : parameterList; // 根据type分配到对应的列表
+
+        const targetItem = targetList.value.find(
+          (spec) => spec.id === item.productAttributeId
+        ); // 在目标列表中找到或创建对应项
+
+        if (targetItem) {
+          // 5. 根据selectType设置值
+          switch (attributeConfig.selectType) {
+            case 0: // 唯一值
+            case 1: // 单选
+              targetItem.currentValue = item.value;
+              break;
+            case 2: // 多选
+              targetItem.selectedValues = decodeArray(item.value);
+              break;
+          }
+        }
+      });
+
+      // 处理详情图片列表
+      if (res.data.instructionImagesList?.length) {
+        fileList.value = res.data.instructionImagesList.map((item, index) => {
+          return {
+            name: item.imageUrl.split("/").pop() || `img-${index}`,
+            url: BASEURL + item.imageUrl,
+            uid: index,
+            status: "success",
+            raw: undefined, // 添加raw属性
+          };
+        });
+        debugLog("详情图片列表", fileList.value);
+      }
+    }
   };
 
   // 提交表单-------------------------------
   const A_EFormRef = ref<FormInstance>();
   const cropperUploadRef = ref();
   const submitForm = () => {
-    debugLog(toRaw(specificationList.value), attributeList.value);
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
         // 如果有裁剪的图片，先上传图片
@@ -834,7 +947,7 @@
             A_EFormData.miniImg = thumbnailRes.fileName;
         }
         // 如果有详情图片,先上传详情图片
-        instructionImgUpload();
+        await instructionImgUpload();
 
         // 合并规格和参数列表中的所有属性值
         const attributeValues: AttributeValueItem[] = [];
@@ -848,7 +961,7 @@
           if (spec.selectedValues && spec.selectedValues.length > 0)
             attributeValues.push({
               productAttributeId: spec.id,
-              value: spec.selectedValues.join(","),
+              value: encodeArray(spec.selectedValues),
             });
         });
         // 处理参数列表
@@ -861,7 +974,7 @@
           if (param.selectedValues && param.selectedValues.length > 0)
             attributeValues.push({
               productAttributeId: param.id,
-              value: param.selectedValues.join(","),
+              value: encodeArray(param.selectedValues),
             });
         });
         A_EFormData.productAttributeValueList = attributeValues;

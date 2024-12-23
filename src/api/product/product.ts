@@ -29,7 +29,7 @@ export const addProduct = (data: ProductItem & { delFlag: 0 }) => {
 export const editProduct = (id: number, data: ProductItem) => {
   return customRequest(
     {
-      method: "PUT",
+      method: "POST",
       url: `/product/update/${id}`,
       data,
     },
@@ -87,7 +87,9 @@ export const updateRecommendStatus = (data: UpdateStatusParams) => {
  * @param id 药品ID
  */
 export const getProductInfo = (id: number) => {
-  return customRequest<ProductItem>(
+  return customRequest<
+    ProductItem & { productAttributeCategoryList: { id: number }[] }
+  >(
     {
       method: "GET",
       url: `/product/updateInfo/${id}`,
