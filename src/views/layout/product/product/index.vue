@@ -263,22 +263,18 @@
                   <span class="el-upload-list__item-actions">
                     <span
                       @click.stop="moveImage(file, 'left')"
-                      v-if="getFileIndex(file) > 0">
+                      v-show="getFileIndex(file) > 0">
                       <Icon icon="icon-xiangzuo1" />
                     </span>
-                    <span
-                      class="el-upload-list__item-preview"
-                      @click.stop="handlePreview(file)">
+                    <span @click.stop="handlePreview(file)">
                       <Icon icon="icon-sousuofangda" />
                     </span>
-                    <span
-                      class="el-upload-list__item-delete"
-                      @click.stop="handleRemove(file)">
+                    <span @click.stop="handleRemove(file)">
                       <Icon icon="icon-shanchu" />
                     </span>
                     <span
                       @click.stop="moveImage(file, 'right')"
-                      v-if="getFileIndex(file) < fileList.length - 1">
+                      v-show="getFileIndex(file) < fileList.length - 1">
                       <Icon icon="icon-xiangyou1" />
                     </span>
                   </span>
