@@ -150,6 +150,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
+    <CustomPagination
+      v-model:current-page="currentPage"
+      :total="total"
+      @size-change="fetchProductList"
+      @current-change="fetchProductList"
+      class="mt-3" />
 
     <!-- 添加/修改弹窗 -->
     <A_EDialog
@@ -244,13 +251,39 @@
               multiple
               :accept="IMAGE_FORMATS"
               list-type="picture-card"
-              :on-change="handleChange"
-              @preview="handlePreview">
+              :on-change="handleChange">
               <div
                 class="d-flex align-items-center flex-column justify-content-around text-primary">
                 <Icon icon="icon-shouye" style="font-size: 5rem" class="my-4" />
                 <div>添加图片</div>
               </div>
+              <template #file="{ file }">
+                <div>
+                  <img class="el-upload-list__item-thumbnail" :src="file.url" />
+                  <span class="el-upload-list__item-actions">
+                    <span
+                      @click.stop="moveImage(file, 'left')"
+                      v-if="getFileIndex(file) > 0">
+                      <Icon icon="icon-xiangzuo1" />
+                    </span>
+                    <span
+                      class="el-upload-list__item-preview"
+                      @click.stop="handlePreview(file)">
+                      <Icon icon="icon-sousuofangda" />
+                    </span>
+                    <span
+                      class="el-upload-list__item-delete"
+                      @click.stop="handleRemove(file)">
+                      <Icon icon="icon-shanchu" />
+                    </span>
+                    <span
+                      @click.stop="moveImage(file, 'right')"
+                      v-if="getFileIndex(file) < fileList.length - 1">
+                      <Icon icon="icon-xiangyou1" />
+                    </span>
+                  </span>
+                </div>
+              </template>
             </el-upload>
             <el-image-viewer
               v-if="showViewer"
@@ -755,7 +788,6 @@
   const fileList = ref<UploadFile[]>([]);
   const MAX_FILE_SIZE = 3 * 1024 * 1024;
   const MAX_RESOLUTION = 3840;
-  // 验证文件------------------
   const validateImage = async (
     status: UploadStatus,
     file: UploadRawFile
@@ -798,8 +830,6 @@
       };
     });
   };
-
-  // 修改验证函数
   const debouncedValidateFiles = debounce(async (files: UploadFiles) => {
     const validatedFiles: UploadFile[] = [];
 
@@ -818,6 +848,24 @@
   const handleChange = async (_file: UploadFile, files: UploadFiles) => {
     debouncedValidateFiles(files);
   };
+  // 获取文件索引
+  const getFileIndex = (file: UploadFile) =>
+    fileList.value.findIndex((item) => item.uid === file.uid);
+  const handleRemove = (file: UploadFile) => {
+    const index = getFileIndex(file);
+    if (index !== -1) fileList.value.splice(index, 1);
+  };
+  const moveImage = (file: UploadFile, direction: "left" | "right") => {
+    const index = getFileIndex(file);
+    if (index === -1) return;
+    const newIndex = direction === "left" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= fileList.value.length) return;
+    // 交换位置
+    const temp = fileList.value[index];
+    fileList.value[index] = fileList.value[newIndex];
+    fileList.value[newIndex] = temp;
+  };
+
   // 处理文件上传
   const instructionImgUpload = async () => {
     if (!fileList) return;
@@ -858,10 +906,9 @@
   const showViewer = ref(false); // 控制图片预览显示/隐藏
   const currentIndex = ref(0); // 当前预览的图片索引
   const urlList = computed(() => fileList.value.map((file) => file.url || ""));
-  const handlePreview = (uploadFile: UploadFile) => {
-    const index = fileList.value.findIndex(
-      (file) => file.uid === uploadFile.uid
-    );
+  // 处理预览
+  const handlePreview = (file: UploadFile) => {
+    const index = getFileIndex(file);
     currentIndex.value = index !== -1 ? index : 0;
     showViewer.value = true;
   };
