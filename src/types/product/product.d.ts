@@ -20,6 +20,7 @@ export interface ProductItem {
   sale: number; // 销量
   note: string; // 备注（可选）
   recommendStatus?: 0 | 1; // 推荐状态 0否 1是
+  isActive?: 0 | 1; //0下架 1上架
   isPrescription?: 0 | 1; // 是否处方药 0否 1是
   illustrate: string; // 药品介绍(详情)富文本
   instructionImagesList: {
@@ -34,9 +35,3 @@ export interface ProductItem {
 // 药品列表查询参数接口
 export type GetProductListParams = PaginationParams &
   Pick<ProductItem, "recommendStatus" | "isPrescription">;
-
-// 批量修改状态参数接口
-export interface UpdateStatusParams {
-  ids: number[];
-  status: 0 | 1;
-}

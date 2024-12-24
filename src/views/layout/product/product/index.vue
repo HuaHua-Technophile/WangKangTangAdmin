@@ -53,7 +53,7 @@
       table-layout="auto"
       cell-class-name="text-center"
       header-cell-class-name="text-center"
-      @selection-change="">
+      @selection-change="handleProductSelectionChange">
       <el-table-column type="selection" width="30" />
       <el-table-column prop="id" label="ID" />
       <el-table-column prop="name" label="名称" />
@@ -76,13 +76,6 @@
         }}</template>
       </el-table-column>
       <el-table-column prop="sale" label="销量" />
-      <el-table-column prop="recommendStatus" label="推荐状态">
-        <template #default="{ row }">
-          <el-tag :type="row.recommendStatus === 1 ? 'success' : 'info'">
-            {{ row.recommendStatus === 1 ? "已推荐" : "未推荐" }}
-          </el-tag>
-        </template>
-      </el-table-column>
       <el-table-column prop="isPrescription" label="处方药">
         <template #default="{ row }">
           <el-tag :type="row.isPrescription === 1 ? 'warning' : 'info'">
@@ -119,6 +112,29 @@
         </template>
       </el-table-column>
       <DataTebleColumnTime />
+      <el-table-column label="上架/推荐(可多选)">
+        <template #default="{ row }">
+          <el-switch
+            v-model="row.recommendStatus"
+            :active-value="1"
+            :inactive-value="0"
+            inline-prompt
+            active-text="推荐中"
+            inactive-text="未推荐"
+            :before-change="() => beforeToggleRecommendation(row)"
+            style="--el-switch-on-color: var(--bs-success)"
+            class="me-2" />
+          <el-switch
+            v-model="row.isActive"
+            :active-value="1"
+            :inactive-value="0"
+            inline-prompt
+            active-text="上架中"
+            inactive-text="已下架"
+            :before-change="() => beforeToggleStatus(row)"
+            style="--el-switch-off-color: var(--bs-danger)" />
+        </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }">
           <div class="d-flex justify-content-around align-items-center">
@@ -127,13 +143,9 @@
               class="cursor-pointer"
               @click="toEditProduct(row)" />
             <Icon
-              icon="icon-shuoming"
-              class="cursor-pointer text-primary"
-              @click="" />
-            <Icon
               icon="icon-shanchu"
               class="cursor-pointer text-danger"
-              @click="" />
+              @click="toDelProduct(row)" />
           </div>
         </template>
       </el-table-column>
@@ -418,9 +430,12 @@
   import { getCategoryList } from "@/api/product/category";
   import {
     addProduct,
+    delProduct,
     editProduct,
     getProductInfo,
     getProductList,
+    toggleProductActivation,
+    updateRecommendStatus,
   } from "@/api/product/product";
   import { allFileUpload } from "@/api/upload";
   import { usePaginationStore } from "@/stores/pagination";
@@ -440,6 +455,7 @@
     ElMessage,
     FormInstance,
     FormRules,
+    TableInstance,
     UploadFile,
     UploadFiles,
     UploadRawFile,
@@ -447,6 +463,7 @@
   } from "element-plus";
   import { cloneDeep, debounce } from "lodash";
   import { computed, onMounted, reactive, ref, toRaw, watch } from "vue";
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
 
   // 查询参数-----------------------
   const queryParams = reactive<
@@ -991,5 +1008,129 @@
         } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
       }
     });
+  };
+
+  // 删除商品---------------------------
+  const selectedProducts = ref<ProductItem[]>([]);
+  const productTable = ref<TableInstance>();
+  const handleProductSelectionChange = (selection: ProductItem[]) => {
+    selectedProducts.value = selection;
+  };
+  const toDelProduct = (row: ProductItem) => {
+    productTable.value?.toggleRowSelection(row, true); // 选中当前行
+
+    elMessageBoxConfirm(
+      `确认删除以下${
+        selectedProducts.value.length
+      }个药品? ID: ${selectedProducts.value.map((item) => item.id)}`,
+      async () => {
+        // 获取所有选中商品的ID
+        /* const productIds = selectedProducts.value
+          .map((item) => item.id)
+          .filter((id) => id !== undefined); */
+        const productIds = selectedProducts.value.reduce<number[]>(
+          (ids, item) => {
+            if (item.id !== undefined) ids.push(item.id);
+            return ids;
+          },
+          []
+        ); //使用reduce方法将map和filter合并为一次遍历,这样可以优化性能
+
+        // 调用删除API
+        const res = await delProduct(productIds);
+        debugLog(`删除药品${productIds}结果=>`, res);
+
+        if (res.code === 200) {
+          ElMessage.success(res.msg);
+          // 刷新商品列表
+          fetchProductList();
+        } else ElMessage.error(res.msg || "删除失败");
+      }
+    );
+  };
+
+  // 上架/下架商品-------------------
+  const beforeToggleStatus = async (row: ProductItem) => {
+    // 选中当前行
+    productTable.value?.toggleRowSelection(row, true);
+
+    const newStatus = row.isActive === 1 ? 0 : 1;
+    const actionText = newStatus === 1 ? "上架" : "下架";
+
+    elMessageBoxConfirm(
+      `${actionText}以下${
+        selectedProducts.value.length
+      }个商品? ID: ${selectedProducts.value.map((item) => item.id)}`,
+      async () => {
+        // 使用reduce优化为一次遍历获取ids
+        const productIds = selectedProducts.value.reduce<number[]>(
+          (ids, item) => {
+            if (item.id !== undefined) ids.push(item.id);
+            return ids;
+          },
+          []
+        );
+
+        // 调用上架/下架API
+        const res = await toggleProductActivation({
+          ids: productIds,
+          isActive: newStatus,
+        });
+        debugLog(`${actionText}商品结果=>`, res);
+
+        if (res.code === 200) {
+          ElMessage.success(
+            `${actionText}${selectedProducts.value.length}个商品成功`
+          );
+          fetchProductList(); // 刷新商品列表
+          return true;
+        } else {
+          ElMessage.error(`${actionText}失败`);
+          return false;
+        }
+      }
+    );
+  };
+
+  // 推荐/取消推荐商品-------------------
+  const beforeToggleRecommendation = async (row: ProductItem) => {
+    // 选中当前行
+    productTable.value?.toggleRowSelection(row, true);
+
+    const newStatus = row.recommendStatus === 1 ? 0 : 1;
+    const actionText = newStatus === 1 ? "推荐" : "取消推荐";
+
+    elMessageBoxConfirm(
+      `${actionText}以下${
+        selectedProducts.value.length
+      }个商品? ID: ${selectedProducts.value.map((item) => item.id)}`,
+      async () => {
+        // 使用reduce优化为一次遍历获取ids
+        const productIds = selectedProducts.value.reduce<number[]>(
+          (ids, item) => {
+            if (item.id !== undefined) ids.push(item.id);
+            return ids;
+          },
+          []
+        );
+
+        const res = await updateRecommendStatus({
+          ids: productIds,
+          recommendStatus: newStatus,
+        });
+        debugLog(`${actionText}商品结果=>`, res);
+
+        if (res.code === 200) {
+          ElMessage.success(
+            `${actionText}${selectedProducts.value.length}个商品成功`
+          );
+          fetchProductList(); // 刷新商品列表
+          return true;
+        } else {
+          ElMessage.error(`${actionText}失败`);
+          return false;
+        }
+      }
+    );
   };
 </script>

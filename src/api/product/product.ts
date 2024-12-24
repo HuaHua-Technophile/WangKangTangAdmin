@@ -1,10 +1,5 @@
-import {
-  GetProductListParams,
-  ProductItem,
-  UpdateStatusParams,
-} from "@/types/product/product";
+import { GetProductListParams, ProductItem } from "@/types/product/product";
 import { customRequest } from "../instance";
-import { AttributeCategoryItem } from "@/types/product/attributeCategory";
 
 /**
  * 添加药品
@@ -53,36 +48,6 @@ export const getProductList = (params: GetProductListParams) => {
 };
 
 /**
- * 批量修改删除状态
- * @param data 状态修改参数
- */
-export const updateDeleteStatus = (data: UpdateStatusParams) => {
-  return customRequest(
-    {
-      method: "POST",
-      url: "/product/update/deleteStatus",
-      data,
-    },
-    "修改删除状态"
-  );
-};
-
-/**
- * 批量修改推荐状态
- * @param data 状态修改参数
- */
-export const updateRecommendStatus = (data: UpdateStatusParams) => {
-  return customRequest(
-    {
-      method: "POST",
-      url: "/product/update/recommendStatus",
-      data,
-    },
-    "修改推荐状态"
-  );
-};
-
-/**
  * 获取药品编辑信息
  * @param id 药品ID
  */
@@ -112,13 +77,55 @@ export const searchProduct = (productName: string) => {
   );
 };
 
-// 6. 查询药品选择了哪个属性分类
-export const getAttributeCategoryByProduct = (id: number) => {
-  return customRequest<AttributeCategoryItem>(
+/**
+ * 批量删除药品
+ * @param ids id数组
+ */
+export const delProduct = (ids: number[]) => {
+  return customRequest(
     {
-      method: "GET",
-      url: `/product/attribute/category/${id}`,
+      method: "POST",
+      url: "/product/update/deleteStatus",
+      params: {
+        ids,
+        delFlag: 1,
+      },
     },
-    `查询ID:${id}药品选择了哪个属性分类`
+    `删除了${ids}这些药品`
+  );
+};
+/**
+ * 批量上架/下架药品
+ * @param params 上架下架参数
+ */
+export const toggleProductActivation = (params: {
+  ids: number[];
+  isActive: 0 | 1;
+}) => {
+  return customRequest(
+    {
+      method: "POST",
+      url: "/product/update/isActive",
+      params,
+    },
+    "修改上架/下架"
+  );
+};
+
+/**
+ * 批量修改推荐状态
+ * @param params 状态修改参数
+ */
+export const updateRecommendStatus = (params: {
+  ids: number[];
+  recommendStatus: 0 | 1;
+}) => {
+  return customRequest(
+    {
+      method: "POST",
+      url: "/product/update/recommendStatus",
+      params,
+    },
+    "修改推荐状态"
   );
 };

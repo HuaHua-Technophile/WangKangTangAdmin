@@ -55,7 +55,7 @@
   const loading = ref(false);
 
   const loginForm = reactive({
-    username: "admin",
+    username: "WanKanTang",
     password: "123456",
   });
 
