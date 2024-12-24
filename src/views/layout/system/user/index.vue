@@ -146,7 +146,7 @@
         label-width="auto"
         :rules="rules"
         v-if="A_EFormData">
-        <el-form-item label="账号" prop="userName" v-if="isAdd">
+        <el-form-item label="账号(不可更改)" prop="userName" v-if="isAdd">
           <el-input
             v-model="A_EFormData.userName"
             placeholder="请输入账号"

@@ -128,16 +128,17 @@
     A_EFormData.value = reactive<MenuItem>({
       menuId: row.menuId,
       menuName: row.menuName,
-      parentId: row.parentId,
+      menuType: row.menuType, //M目录 C菜单  F按钮
       orderNum: row.orderNum,
+      parentId: row.parentId,
       path: row.path,
       component: row.component,
+      perms: row.perms, //权限字符串
+      icon: row.icon, //图标
       isFrame: row.isFrame,
       isCache: row.isCache,
-      menuType: row.menuType, //M目录 C菜单  F按钮
       visible: row.visible, //0显示 1隐藏
       status: row.status, //0正常 1停用
-      icon: row.icon, //图标
     });
     A_EVisible.value = true;
     const res = (await getMenuTreeSelect()).data;

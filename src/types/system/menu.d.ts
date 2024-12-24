@@ -1,6 +1,6 @@
 export interface MenuItem {
   menuId?: number;
-  menuType: "M" | "C" | "F"; //M目录 C菜单  F按钮
+  menuType: "M" | "C" | "F"; //M目录 C菜单 F按钮
   orderNum: number;
   parentId: number;
   visible: "0" | "1"; //0显示 1隐藏

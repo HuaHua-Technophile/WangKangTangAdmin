@@ -205,10 +205,7 @@
   import { AxiosResponse } from "axios";
   import { formatTreeSelectByTree } from "@/utils/formatTreeSelectByTree";
   import { ElMessage, FormInstance, FormRules } from "element-plus";
-  import {
-    validateAlphaNumericUnderscore,
-    validateNoChineseOrSpaces,
-  } from "@/utils/formRegularExpression";
+  import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
   import { useDictStore } from "@/stores/dictData";
   import { TreeSelectItem } from "@/types/treeSelect";
   // 请求字典----------------
@@ -269,6 +266,7 @@
     menuType: "C", //M目录 C菜单  F按钮
     parentId: 0,
     orderNum: 0,
+
     visible: "0", //0显示 1隐藏
     status: "0", //0正常 1停用
     isFrame: "1", //是否外链
@@ -282,8 +280,43 @@
       { required: true, message: "请选择菜单类型", trigger: "change" },
     ],
     path: [
-      { validator: validateAlphaNumericUnderscore, trigger: "blur" },
-      { required: true, message: "请输入路由路径", trigger: "blur" },
+      {
+        validator: (
+          _rule: any,
+          value: string,
+          callback: (arg0?: Error) => void
+        ) => {
+          // 首先检查是否为按钮类型
+          if (A_EFormData.menuType === "F") {
+            callback(); // 如果是按钮类型，直接通过验证
+            return;
+          }
+
+          // 检查是否为空（仅针对目录或菜单）
+          if (
+            (A_EFormData.menuType === "M" || A_EFormData.menuType === "C") &&
+            !value
+          ) {
+            callback(new Error("若是目录或菜单,则路径不可为空"));
+            return;
+          }
+
+          // 如果有值，则验证格式
+          if (value) {
+            const regex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+            if (!regex.test(value)) {
+              callback(
+                new Error("必须以英文字符开头，仅允许英文、数字和下划线")
+              );
+              return;
+            }
+          }
+
+          // 通过所有验证
+          callback();
+        },
+        trigger: "blur",
+      },
     ],
     component: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
     perms: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
