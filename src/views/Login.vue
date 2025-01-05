@@ -56,7 +56,7 @@
 
   const loginForm = reactive({
     username: "WanKanTang",
-    password: "123456",
+    password: "",
   });
 
   const rules: FormRules = {
@@ -93,5 +93,3 @@
     });
   };
 </script>
-
-<style lang="scss" scoped></style>
