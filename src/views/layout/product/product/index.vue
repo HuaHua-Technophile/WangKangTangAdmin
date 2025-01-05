@@ -1042,7 +1042,10 @@
         const res = isAdd.value
           ? await addProduct({ ...A_EFormData, delFlag: 0 })
           : await editProduct(A_EFormData.id!, A_EFormData);
-        debugLog("药品添加结果=>", res);
+        debugLog(
+          `药品${isAdd.value ? `ID:${A_EFormData.id}修改` : "添加"}结果=>`,
+          res
+        );
 
         if (res.code === 200) {
           A_EVisible.value = false;
