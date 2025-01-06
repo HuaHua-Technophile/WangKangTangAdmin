@@ -6,12 +6,14 @@
       :auto-upload="false"
       :accept="IMAGE_FORMATS">
       <template #trigger>
-        <el-button type="primary" v-show="!croppedFile"
+        <el-button type="primary" v-show="!croppedFile && !showClearBtn"
           >选择图片({{ maxSize }}MB)</el-button
         >
       </template>
-      <el-button v-show="croppedFile" @click.stop="resetSelection"
-        >重新选择</el-button
+      <el-button
+        v-show="croppedFile || showClearBtn"
+        @click.stop="clearSelection"
+        >清除所选</el-button
       >
       <el-button
         v-show="croppedFile && showUploadBtn"
@@ -61,6 +63,7 @@
       maxSize?: number;
       maxThumbnailWidthOrHeight?: number;
       successMsg?: string;
+      showClearBtn?: boolean;
     }>(),
     {
       showUploadBtn: true,
@@ -72,7 +75,9 @@
       maxThumbnailWidthOrHeight: 100,
     }
   );
-
+  const emit = defineEmits<{
+    (event: "clear"): void;
+  }>();
   // 常量和响应式变量
   const IMAGE_FORMATS = import.meta.env.VITE_APP_IMAGE_FORMATS;
 
@@ -225,7 +230,7 @@
       croppedRes.code === 200 &&
       (!props.needThumbnail || thumbnailRes?.code === 200)
     ) {
-      resetSelection();
+      clearSelection();
       if (props.successMsg) ElMessage.success(props.successMsg);
       return { croppedRes, thumbnailRes };
     } else {
@@ -234,10 +239,11 @@
     }
   };
   // 重新选择文件
-  const resetSelection = () => {
+  const clearSelection = () => {
     croppedFile.value = undefined;
     thumbnailFile.value = undefined;
     previewImageUrl.value = "";
+    emit("clear");
   };
 
   defineExpose({

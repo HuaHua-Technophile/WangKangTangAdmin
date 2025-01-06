@@ -51,7 +51,7 @@
       <el-table-column prop="icon" label="示意图">
         <template #default="scope">
           <el-image
-            v-if="scope.row.icon != '#'"
+            v-if="scope.row.icon != '#' && scope.row.icon != ''"
             :src="BASEURL + scope.row.miniImg"
             :preview-src-list="[BASEURL + scope.row.icon]"
             :preview-teleported="true"
@@ -128,6 +128,8 @@
             :uploadApi="allFileUpload"
             v-model:croppedFile="croppedFile"
             :showUploadBtn="false"
+            :showClearBtn="showClearBtn"
+            @clear="clearImg"
             needThumbnail />
         </el-form-item>
         <el-form-item label="分类状态" prop="status">
@@ -161,6 +163,7 @@
     FormRules,
     TableInstance,
   } from "element-plus";
+  import { cloneDeep } from "lodash";
   import { computed, onMounted, reactive, ref, toRaw } from "vue";
 
   const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
@@ -202,14 +205,16 @@
     ],
     status: [{ required: true, message: "请选择分类状态", trigger: "change" }],
   };
-  let A_EFormData: CategoryItem;
+  const A_EFormData = reactive<CategoryItem>(cloneDeep(defaultForm));
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
-
+  const showClearBtn = computed(() => {
+    return A_EFormData.icon && A_EFormData.icon !== "#";
+  });
   // 添加/修改方法
   const toAddCategory = async () => {
     A_ETitle.value = "添加药品分类";
     isAdd.value = true;
-    A_EFormData = reactive({ ...defaultForm }); // 重置表单
+    Object.assign(A_EFormData, defaultForm); // 重置表单
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
 
@@ -233,16 +238,7 @@
     isAdd.value = false;
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
-
-    A_EFormData = reactive({
-      id: row.id,
-      name: row.name,
-      parentId: row.parentId,
-      icon: row.icon,
-      miniImg: row.miniImg,
-      sort: row.sort,
-      status: row.status,
-    }); // 复制当前行数据到表单
+    Object.assign(A_EFormData, row); // 复制当前行数据到表单
 
     // 获取分类树形数据
     const res = await getCategoryListExclude(row.id!);
@@ -255,6 +251,12 @@
         rootId: 1,
       });
     debugLog("处理后的药品分类树形选单=>", categoryTreeSelect.value);
+  };
+
+  const clearImg = () => {
+    debugLog("清除了当前分类的所选图片");
+    A_EFormData.icon = "";
+    A_EFormData.miniImg = "";
   };
 
   // 裁剪图片-------------------------
