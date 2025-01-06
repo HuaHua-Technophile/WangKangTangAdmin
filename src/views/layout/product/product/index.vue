@@ -942,31 +942,53 @@
       await fetchAttributeList(res.data.productAttributeCategoryList[0].id);
       A_EFormData.skuStockList = res.data.skuStockList;
 
-      res.data.productAttributeValueList.forEach((item) => {
-        const attributeConfig = attributeList.value.find(
-          (attr) => attr.id === item.productAttributeId
-        ); // 在attributeList中找到对应的属性配置
+      // 处理单个属性值的函数
+      const handleAttributeValue = (
+        attr: AttributeItemUsing,
+        value: string
+      ) => {
+        switch (attr.selectType) {
+          case 0:
+          case 1:
+            // 唯一值或单选
+            attr.currentValue = value;
+            // 检查valueList是否存在该选项
+            if (attr.valueList && !attr.valueList.includes(value))
+              attr.valueList.push(value);
+            break;
+          case 2:
+            // 多选
+            try {
+              // 将value转换为数组
+              const valueArray = decodeArray(value);
+              attr.selectedValues = valueArray;
 
-        if (!attributeConfig) return;
-
-        const targetList =
-          attributeConfig.type === 0 ? specificationList : parameterList; // 根据type分配到对应的列表
-
-        const targetItem = targetList.value.find(
-          (spec) => spec.id === item.productAttributeId
-        ); // 在目标列表中找到或创建对应项
-
-        if (targetItem) {
-          // 5. 根据selectType设置值
-          switch (attributeConfig.selectType) {
-            case 0: // 唯一值
-            case 1: // 单选
-              targetItem.currentValue = item.value;
-              break;
-            case 2: // 多选
-              targetItem.selectedValues = decodeArray(item.value);
-              break;
-          }
+              // 检查并添加缺失的选项到valueList
+              valueArray.forEach((val) => {
+                if (!attr.valueList?.includes(val)) attr.valueList?.push(val);
+              });
+            } catch (e) {
+              console.error("解析多选值失败:", e);
+            }
+            break;
+        }
+      };
+      res.data.productAttributeValueList.forEach((i) => {
+        let specIndex = specificationList.value.findIndex(
+          (spec) => spec.id === i.productAttributeId
+        ); // 在规格列表中查找
+        if (specIndex !== -1) {
+          const spec = specificationList.value[specIndex];
+          handleAttributeValue(spec, i.value);
+        } // 处理规格列表
+        else {
+          let paramIndex = parameterList.value.findIndex(
+            (param) => param.id === i.productAttributeId
+          ); // 在参数列表中查找
+          if (paramIndex !== -1) {
+            const param = parameterList.value[paramIndex];
+            handleAttributeValue(param, i.value);
+          } // 处理参数列表
         }
       });
 
@@ -991,68 +1013,67 @@
   const cropperUploadRef = ref();
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
-      if (valid) {
-        // 如果有裁剪的图片，先上传图片
-        if (croppedFile.value) {
-          const { croppedRes, thumbnailRes } =
-            await cropperUploadRef.value.handleUpload();
+      if (!valid) return;
+      // 如果有裁剪的图片，先上传图片
+      if (croppedFile.value) {
+        const { croppedRes, thumbnailRes } =
+          await cropperUploadRef.value.handleUpload();
 
-          if (!croppedRes || croppedRes.code !== 200) {
-            ElMessage.error("封面图片上传失败");
-            return;
-          }
-
-          A_EFormData.imageUrl = croppedRes.fileName;
-          if (thumbnailRes?.code === 200)
-            A_EFormData.miniImg = thumbnailRes.fileName;
+        if (!croppedRes || croppedRes.code !== 200) {
+          ElMessage.error("封面图片上传失败");
+          return;
         }
-        // 如果有详情图片,先上传详情图片
-        await instructionImgUpload();
 
-        // 合并规格和参数列表中的所有属性值
-        const attributeValues: AttributeValueItem[] = [];
-        // 处理规格列表
-        specificationList.value.forEach((spec) => {
-          if (spec.currentValue)
-            attributeValues.push({
-              productAttributeId: spec.id,
-              value: spec.currentValue,
-            });
-          if (spec.selectedValues && spec.selectedValues.length > 0)
-            attributeValues.push({
-              productAttributeId: spec.id,
-              value: encodeArray(spec.selectedValues),
-            });
-        });
-        // 处理参数列表
-        parameterList.value.forEach((param) => {
-          if (param.currentValue)
-            attributeValues.push({
-              productAttributeId: param.id,
-              value: param.currentValue,
-            });
-          if (param.selectedValues && param.selectedValues.length > 0)
-            attributeValues.push({
-              productAttributeId: param.id,
-              value: encodeArray(param.selectedValues),
-            });
-        });
-        A_EFormData.productAttributeValueList = attributeValues;
-
-        const res = isAdd.value
-          ? await addProduct({ ...A_EFormData, delFlag: 0 })
-          : await editProduct(A_EFormData.id!, A_EFormData);
-        debugLog(
-          `药品${isAdd.value ? `ID:${A_EFormData.id}修改` : "添加"}结果=>`,
-          res
-        );
-
-        if (res.code === 200) {
-          A_EVisible.value = false;
-          ElMessage.success(`${A_ETitle.value}成功`);
-          fetchProductList(); // 刷新列表
-        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+        A_EFormData.imageUrl = croppedRes.fileName;
+        if (thumbnailRes?.code === 200)
+          A_EFormData.miniImg = thumbnailRes.fileName;
       }
+      // 如果有详情图片,先上传详情图片
+      await instructionImgUpload();
+
+      // 合并规格和参数列表中的所有属性值
+      const attributeValues: AttributeValueItem[] = [];
+      // 处理规格列表
+      specificationList.value.forEach((spec) => {
+        if (spec.currentValue)
+          attributeValues.push({
+            productAttributeId: spec.id,
+            value: spec.currentValue,
+          });
+        if (spec.selectedValues && spec.selectedValues.length > 0)
+          attributeValues.push({
+            productAttributeId: spec.id,
+            value: encodeArray(spec.selectedValues),
+          });
+      });
+      // 处理参数列表
+      parameterList.value.forEach((param) => {
+        if (param.currentValue)
+          attributeValues.push({
+            productAttributeId: param.id,
+            value: param.currentValue,
+          });
+        if (param.selectedValues && param.selectedValues.length > 0)
+          attributeValues.push({
+            productAttributeId: param.id,
+            value: encodeArray(param.selectedValues),
+          });
+      });
+      A_EFormData.productAttributeValueList = attributeValues;
+
+      const res = isAdd.value
+        ? await addProduct({ ...A_EFormData, delFlag: 0 })
+        : await editProduct(A_EFormData.id!, A_EFormData);
+      debugLog(
+        `药品${isAdd.value ? `ID:${A_EFormData.id}修改` : "添加"}结果=>`,
+        res
+      );
+
+      if (res.code === 200) {
+        A_EVisible.value = false;
+        ElMessage.success(`${A_ETitle.value}成功`);
+        fetchProductList(); // 刷新列表
+      } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
     });
   };
 
