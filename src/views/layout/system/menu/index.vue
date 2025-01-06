@@ -251,7 +251,7 @@
     debugLog("获取到菜单列表=>", res);
 
     menuTree.value = buildTree(res);
-    debugLog("转换后的菜单列表=>", toRaw(menuTree.value));
+    debugLog("转换后的菜单目录=>", toRaw(menuTree.value));
   };
   onMounted(fetchMenuList);
 

@@ -14,7 +14,7 @@ const addRoute = (routeList: RouteRecordRaw[]) => {
       const componentPath = `/src/views/layout/${j.component}.vue`;
       if (modules[componentPath]) {
         router.addRoute("Layout", {
-          path: i.path + "/" + j.path,
+          path: i.path == "/" ? "/" + j.path : i.path + "/" + j.path,
           name: j.name,
           meta: {
             title: j.meta?.title,

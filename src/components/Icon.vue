@@ -23,7 +23,7 @@
   });
   const iconClass = computed(() => {
     // 检查 name 是否已经包含 'icon-' 前缀
-    return props.icon.startsWith("icon-") ? props.icon : `icon-${props.icon}`;
+    return props.icon?.startsWith("icon-") ? props.icon : `icon-${props.icon}`;
   });
   const style = computed(() => ({
     fontSize: typeof props.size === "number" ? `${props.size}px` : props.size,
