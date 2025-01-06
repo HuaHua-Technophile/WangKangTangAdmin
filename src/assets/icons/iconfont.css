@@ -9,6 +9,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.icon-fendian:before {
+  content: "\e600";
+}
+
 .icon-sousuofangda:before {
   content: "\ec32";
 }
