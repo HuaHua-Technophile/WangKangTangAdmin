@@ -26,7 +26,6 @@
         >
       </el-form-item>
     </el-form>
-
     <!-- 药品属性分类表格 -->
     <el-table
       ref="attributeCategoryTable"
@@ -76,7 +75,6 @@
         </template>
       </el-table-column>
     </el-table>
-
     <!-- 分页 -->
     <CustomPagination
       v-model:current-page="currentPage"
@@ -111,7 +109,6 @@
     </A_EDialog>
   </div>
 </template>
-
 <script lang="ts" setup>
   import {
     addAttributeCategory,
