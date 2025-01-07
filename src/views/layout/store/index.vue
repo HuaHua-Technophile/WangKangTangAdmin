@@ -121,11 +121,14 @@
             clearable />
         </el-form-item>
         <el-form-item label="营业时间" prop="businessHours">
-          <el-input
+          <el-time-picker
             v-model="A_EFormData.businessHours"
-            placeholder="请输入营业时间"
-            maxlength="50"
-            clearable />
+            is-range
+            range-separator="至"
+            start-placeholder="开店时间"
+            end-placeholder="闭店时间"
+            value-format="HH:mm"
+            format="HH:mm" />
         </el-form-item>
         <el-form-item label="开启店铺" prop="status">
           <el-switch
@@ -198,7 +201,13 @@
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (!valid) return;
-      const res = await A_EFun(A_EFormData);
+      const res = await A_EFun({
+        ...A_EFormData,
+        // 如果是数组，则转换为字符串
+        businessHours: Array.isArray(A_EFormData.businessHours)
+          ? A_EFormData.businessHours.join("-")
+          : A_EFormData.businessHours,
+      });
       debugLog(`${A_ETitle.value}结果=>`, res);
       if (res.code === 200) {
         ElMessage.success(`${A_ETitle.value}成功`);
@@ -230,7 +239,10 @@
       storeName: data.storeName,
       phone: data.phone,
       address: data.address,
-      businessHours: data.businessHours,
+      businessHours:
+        typeof data.businessHours === "string"
+          ? data.businessHours.split("-")
+          : [],
       status: data.status,
     });
     A_EVisible.value = true;

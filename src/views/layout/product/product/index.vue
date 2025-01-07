@@ -112,6 +112,11 @@
         </template>
       </el-table-column>
       <DataTebleColumnTime />
+      <el-table-column label="库存">
+        <template #default="{ row }">
+          <el-button @click="toEditStock(row)">库存</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="上架/推荐(可多选)">
         <template #default="{ row }">
           <el-switch
@@ -449,6 +454,22 @@
         </el-form>
       </el-scrollbar>
     </A_EDialog>
+
+    <!-- 库存管理弹窗 -->
+    <el-drawer v-model="drawerVisible" direction="rtl" :with-header="false">
+      <el-select
+        v-model="currentProductId"
+        filterable
+        placeholder="请选择分店后再设置库存"
+        @change="fetchStock">
+        <el-option
+          v-for="i in storeList"
+          :key="i.id"
+          :label="i.storeName"
+          :value="i.id"
+          :disabled="i.status == 0" />
+      </el-select>
+    </el-drawer>
   </div>
 </template>
 <script lang="ts" setup>
@@ -493,6 +514,8 @@
   import { cloneDeep, debounce } from "lodash";
   import { computed, onMounted, reactive, ref, toRaw, watch } from "vue";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
+  import { StoreItem } from "@/types/store/store";
+  import { getStoreList } from "@/api/store/store";
 
   // 查询参数-----------------------
   const queryParams = reactive<
@@ -1200,4 +1223,18 @@
       }
     );
   };
+
+  // 库存管理-------------------------
+  const drawerVisible = ref(false);
+  const storeList = ref<StoreItem[]>();
+  const currentProductId = ref<number>();
+  const toEditStock = async (_data: ProductItem) => {
+    const storeRes = await getStoreList();
+    debugLog("所有开启的分店列表=>", storeRes);
+    if (storeRes.code !== 200)
+      return ElMessage.error(storeRes.msg || "获取店铺列表失败");
+    storeList.value = storeRes.data;
+    drawerVisible.value = true;
+  };
+  const fetchStock = () => {};
 </script>
