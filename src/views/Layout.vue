@@ -4,31 +4,30 @@
     <el-aside width="150px" class="border-end">
       <el-scrollbar>
         <el-menu router :default-active="activePath" class="border-0">
-          <template v-for="route in filteredRoutes" :key="route.path">
-            <!-- 处理有children的多级菜单 -->
+          <template v-for="route in processedRoutes">
+            <!-- 如果有子路由，显示为 sub-menu -->
             <el-sub-menu
-              v-if="route.children && route.children.length > 1"
+              v-if="route.children && route.children.length"
               :index="route.path">
               <template #title>
                 <Icon :icon="route.meta?.icon" />
                 <span class="ms-2">{{ route.meta?.title }}</span>
               </template>
               <el-menu-item
-                v-for="child in getVisibleChildren(route)"
-                :key="child.path"
+                v-for="child in route.children.filter((c:CustomRouteRecordRaw) => !c.hidden)"
                 :index="route.path + '/' + child.path"
                 class="transition1000">
+                <Icon :icon="child.meta?.icon" />
                 <span class="ms-2">{{ child.meta?.title }}</span>
               </el-menu-item>
             </el-sub-menu>
-
-            <!-- 处理单个一级菜单或只有一个子菜单的情况 -->
+            <!-- 如果没有子路由，直接显示为 menu-item -->
             <el-menu-item
               v-else
-              :index="getMenuItemPath(route)"
+              :index="'/' + route.path"
               class="transition1000">
-              <Icon :icon="getMenuItemIcon(route)" />
-              <span class="ms-2">{{ getMenuItemTitle(route) }}</span>
+              <Icon :icon="route.meta?.icon" />
+              <span class="ms-2">{{ route.meta?.title }}</span>
             </el-menu-item>
           </template>
         </el-menu>
@@ -106,38 +105,25 @@
   const authStore = useAuthStore();
 
   // 过滤可见路由
-  const filteredRoutes = computed(() => {
-    return authStore.dynamicRoutes.filter((route: any) => !route.hidden);
+  const processedRoutes = computed(() => {
+    const filteredRoutes = authStore.dynamicRoutes.filter(
+      (route) => !route.hidden
+    );
+    let result: CustomRouteRecordRaw[] = [];
+
+    filteredRoutes.forEach((route) => {
+      if (route.path === "/") {
+        // 如果是根路由，将其子路由提取出来
+        if (route.children && route.children.length) {
+          const filteredChildren = route.children.filter(
+            (child: CustomRouteRecordRaw) => !child.hidden
+          ); // 过滤子路由中 hidden 为 true 的项
+          result = result.concat(filteredChildren);
+        }
+      } else result.push(route); // 其他路由直接添加
+    });
+    return result;
   });
-
-  // 获取可见的子路由
-  const getVisibleChildren = (route: any) => {
-    return route.children?.filter((child: any) => !child.hidden) || [];
-  };
-
-  // 获取菜单项的路径
-  const getMenuItemPath = (route: any) => {
-    if (route.children && route.children.length === 1) {
-      return `${route.path == "/" ? "" : route.path}/${route.children[0].path}`;
-    }
-    return route.path;
-  };
-
-  // 获取菜单项的图标
-  const getMenuItemIcon = (route: any) => {
-    if (route.children && route.children.length === 1) {
-      return route.children[0].meta?.icon;
-    }
-    return route.meta?.icon;
-  };
-
-  // 获取菜单项的标题
-  const getMenuItemTitle = (route: any) => {
-    if (route.children && route.children.length === 1) {
-      return route.children[0].meta?.title;
-    }
-    return route.meta?.title;
-  };
 
   // 个人信息不持久化存储--------------------
   const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
@@ -152,6 +138,7 @@
   import { useHistoryStore } from "@/stores/history";
   import { useRoute } from "vue-router";
   import { useThemeStore } from "@/stores/theme";
+  import { CustomRouteRecordRaw } from "@/types/router";
   const historyStore = useHistoryStore();
 
   // 当前激活路由------------

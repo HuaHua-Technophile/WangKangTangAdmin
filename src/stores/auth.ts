@@ -5,7 +5,7 @@ import { defineStore } from "pinia";
 import CryptoJS from "crypto-js"; // 引入加密库
 import router from "@/router/router";
 import { useHistoryStore } from "./history";
-import { RouteRecordRaw } from "vue-router";
+import { CustomRouteRecordRaw } from "@/types/router";
 
 // 密钥，可以根据需要修改为更复杂的
 const SECRET_KEY = "my-secret-key";
@@ -25,7 +25,7 @@ export const useAuthStore = defineStore(
   "auth",
   () => {
     const token = ref<string>(""); // 存储 token
-    const dynamicRoutes = ref<RouteRecordRaw[]>([]); // 存储动态路由
+    const dynamicRoutes = ref<CustomRouteRecordRaw[]>([]); // 存储动态路由
 
     const isAuthenticated = computed(() => token.value !== ""); // 计算属性，判断是否已认证
 
