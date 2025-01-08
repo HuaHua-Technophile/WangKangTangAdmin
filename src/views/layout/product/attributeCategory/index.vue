@@ -79,7 +79,7 @@
     <CustomPagination
       v-model:current-page="currentPage"
       :total="total"
-      @size-change="fetchAttributeCategoryList"
+      @size-change="refreshList"
       @current-change="fetchAttributeCategoryList"
       class="mt-3" />
 
@@ -152,6 +152,10 @@
       if (res.rows) attributeCategoryList.value = res.rows;
       if (res.total) total.value = res.total;
     } else ElMessage.error(res.msg || "获取药品属性分类列表失败");
+  };
+  const refreshList = () => {
+    currentPage.value = 1;
+    fetchAttributeCategoryList();
   };
   onMounted(fetchAttributeCategoryList);
 

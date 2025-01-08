@@ -75,7 +75,7 @@
     <CustomPagination
       v-model:current-page="currentPage"
       :total="total"
-      @size-change="fetchAttributeList"
+      @size-change="refreshList"
       @current-change="fetchAttributeList"
       class="mt-3" />
 
@@ -239,6 +239,10 @@
       attributeList.value = res.rows || [];
       total.value = res.total || 0;
     } else ElMessage.error(res.msg || "获取属性列表失败");
+  };
+  const refreshList = () => {
+    currentPage.value = 1;
+    fetchAttributeList();
   };
   watch(
     () => route.query.type,

@@ -125,7 +125,7 @@
     <CustomPagination
       v-model:current-page="currentPage"
       :total="total"
-      @size-change="fetchUserList"
+      @size-change="refreshList"
       @current-change="fetchUserList"
       class="mt-3" />
 
@@ -273,6 +273,10 @@
       if (res.rows) userList.value = res.rows;
       if (res.total) total.value = res.total;
     } else ElMessage.error(res.msg || "获取用户列表失败");
+  };
+  const refreshList = () => {
+    currentPage.value = 1;
+    fetchUserList();
   };
   // 组件挂载时获取用户列表
   onMounted(fetchUserList);

@@ -45,7 +45,7 @@
     </el-form>
     <!-- 表格 -->
     <el-table
-      ref="noticeTable"
+      ref="configTable"
       :data="configList"
       table-layout="auto"
       cell-class-name="text-center"
@@ -93,7 +93,7 @@
     <CustomPagination
       v-model:current-page="currentPage"
       :total="total"
-      @size-change="fetchConfigList"
+      @size-change="refreshList"
       @current-change="fetchConfigList"
       class="mt-3" />
 
@@ -195,6 +195,10 @@
       configList.value = res.rows;
       total.value = res.total;
     } else ElMessage.error(res.msg || "获取参数设置列表失败");
+  };
+  const refreshList = () => {
+    currentPage.value = 1;
+    fetchConfigList();
   };
   onMounted(fetchConfigList);
 

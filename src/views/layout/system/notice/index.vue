@@ -43,7 +43,6 @@
         <el-button type="primary" @click="toAddNotice">添加通知/公告</el-button>
       </el-form-item>
     </el-form>
-
     <!-- 表格 -->
     <el-table
       ref="noticeTable"
@@ -116,7 +115,7 @@
     <CustomPagination
       v-model:current-page="currentPage"
       :total="total"
-      @size-change="fetchNoticeList"
+      @size-change="refreshList"
       @current-change="fetchNoticeList"
       class="mt-3" />
 
@@ -223,6 +222,10 @@
     } else ElMessage.error(res.msg || "获取通知/公告列表失败");
   };
   onMounted(fetchNoticeList);
+  const refreshList = () => {
+    currentPage.value = 1;
+    fetchNoticeList();
+  };
 
   // 添加/修改通知/公告表单----------------
   const isAdd = ref(true);

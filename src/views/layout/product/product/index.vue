@@ -70,7 +70,7 @@
       <el-table-column prop="freightTemplateId" label="运费(元)">
         <template #default="{ row }">￥{{ row.freightTemplateId }}</template>
       </el-table-column>
-      <el-table-column prop="categoryId" label="分类ID">
+      <el-table-column prop="categoryId" label="分类">
         <template #default="{ row }">{{
           categoryMap.get(row.categoryId) || "未知分类"
         }}</template>
@@ -114,7 +114,7 @@
       <DataTebleColumnTime />
       <el-table-column label="库存">
         <template #default="{ row }">
-          <el-button @click="toEditStock(row)">库存</el-button>
+          <el-button @click="toEditStock(row)" size="small">库存</el-button>
         </template>
       </el-table-column>
       <el-table-column label="上架/推荐(可多选)">
@@ -159,7 +159,7 @@
     <CustomPagination
       v-model:current-page="currentPage"
       :total="total"
-      @size-change="fetchProductList"
+      @size-change="refreshList"
       @current-change="fetchProductList"
       class="mt-3" />
 
@@ -382,7 +382,11 @@
                     v-model="row.price"
                     :precision="2"
                     :step="0.1"
-                    :min="0" />
+                    :min="0">
+                    <template #prefix>
+                      <span>￥</span>
+                    </template>
+                  </el-input-number>
                 </template>
               </el-table-column>
               <el-table-column
@@ -456,11 +460,15 @@
     </A_EDialog>
 
     <!-- 库存管理弹窗 -->
-    <el-drawer v-model="drawerVisible" direction="rtl" :with-header="false">
+    <el-drawer
+      v-model="drawerVisible"
+      direction="rtl"
+      :with-header="false"
+      size="65%">
       <el-select
-        v-model="currentProductId"
+        v-model="currentStoreId"
         filterable
-        placeholder="请选择分店后再设置库存"
+        placeholder="选择分店后,才可具体管理每店库存"
         @change="fetchStock">
         <el-option
           v-for="i in storeList"
@@ -469,6 +477,33 @@
           :value="i.id"
           :disabled="i.status == 0" />
       </el-select>
+      <el-table
+        :data="SKUList"
+        v-if="SKUList.length"
+        table-layout="auto"
+        cell-class-name="text-center"
+        header-cell-class-name="text-center"
+        class="border rounded-4 shadow-sm mt-2">
+        <el-table-column label="SKU编码" prop="skuCode" />
+        <el-table-column label="价格" prop="price" />
+        <el-table-column
+          v-for="(specName, index) in SKUListSpecNames"
+          :key="index"
+          :label="specName">
+          <template #default="{ row }">
+            {{ JSON.parse(row.spData)[specName] }}
+          </template>
+        </el-table-column>
+        <el-table-column label="库存" prop="stock">
+          <template #default="{ row }">
+            <el-input-number
+              v-model="row.stock"
+              :step="1"
+              :min="0"
+              style="width: 100px" />
+          </template>
+        </el-table-column>
+      </el-table>
     </el-drawer>
   </div>
 </template>
@@ -495,7 +530,7 @@
     AttributeValueItem,
   } from "@/types/product/attribute";
   import { AttributeCategoryItem } from "@/types/product/attributeCategory";
-  import { ProductItem } from "@/types/product/product";
+  import { ProductItem, SKUItem } from "@/types/product/product";
   import { TreeSelectItem } from "@/types/treeSelect";
   import { debugLog } from "@/utils/debug";
   import { formatTreeSelectByFlat } from "@/utils/formatTreeSelectByFlat";
@@ -516,6 +551,7 @@
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { StoreItem } from "@/types/store/store";
   import { getStoreList } from "@/api/store/store";
+  import { getInventoryByStoreId } from "@/api/product/SKUStock";
 
   // 查询参数-----------------------
   const queryParams = reactive<
@@ -547,7 +583,10 @@
       if (res.total) total.value = res.total;
     } else ElMessage.error(res.msg || "获取药品列表失败");
   };
-
+  const refreshList = () => {
+    currentPage.value = 1;
+    fetchProductList();
+  };
   // 监听页码变化
   watch(currentPage, () => {
     fetchProductList();
@@ -1227,14 +1266,35 @@
   // 库存管理-------------------------
   const drawerVisible = ref(false);
   const storeList = ref<StoreItem[]>();
-  const currentProductId = ref<number>();
-  const toEditStock = async (_data: ProductItem) => {
+  const currentStoreId = ref<number>();
+  const SKUList = ref<SKUItem[]>([]);
+  const SKUListSpecNames = computed(() => {
+    if (!SKUList.value.length) return [];
+    const firstSpData = JSON.parse(SKUList.value[0].spData);
+    return Object.keys(firstSpData); // 获取规格字段名
+  });
+  const toEditStock = async (data: ProductItem) => {
     const storeRes = await getStoreList();
     debugLog("所有开启的分店列表=>", storeRes);
     if (storeRes.code !== 200)
       return ElMessage.error(storeRes.msg || "获取店铺列表失败");
     storeList.value = storeRes.data;
+    const SKURes = await getProductInfo(data.id!);
+    debugLog(`药品${data.name}的补充信息=>`, SKURes);
+    SKUList.value = SKURes.data.skuStockList;
     drawerVisible.value = true;
   };
-  const fetchStock = () => {};
+  const fetchStock = async () => {
+    const res = await getInventoryByStoreId(currentStoreId.value!);
+    debugLog(`获取分店ID:${currentStoreId}的库存结果=>`, res);
+    if (res.code == 200 || res.data.length > 0) {
+      SKUList.value = SKUList.value.map((sku) => {
+        const inventoryItem = res.data.find((item) => item.id === sku.id);
+        return {
+          ...sku,
+          stock: inventoryItem ? inventoryItem.stock : sku.stock,
+        };
+      });
+    }
+  };
 </script>

@@ -208,7 +208,11 @@
   const A_EFormData = reactive<CategoryItem>(cloneDeep(defaultForm));
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
   const showClearBtn = computed(() => {
-    return A_EFormData.icon && A_EFormData.icon !== "#";
+    return (
+      A_EFormData.icon !== undefined &&
+      A_EFormData.icon !== "#" &&
+      A_EFormData.icon !== ""
+    );
   });
   // 添加/修改方法
   const toAddCategory = async () => {

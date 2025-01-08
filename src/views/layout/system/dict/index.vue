@@ -102,7 +102,7 @@
     <CustomPagination
       v-model:current-page="currentPage"
       :total="total"
-      @size-change="fetchDictTypeList"
+      @size-change="refreshList"
       @current-change="fetchDictTypeList"
       class="mt-3" />
 
@@ -240,7 +240,7 @@
       <CustomPagination
         v-model:current-page="dictDataCurrentPage"
         :total="dictDataTotal"
-        @size-change="fetchDictDataList"
+        @size-change="refreshList2"
         @current-change="fetchDictDataList"
         class="mt-3" />
     </el-drawer>
@@ -307,6 +307,10 @@
     } else ElMessage.error(res.msg || "获取字典类型列表失败");
   };
   onMounted(fetchDictTypeList);
+  const refreshList = () => {
+    currentPage.value = 1;
+    fetchDictTypeList();
+  };
 
   // 字典类型--------------------
   const A_EVisible = ref(false);
@@ -390,6 +394,10 @@
       dictDataList.value = res.rows;
       dictDataTotal.value = res.total;
     } else ElMessage.error(res.msg || "获取字典数据列表失败");
+  };
+  const refreshList2 = () => {
+    currentPage.value = 1;
+    fetchDictDataList();
   };
 
   // 打开字典数据抽屉---------------

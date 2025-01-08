@@ -110,7 +110,7 @@
     <CustomPagination
       v-model:current-page="currentPage"
       :total="total"
-      @size-change="fetchRoleList"
+      @size-change="refreshList"
       @current-change="fetchRoleList"
       class="mt-3" />
     <!-- 添加/修改弹窗 -->
@@ -256,6 +256,10 @@
     if (res.total) total.value = res.total;
   };
   onMounted(fetchRoleList);
+  const refreshList = () => {
+    currentPage.value = 1;
+    fetchRoleList();
+  };
 
   // 添加/修改表单--------------
   const isAdd = ref(true);
