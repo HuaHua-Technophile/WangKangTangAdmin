@@ -91,7 +91,7 @@
   } from "@/api/wxapp/aptitude";
   import { allFileUpload } from "@/api/upload";
   import { usePaginationStore } from "@/stores/pagination";
-  import { AptitudeItem } from "@/types/wxapp/aptitube";
+  import { AptitudeItem } from "@/types/wxapp/aptitude";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import {
