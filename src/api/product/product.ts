@@ -5,7 +5,7 @@ import { customRequest } from "../instance";
  * 添加药品
  * @param data 药品数据
  */
-export const addProduct = (data: ProductItem & { delFlag: 0 }) => {
+export const addProduct = (data: ProductItem) => {
   return customRequest(
     {
       method: "POST",

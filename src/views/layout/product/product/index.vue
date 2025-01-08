@@ -500,10 +500,18 @@
               v-model="row.stock"
               :step="1"
               :min="0"
-              style="width: 100px" />
+              :max="100000"
+              style="width: 100px"
+              controls-position="right"
+              :disabled="!currentStoreId" />
           </template>
         </el-table-column>
       </el-table>
+      <template #footer>
+        <el-button @click="editStock" :disabled="!currentStoreId">
+          {{ currentStoreId ? "确认修改" : "请先选择分店" }}</el-button
+        >
+      </template>
     </el-drawer>
   </div>
 </template>
@@ -551,7 +559,10 @@
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { StoreItem } from "@/types/store/store";
   import { getStoreList } from "@/api/store/store";
-  import { getInventoryByStoreId } from "@/api/product/SKUStock";
+  import {
+    getInventoryByStoreId,
+    updateInventoryQuantity,
+  } from "@/api/product/SKUStock";
 
   // 查询参数-----------------------
   const queryParams = reactive<
@@ -1124,7 +1135,7 @@
       A_EFormData.productAttributeValueList = attributeValues;
 
       const res = isAdd.value
-        ? await addProduct({ ...A_EFormData, delFlag: 0 })
+        ? await addProduct(A_EFormData)
         : await editProduct(A_EFormData.id!, A_EFormData);
       debugLog(
         `药品${isAdd.value ? `ID:${A_EFormData.id}修改` : "添加"}结果=>`,
@@ -1267,6 +1278,7 @@
   const drawerVisible = ref(false);
   const storeList = ref<StoreItem[]>();
   const currentStoreId = ref<number>();
+  const currentProductId = ref<number>();
   const SKUList = ref<SKUItem[]>([]);
   const SKUListSpecNames = computed(() => {
     if (!SKUList.value.length) return [];
@@ -1274,6 +1286,7 @@
     return Object.keys(firstSpData); // 获取规格字段名
   });
   const toEditStock = async (data: ProductItem) => {
+    currentProductId.value = data.id;
     const storeRes = await getStoreList();
     debugLog("所有开启的分店列表=>", storeRes);
     if (storeRes.code !== 200)
@@ -1285,8 +1298,14 @@
     drawerVisible.value = true;
   };
   const fetchStock = async () => {
-    const res = await getInventoryByStoreId(currentStoreId.value!);
-    debugLog(`获取分店ID:${currentStoreId}的库存结果=>`, res);
+    const res = await getInventoryByStoreId(
+      currentStoreId.value!,
+      currentProductId.value!
+    );
+    debugLog(
+      `获取分店ID:${currentStoreId.value} 的药品ID:${currentProductId.value} 的SKU-库存=>`,
+      res
+    );
     if (res.code == 200 || res.data.length > 0) {
       SKUList.value = SKUList.value.map((sku) => {
         const inventoryItem = res.data.find((item) => item.id === sku.id);
@@ -1296,5 +1315,16 @@
         };
       });
     }
+  };
+  const editStock = async () => {
+    const res = await updateInventoryQuantity(
+      currentStoreId.value!,
+      SKUList.value.map(({ skuCode, stock }) => ({ skuCode, stock }))
+    );
+    debugLog(`更新店铺ID:${currentStoreId.value}的SKU-库存结果=>`, res);
+    if (res.code == 200) {
+      ElMessage.success("更新库存成功");
+      fetchStock();
+    } else ElMessage.error(res.msg || "更新库存失败");
   };
 </script>
