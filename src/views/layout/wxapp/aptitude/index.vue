@@ -88,10 +88,10 @@
     delAptitude,
     editAptitude,
     getAptitudeList,
-  } from "@/api/system/aptitude";
+  } from "@/api/wxapp/aptitude";
   import { allFileUpload } from "@/api/upload";
   import { usePaginationStore } from "@/stores/pagination";
-  import { AptitudeItem } from "@/types/system/aptitube";
+  import { AptitudeItem } from "@/types/wxapp/aptitube";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import {

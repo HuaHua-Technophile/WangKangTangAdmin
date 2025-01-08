@@ -1,5 +1,5 @@
 // aptitudeApi.ts
-import { AptitudeItem } from "@/types/system/aptitube";
+import { AptitudeItem } from "@/types/wxapp/aptitube";
 import { customRequest } from "../instance";
 import { PaginationParams } from "@/types/pagination";
 
