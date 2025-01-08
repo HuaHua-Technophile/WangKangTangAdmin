@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button @click="toAddAptitude">添加资质图片</el-button>
+    <el-button @click="toAddAptitude">添加小程序资质图片</el-button>
     <!-- 数据展示表格 -->
     <el-table
       ref="aptitudeTable"
@@ -12,7 +12,7 @@
       <el-table-column type="selection" width="30" />
       <el-table-column prop="id" label="ID" />
       <el-table-column prop="sort" label="排序" />
-      <el-table-column prop="image" label="资质图片">
+      <el-table-column prop="image" label="小程序资质图片">
         <template #default="scope">
           <el-image
             v-if="scope.row.image"
@@ -20,7 +20,7 @@
             fit="cover"
             :preview-src-list="[BASEURL + scope.row.image]"
             :preview-teleported="true"
-            style="width: 120px; height: 80px" />
+            style="width: 50px; height: 50px" />
         </template>
       </el-table-column>
       <DataTebleColumnTime />
@@ -59,7 +59,7 @@
         :model="A_EFormData"
         :rules="rules"
         label-width="100px">
-        <el-form-item label="资质图片" prop="image">
+        <el-form-item label="小程序资质图片" prop="image">
           <el-image
             fit="cover"
             style="width: 100px; height: 100px"
@@ -115,12 +115,12 @@
       pageSize: paginationStore.pageSize,
     });
 
-    debugLog("资质图片列表=>", res);
+    debugLog("小程序资质图片列表=>", res);
 
     if (res.code === 200) {
       if (res.rows) aptitudeList.value = res.rows;
       if (res.total) total.value = res.total;
-    } else ElMessage.error(res.msg || "获取资质图片列表失败");
+    } else ElMessage.error(res.msg || "获取小程序资质图片列表失败");
   };
   onMounted(fetchAptitudeList);
   const refreshList = () => {
@@ -152,7 +152,7 @@
         required: true,
         validator: (_rule, value, callback) => {
           if (!value && !croppedFile.value)
-            callback(new Error("请上传资质图片"));
+            callback(new Error("请上传小程序资质图片"));
           else callback();
         },
         trigger: "change",
@@ -178,7 +178,7 @@
   };
 
   const toAddAptitude = () => {
-    A_ETitle.value = "添加资质图片";
+    A_ETitle.value = "添加小程序资质图片";
     isAdd.value = true;
     Object.assign(A_EFormData, defaultForm);
     A_EVisible.value = true;
@@ -186,7 +186,7 @@
   };
 
   const toEditAptitude = (row: AptitudeItem) => {
-    A_ETitle.value = "修改资质图片";
+    A_ETitle.value = "修改小程序资质图片";
     isAdd.value = false;
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
@@ -233,17 +233,17 @@
     elMessageBoxConfirm(
       `删除以下${
         selectedAptitudes.value.length
-      }个资质图片 ID: ${selectedAptitudes.value.map((i) => i.id)}`,
+      }个小程序资质图片 ID: ${selectedAptitudes.value.map((i) => i.id)}`,
       async () => {
         const aptitudeIds = selectedAptitudes.value
           .map((i) => i.id)
           .filter((id) => id !== undefined);
         const res = await delAptitude(aptitudeIds);
-        debugLog("删除资质图片=>", res);
+        debugLog("删除小程序资质图片=>", res);
         if (res.code === 200) {
           ElMessage.success("删除成功");
           selectedAptitudes.value = [];
-          // 假设有一个获取资质图片列表的方法
+          // 假设有一个获取小程序资质图片列表的方法
           fetchAptitudeList();
         } else ElMessage.error(res.msg || "删除失败");
       }
