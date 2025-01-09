@@ -53,7 +53,6 @@ export interface ConfigItem {
 
 /**
  * 配置查询参数类型
- * @typedef {Object} ConfigParams
  * @description 继承分页参数并包含配置查询相关字段
  * @extends {PaginationParams}
  */

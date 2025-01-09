@@ -76,7 +76,6 @@ export interface ProductItem {
 }
 
 /**
- * @typedef {Object} GetProductListParams
  * @description 获取药品列表的查询参数类型
  * @extends {PaginationParams}
  * @property {0 | 1} [recommendStatus] - 推荐状态过滤

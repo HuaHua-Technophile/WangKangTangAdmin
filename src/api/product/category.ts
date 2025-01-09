@@ -20,7 +20,6 @@ import { CategoryItem, CategoryParams } from "@/types/product/category";
  * @async
  * @function addCategory
  * @param {Omit<CategoryItem, "id">} data - 新增分类的数据，不包含 id 字段
- * @returns {Promise<any>} 返回后端响应结果
  * @throws {Error} 请求失败时抛出错误
  */
 export const addCategory = (data: Omit<CategoryItem, "id">) => {
@@ -39,7 +38,6 @@ export const addCategory = (data: Omit<CategoryItem, "id">) => {
  * @async
  * @function editCategory
  * @param {CategoryItem} data - 完整的分类数据，包含 id
- * @returns {Promise<any>} 返回后端响应结果
  * @throws {Error} 请求失败时抛出错误
  */
 export const editCategory = (data: CategoryItem) => {
@@ -58,7 +56,6 @@ export const editCategory = (data: CategoryItem) => {
  * @async
  * @function getCategoryList
  * @param {CategoryParams} params - 查询参数
- * @returns {Promise<CategoryItem[]>} 返回分类列表数据
  * @throws {Error} 请求失败时抛出错误
  */
 export const getCategoryList = (params: CategoryParams) => {
@@ -77,7 +74,6 @@ export const getCategoryList = (params: CategoryParams) => {
  * @async
  * @function getCategoryListExclude
  * @param {number} categoryId - 需要排除的分类 ID
- * @returns {Promise<CategoryItem[]>} 返回排除指定节点后的分类列表
  * @throws {Error} 请求失败时抛出错误
  */
 export const getCategoryListExclude = (categoryId: number) => {
@@ -95,7 +91,6 @@ export const getCategoryListExclude = (categoryId: number) => {
  * @async
  * @function delCategories
  * @param {number[]} ids - 要删除的分类 ID 数组
- * @returns {Promise<any>} 返回后端响应结果
  * @throws {Error} 请求失败时抛出错误
  */
 export const delCategories = (ids: number[]) => {

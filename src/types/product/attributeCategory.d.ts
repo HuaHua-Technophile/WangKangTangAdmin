@@ -40,7 +40,6 @@ export interface AttributeCategoryItem {
 
 /**
  * 药品属性分类查询参数类型
- * @typedef {Object} AttributeCategoryParams
  * @description 继承分页参数并包含属性分类名称的查询参数类型
  * @extends {PaginationParams}
  */

@@ -12,7 +12,6 @@ import { SKUItem } from "@/types/product/product";
  * @function getInventoryByStoreId
  * @param {number} storeId - 分店ID
  * @param {number} productId - 药品ID
- * @returns {Promise<Pick<SKUItem, "id" | "stock">[]>} 返回包含SKU ID和库存数量的数组
  * @throws {Error} 当API请求失败时抛出错误
  * @example
  * // 获取ID为1的分店中ID为100的药品库存
@@ -37,7 +36,6 @@ export const getInventoryByStoreId = (storeId: number, productId: number) => {
  * @param {Pick<SKUItem, "skuCode" | "stock">[]} data - 需要更新的SKU库存信息数组
  * @param {string} data[].skuCode - SKU编码
  * @param {number} data[].stock - 更新后的库存数量
- * @returns {Promise<void>} 更新成功时返回空
  * @throws {Error} 当API请求失败时抛出错误
  * @example
  * // 更新ID为1的分店中多个SKU的库存

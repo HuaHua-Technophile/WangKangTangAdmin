@@ -144,8 +144,12 @@
     </A_EDialog>
   </div>
 </template>
-
 <script lang="ts" setup>
+  /** * @file Config Management Component * @description
+该组件用于管理系统参数配置，包括增删改查功能。使用Vue 3、TypeScript、Element
+Plus等技术栈实现。 */
+
+  // 导入API接口和工具函数
   import {
     addConfig,
     delConfigs,
@@ -170,20 +174,29 @@
     validateNoChineseOrSpaces,
   } from "@/utils/formRegularExpression";
 
-  // 字典数据------------------
+  /**
+   * @description 字典数据加载
+   */
   const dictStore = useDictStore();
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_yes_no");
   });
 
-  // 请求参数设置------------
+  /**
+   * @description 请求参数设置和分页相关数据
+   */
   const queryParams = reactive<
     Pick<ConfigItem, "configName" | "configKey" | "configType">
   >({});
-  const configList = ref<ConfigItem[]>();
-  const total = ref(0);
-  const paginationStore = usePaginationStore();
-  const currentPage = ref(1);
+  const configList = ref<ConfigItem[]>(); // 配置列表
+  const total = ref(0); // 数据总条数
+  const paginationStore = usePaginationStore(); // 分页设置
+  const currentPage = ref(1); // 当前页码
+
+  /**
+   * @function fetchConfigList
+   * @description 获取配置列表数据
+   */
   const fetchConfigList = async () => {
     const res = await getConfigList({
       pageNum: currentPage.value,
@@ -194,25 +207,35 @@
     if (res.rows && res.total !== undefined) {
       configList.value = res.rows;
       total.value = res.total;
-    } else ElMessage.error(res.msg || "获取参数设置列表失败");
+    } else {
+      ElMessage.error(res.msg || "获取参数设置列表失败");
+    }
   };
+
+  /**
+   * @function refreshList
+   * @description 刷新列表并重置到第一页
+   */
   const refreshList = () => {
     currentPage.value = 1;
     fetchConfigList();
   };
+
   onMounted(fetchConfigList);
 
-  // 添加/修改参数表单----------------
-  const isAdd = ref(true);
-  const A_EVisible = ref(false);
-  const A_ETitle = ref("");
+  /**
+   * @description 添加/修改参数表单数据与规则
+   */
+  const isAdd = ref(true); // 是否为新增模式
+  const A_EVisible = ref(false); // 表单弹窗的显示状态
+  const A_ETitle = ref(""); // 表单弹窗标题
   const defaultForm: ConfigItem = {
     configName: "",
     configKey: "",
     configValue: "",
   };
-  let A_EFormData: ConfigItem;
-  let A_EFun: (data: ConfigItem) => Promise<AxiosResponse>;
+  let A_EFormData: ConfigItem; // 表单数据
+  let A_EFun: (data: ConfigItem) => Promise<AxiosResponse>; // 提交函数
   const rules: FormRules = {
     configName: [
       { required: true, message: "请输入参数名称", trigger: "blur" },
@@ -233,7 +256,10 @@
     ],
   };
 
-  // 提交表单-----------------
+  /**
+   * @function submitForm
+   * @description 提交添加/修改表单
+   */
   const A_EFormRef = ref();
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
@@ -244,12 +270,17 @@
           ElMessage.success(`${A_ETitle.value}成功`);
           A_EVisible.value = false;
           fetchConfigList();
-        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+        } else {
+          ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+        }
       }
     });
   };
 
-  // 打开新增参数对话框-----------
+  /**
+   * @function toAddConfig
+   * @description 打开新增参数对话框
+   */
   const toAddConfig = () => {
     A_ETitle.value = "新增参数设置";
     isAdd.value = true;
@@ -259,7 +290,11 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 打开编辑参数对话框-------------
+  /**
+   * @function toEditConfig
+   * @description 打开编辑参数对话框
+   * @param {ConfigItem} row - 当前行的参数数据
+   */
   const toEditConfig = (row: ConfigItem) => {
     A_ETitle.value = "修改参数";
     isAdd.value = false;
@@ -275,12 +310,26 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 删除参数设置--------------
-  const selectedConfigs = ref<ConfigItem[]>([]);
-  const configTable = ref<TableInstance>();
+  /**
+   * @description 删除参数设置
+   */
+  const selectedConfigs = ref<ConfigItem[]>([]); // 当前选中的参数配置
+  const configTable = ref<TableInstance>(); // 表格实例
+
+  /**
+   * @function handleSelectionChange
+   * @description 监听表格选中项变化
+   * @param {ConfigItem[]} selection - 当前选中的数据
+   */
   const handleSelectionChange = (selection: ConfigItem[]) => {
     selectedConfigs.value = selection;
   };
+
+  /**
+   * @function toDelConfig
+   * @description 删除选中的参数配置
+   * @param {ConfigItem} row - 当前行的参数数据
+   */
   const toDelConfig = (row: ConfigItem) => {
     // 勾选被点击的行
     configTable.value?.toggleRowSelection(row, true);
@@ -295,10 +344,12 @@
         const res = await delConfigs(configIds);
         debugLog("删除参数设置=>", res);
         if (res.code === 200) {
-          ElMessage.success("删除成功"); // 清空选中
-          selectedConfigs.value = [];
+          ElMessage.success("删除成功");
+          selectedConfigs.value = []; // 清空选中项
           fetchConfigList();
-        } else ElMessage.error(res.msg || "删除失败");
+        } else {
+          ElMessage.error(res.msg || "删除失败");
+        }
       }
     );
   };

@@ -15,7 +15,6 @@ import { ConfigItem, ConfigParams } from "@/types/system/config";
  * @param {string} [params.configName] - 参数名称
  * @param {string} [params.configKey] - 参数键名
  * @param {string} [params.configType] - 参数类型
- * @returns {Promise<ConfigItem[]>} 返回参数设置列表
  * @throws {Error} 请求失败时抛出错误
  */
 export const getConfigList = (params: ConfigParams) => {
@@ -34,7 +33,6 @@ export const getConfigList = (params: ConfigParams) => {
  * @async
  * @function delConfigs
  * @param {number[]} configIds - 要删除的参数ID数组
- * @returns {Promise<any>} 删除操作的结果
  * @throws {Error} 请求失败时抛出错误
  * @example
  * // 删除多个配置项
@@ -55,7 +53,6 @@ export const delConfigs = (configIds: number[]) => {
  * @async
  * @function addConfig
  * @param {Omit<ConfigItem, "configId">} data - 新增的参数设置数据（不包含configId）
- * @returns {Promise<any>} 新增操作的结果
  * @throws {Error} 请求失败时抛出错误
  * @example
  * // 新增配置项
@@ -82,7 +79,6 @@ export const addConfig = (data: Omit<ConfigItem, "configId">) => {
  * @async
  * @function editConfig
  * @param {ConfigItem} data - 要修改的参数设置完整数据
- * @returns {Promise<any>} 修改操作的结果
  * @throws {Error} 请求失败时抛出错误
  * @example
  * // 修改配置项
@@ -108,7 +104,6 @@ export const editConfig = (data: ConfigItem) => {
  * @async
  * @function getConfigValueByConfigKey
  * @param {string} configKey - 参数键名
- * @returns {Promise<any>} 返回的数据在response的msg字段中
  * @throws {Error} 请求失败时抛出错误
  * @example
  * // 获取系统主题配置

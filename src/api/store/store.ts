@@ -15,7 +15,6 @@ import { customRequest } from "../instance";
  * @function addStore
  * @description 创建新的店铺信息
  * @param {StoreItem} data - 店铺数据对象
- * @returns {Promise<any>} 返回后端响应结果
  * @throws {Error} 当请求失败时抛出错误
  * @example
  * ```typescript
@@ -47,7 +46,6 @@ export const addStore = (data: StoreItem) => {
  * @function delStore
  * @description 根据店铺ID删除指定店铺
  * @param {number} id - 要删除的店铺ID
- * @returns {Promise<any>} 返回后端响应结果
  * @throws {Error} 当请求失败时抛出错误
  * @example
  * ```typescript
@@ -74,7 +72,6 @@ export const delStore = (id: number) => {
  * @function getStoreList
  * @description 获取店铺列表，支持条件查询
  * @param {StoreItem} [params] - 可选的查询参数对象
- * @returns {Promise<StoreItem[]>} 返回店铺列表数据
  * @throws {Error} 当请求失败时抛出错误
  * @example
  * ```typescript
@@ -103,7 +100,6 @@ export const getStoreList = (params?: StoreItem) => {
  * @function editStore
  * @description 更新指定店铺的信息
  * @param {StoreItem} data - 需要更新的店铺数据，必须包含店铺ID
- * @returns {Promise<any>} 返回后端响应结果
  * @throws {Error} 当请求失败时抛出错误
  * @example
  * ```typescript

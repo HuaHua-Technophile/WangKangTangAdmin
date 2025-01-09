@@ -63,7 +63,6 @@ export const addAttribute = (data: AttributeItem) => {
  * @function editAttribute
  * @param {AttributeItem} data - 更新的属性数据对象
  * @param {number} id - 需要修改的属性ID
- * @returns {Promise<void>} 修改成功返回空
  * @throws {Error} 请求失败时抛出错误
  * @example
  * const updateData = { name: '尺寸', values: ['S', 'M', 'L'] };
@@ -85,7 +84,6 @@ export const editAttribute = (data: AttributeItem, id: number) => {
  * @async
  * @function delAttribute
  * @param {number[]} ids - 需要删除的属性ID数组
- * @returns {Promise<void>} 删除成功返回空
  * @throws {Error} 请求失败时抛出错误
  * @example
  * await delAttribute([1, 2, 3]);
