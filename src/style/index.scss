@@ -1,7 +1,20 @@
-// 覆盖主题色
+/**
+ * @fileoverview 全局样式配置文件
+ * @description 包含Bootstrap主题覆盖、Element Plus暗黑模式配置、全局通用样式类定义等
+ */
+
+/**
+ * @description 自定义Bootstrap主题色变量
+ * @property {Color} $primary - 主要颜色
+ * @property {Color} $success - 成功状态颜色
+ */
 $primary: #198754;
 $success: #0d6efd;
-// 导入 Bootstrap
+
+/**
+  * @description 导入并配置Bootstrap
+  * @see {@link https://getbootstrap.com/docs/5.0/customize/sass/}
+  */
 @use "bootstrap/scss/bootstrap" with (
   /* node_modules\bootstrap\scss\_variables.scss */$primary: $primary,
   $success: $success,
@@ -11,35 +24,66 @@ $success: #0d6efd;
   $body-secondary-bg-dark: #353535
 );
 
+/**
+  * @description Element Plus暗黑模式变量配置
+  * @note forward必须写在导入@use前
+  * @see {@link https://element-plus.org/zh-CN/guide/dark-mode.html}
+  */
 @forward "element-plus/theme-chalk/src/dark/var.scss" with (
   $colors: (
-    //这里定义在暗黑模式下 primary 的颜色，其他同理
-    "primary": ("base": $primary),
-    "success": ("base": $success),
+    "primary": (
+      "base": $primary,
+    ),
+    "success": (
+      "base": $success,
+    ),
   )
-); //forward必须写在导入@use前
+);
 
+/**
+  * @description 导入Element Plus暗黑模式CSS变量
+  */
 @use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;
-// 然后在任意部位全局引入(不是像亮色模式时，按需引入需要去vite.config.ts修改配置项)
 
+/**
+  * @description 按需导入Element Plus组件样式
+  * @see {@link https://element-plus.org/zh-CN/guide/quickstart.html}
+  */
 @use "element-plus/theme-chalk/src/message.scss";
 @use "element-plus/theme-chalk/src/message-box.scss";
 @use "element-plus/theme-chalk/src/loading.scss";
-// 按需导入element plus时,API调用的特殊样式需要手动引入https://element-plus.org/zh-CN/guide/quickstart.html#:~:text=ElementPlus()%5D%2C%0A%7D)-,WARNING,-%E5%A6%82%E6%9E%9C%E4%BD%BF%E7%94%A8%20unplugin
+
+/**
+  * @description 导入自定义图标字体
+  */
 @use "@/assets/icons/iconfont.css";
 
-$transition-times: 500, 750, 1000, 1250, 1500, 1750, 2000; // 定义一个包含过渡时间（以毫秒为单位）的数组
+/**
+  * @description 过渡动画时间配置
+  * @type {Array<number>}
+  */
+$transition-times: 500, 750, 1000, 1250, 1500, 1750, 2000;
+
+/**
+  * @description 生成不同时长的过渡动画类
+  * @example .transition500 { transition: all 500ms; }
+  */
 @each $time in $transition-times {
   .transition#{$time} {
     transition: all #{$time}ms;
   }
-} // 使用@each指令遍历数组
+}
 
-// 鼠标指针--------------------------
+/**
+  * @description 鼠标指针样式类
+  */
 .cursor-pointer {
   cursor: pointer;
 }
-// 背景居中填充-------------------------
+
+/**
+  * @description 背景图片居中填充样式类
+  */
 .bgimg-center-cover {
   background-position: center;
   background-size: cover;

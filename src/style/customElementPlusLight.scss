@@ -1,7 +1,21 @@
-// 覆盖主题色
+/**
+ * @fileoverview Element Plus主题变量配置文件
+ * @description 用于自定义Element Plus组件库的主题色系
+ */
+
+/**
+ * @description 自定义主题色变量
+ * @property {Color} $primary - 主要颜色
+ * @property {Color} $success - 成功状态颜色
+ */
 $primary: #198754;
 $success: #0d6efd;
 
+/**
+  * @description 覆盖Element Plus默认主题变量
+  * @note forward必须写在最开始
+  * @see {@link https://element-plus.org/zh-CN/guide/theming.html}
+  */
 @forward "element-plus/theme-chalk/src/common/var.scss" with (
   $colors: (
     "primary": (
@@ -11,6 +25,8 @@ $success: #0d6efd;
       "base": $success,
     ),
   )
-); //forward必须写在最开始
+);
 
-// 然后在任意部位全局引入(不是像非暗色模式时按需引入需要去vite.config.ts修改配置项)
+/**
+  * @note 然后在任意部位全局引入(不是像非暗色模式时按需引入需要去vite.config.ts修改配置项)
+  */
