@@ -83,6 +83,13 @@
   </div>
 </template>
 <script lang="ts" setup>
+  /**
+   * @file aptitudeManagement.vue
+   * @description 小程序资质图片管理模块，包括新增、修改、删除及列表查询功能。
+   * @author [您的姓名]
+   * @date [当前日期]
+   */
+
   import {
     addAptitude,
     delAptitude,
@@ -101,14 +108,36 @@
     TableInstance,
   } from "element-plus";
   import { cloneDeep } from "lodash";
-  import { computed, onMounted, reactive, ref } from "vue";
+  import { computed, ComputedRef, onMounted, reactive, ref } from "vue";
+
   const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
 
   // 查询表单数据---------------------------------
+
+  /**
+   * 当前页码
+   */
   const currentPage = ref(1);
+
+  /**
+   * 分页存储
+   */
   const paginationStore = usePaginationStore();
+
+  /**
+   * 总记录数
+   */
   const total = ref(0);
+
+  /**
+   * 资质图片列表
+   */
   const aptitudeList = ref<AptitudeItem[]>([]);
+
+  /**
+   * 获取资质图片列表
+   * @function fetchAptitudeList
+   */
   const fetchAptitudeList = async () => {
     const res = await getAptitudeList({
       pageNum: currentPage.value,
@@ -120,24 +149,65 @@
     if (res.code === 200) {
       if (res.rows) aptitudeList.value = res.rows;
       if (res.total) total.value = res.total;
-    } else ElMessage.error(res.msg || "获取小程序资质图片列表失败");
+    } else {
+      ElMessage.error(res.msg || "获取小程序资质图片列表失败");
+    }
   };
+
   onMounted(fetchAptitudeList);
+
+  /**
+   * 刷新资质图片列表
+   * @function refreshList
+   */
   const refreshList = () => {
     currentPage.value = 1;
     fetchAptitudeList();
   };
 
   // 添加/修改表单-------------------------------------
+
+  /**
+   * 默认表单数据
+   * @type {AptitudeItem}
+   */
   const defaultForm: AptitudeItem = {
     sort: 0,
   };
+
+  /**
+   * 添加/编辑弹窗的显示状态
+   */
   const A_EVisible = ref(false);
+
+  /**
+   * 添加/编辑弹窗的标题
+   */
   const A_ETitle = ref("");
+
+  /**
+   * 是否为添加操作
+   */
   const isAdd = ref(true);
+
+  /**
+   * 添加/编辑表单数据
+   */
   const A_EFormData = reactive<AptitudeItem>(cloneDeep(defaultForm));
+
+  /**
+   * 添加/编辑表单引用
+   */
   const A_EFormRef = ref<FormInstance>();
+
+  /**
+   * 裁剪上传组件引用
+   */
   const cropperUploadRef = ref();
+
+  /**
+   * 是否显示清除按钮
+   */
   const showClearBtn = computed(() => {
     return (
       A_EFormData.image !== undefined &&
@@ -146,14 +216,20 @@
     );
   });
 
+  /**
+   * 表单验证规则
+   * @type {FormRules}
+   */
   const rules: FormRules = {
     image: [
       {
         required: true,
         validator: (_rule, value, callback) => {
-          if (!value && !croppedFile.value)
+          if (!value && !croppedFile.value) {
             callback(new Error("请上传小程序资质图片"));
-          else callback();
+          } else {
+            callback();
+          }
         },
         trigger: "change",
       },
@@ -162,21 +238,44 @@
   };
 
   // 图片相关
+
+  /**
+   * 裁剪后的文件
+   */
   const croppedFile = ref<File>();
-  const A_EImgUrl = computed(() =>
+
+  /**
+   * 添加/编辑图片的预览 URL
+   * @type {ComputedRef<string>}
+   */
+  const A_EImgUrl: ComputedRef<string> = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
       : BASEURL + A_EFormData.image
   );
-  const A_EImgPreviewSrcList = computed(() =>
+
+  /**
+   * 图片预览的源列表
+   * @type {ComputedRef<string[]>}
+   */
+  const A_EImgPreviewSrcList: ComputedRef<string[]> = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
       : [BASEURL + A_EFormData.image]
   );
+
+  /**
+   * 清除图片
+   * @function clearImg
+   */
   const clearImg = () => {
     A_EFormData.image = "";
   };
 
+  /**
+   * 打开添加资质图片弹窗
+   * @function toAddAptitude
+   */
   const toAddAptitude = () => {
     A_ETitle.value = "添加小程序资质图片";
     isAdd.value = true;
@@ -185,6 +284,11 @@
     A_EFormRef.value?.clearValidate();
   };
 
+  /**
+   * 打开编辑资质图片弹窗
+   * @function toEditAptitude
+   * @param {AptitudeItem} row - 要编辑的资质图片数据。
+   */
   const toEditAptitude = (row: AptitudeItem) => {
     A_ETitle.value = "修改小程序资质图片";
     isAdd.value = false;
@@ -193,10 +297,14 @@
     Object.assign(A_EFormData, row);
   };
 
-  // 提交表单
+  /**
+   * 提交表单
+   * @function submitForm
+   */
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (!valid) return;
+
       // 如果有裁剪的图片，先上传图片
       if (croppedFile.value) {
         const { croppedRes } = await cropperUploadRef.value.handleUpload();
@@ -217,16 +325,38 @@
         A_EVisible.value = false;
         ElMessage.success(`${A_ETitle.value}成功`);
         fetchAptitudeList();
-      } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+      } else {
+        ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+      }
     });
   };
 
   // 删除--------------------------------------
+
+  /**
+   * 已选中的资质图片
+   */
   const selectedAptitudes = ref<AptitudeItem[]>([]);
+
+  /**
+   * 表格组件引用
+   */
   const aptitudeTable = ref<TableInstance>();
+
+  /**
+   * 处理表格选中状态变化
+   * @function handleSelectionChange
+   * @param {AptitudeItem[]} selection - 当前选中的资质图片数据。
+   */
   const handleSelectionChange = (selection: AptitudeItem[]) => {
     selectedAptitudes.value = selection;
   };
+
+  /**
+   * 删除资质图片
+   * @function toDelAptitude
+   * @param {AptitudeItem} row - 要删除的资质图片数据。
+   */
   const toDelAptitude = (row: AptitudeItem) => {
     // 勾选当前行
     aptitudeTable.value?.toggleRowSelection(row, true);
@@ -243,9 +373,10 @@
         if (res.code === 200) {
           ElMessage.success("删除成功");
           selectedAptitudes.value = [];
-          // 假设有一个获取小程序资质图片列表的方法
           fetchAptitudeList();
-        } else ElMessage.error(res.msg || "删除失败");
+        } else {
+          ElMessage.error(res.msg || "删除失败");
+        }
       }
     );
   };
