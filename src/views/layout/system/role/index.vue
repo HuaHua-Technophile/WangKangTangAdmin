@@ -200,7 +200,15 @@
     </el-drawer>
   </div>
 </template>
+
 <script lang="ts" setup>
+  /**
+   * @fileoverview 角色管理页面逻辑脚本。
+   * 实现了角色的增删改查、角色授权用户的管理以及与菜单的关联操作。
+   * 使用 Vue 3 的组合式 API 和 TypeScript 提高代码的可读性和类型安全性。
+   */
+
+  // 引入角色管理相关的API方法和类型
   import {
     addRole,
     authUserCancel,
@@ -214,6 +222,8 @@
   } from "@/api/system/role";
   import { RoleItem } from "@/types/system/role";
   import { UserItem } from "@/types/system/user";
+
+  // 引入工具函数
   import { debugLog } from "@/utils/debug";
   import {
     getTagTypeByDictData,
@@ -222,29 +232,42 @@
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { formatTreeSelectByTree } from "@/utils/el-select/formatTreeSelectByTree";
   import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
+
+  // 引入第三方类型和组件
   import { AxiosResponse } from "axios";
   import { ElMessage, FormInstance, FormRules } from "element-plus";
   import { onBeforeMount, onMounted, reactive, ref, toRaw } from "vue";
   import UserListTable from "./UserListTable.vue";
+
+  // 引入状态管理
   import { usePaginationStore } from "@/stores/pagination";
   import { useDictStore } from "@/stores/dictData";
+
+  // 引入树形选择类型
   import { TreeSelectItem } from "@/types/treeSelect";
 
-  // 字典数据--------------
+  /**
+   * 加载字典数据，用于角色状态。
+   */
   const dictStore = useDictStore();
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_normal_disable");
   });
 
-  // 请求角色列表-----------
-  const roleList = ref<RoleItem[]>([]);
+  /**
+   * 角色列表相关状态和方法。
+   */
+  const roleList = ref<RoleItem[]>([]); // 角色列表
   const queryParams = reactive<
     Pick<RoleItem, "roleName" | "roleKey" | "status">
-  >({});
-  const total = ref(0);
-  const paginationStore = usePaginationStore();
+  >({}); // 查询参数
+  const total = ref(0); // 总记录数
+  const paginationStore = usePaginationStore(); // 分页状态
+  const currentPage = ref(1); // 当前页码
 
-  const currentPage = ref(1);
+  /**
+   * 获取角色列表。
+   */
   const fetchRoleList = async () => {
     const res = await getRoleList({
       pageNum: currentPage.value,
@@ -255,25 +278,33 @@
     if (res.rows) roleList.value = res.rows;
     if (res.total) total.value = res.total;
   };
+
+  // 页面加载时获取角色列表
   onMounted(fetchRoleList);
+
+  /**
+   * 刷新角色列表。
+   */
   const refreshList = () => {
     currentPage.value = 1;
     fetchRoleList();
   };
 
-  // 添加/修改表单--------------
-  const isAdd = ref(true);
-  const A_EVisible = ref(false);
-  const A_ETitle = ref("");
+  /**
+   * 添加/修改角色表单相关状态和方法。
+   */
+  const isAdd = ref(true); // 是否为添加操作
+  const A_EVisible = ref(false); // 表单弹窗可见性
+  const A_ETitle = ref(""); // 表单标题
   const defaultForm: RoleItem = {
     roleKey: undefined,
     roleName: undefined,
     roleSort: undefined,
     status: "0",
     menuIds: [],
-  };
-  let A_EFormData: RoleItem;
-  const menuTreeSelect = ref<TreeSelectItem[]>([]);
+  }; // 默认表单数据
+  let A_EFormData: RoleItem; // 当前表单数据
+  const menuTreeSelect = ref<TreeSelectItem[]>([]); // 菜单树形选择数据
   const rules: FormRules = {
     roleKey: [
       { required: true, message: "请输入权限字符", trigger: "blur" },
@@ -282,18 +313,16 @@
     ],
     roleName: [
       { required: true, message: "请输入角色名称", trigger: "blur" },
-      {
-        max: 10,
-        message: "角色名称长度不能超过10个字符",
-        trigger: "blur",
-      },
+      { max: 10, message: "角色名称长度不能超过10个字符", trigger: "blur" },
     ],
     roleSort: [{ required: true, message: "请输入排序", trigger: "blur" }],
-  };
-  let A_EFun: (data: RoleItem) => Promise<AxiosResponse>;
+  }; // 表单校验规则
+  let A_EFun: (data: RoleItem) => Promise<AxiosResponse>; // 当前提交表单的API方法
+  const A_EFormRef = ref<FormInstance>(); // 表单引用
 
-  // 提交函数
-  const A_EFormRef = ref<FormInstance>();
+  /**
+   * 提交表单。
+   */
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
@@ -303,11 +332,16 @@
           A_EVisible.value = false;
           ElMessage.success(`${A_ETitle.value}成功`);
           fetchRoleList();
-        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+        } else {
+          ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+        }
       }
     });
   };
-  // 添加角色---------------
+
+  /**
+   * 添加角色操作。
+   */
   const toAddRole = async () => {
     A_ETitle.value = "添加角色";
     isAdd.value = true;
@@ -316,7 +350,12 @@
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
-  // 修改角色--------------
+
+  /**
+   * 修改角色操作。
+   *
+   * @param {RoleItem} row - 要修改的角色数据。
+   */
   const toEditRole = async (row: RoleItem) => {
     A_ETitle.value = "修改角色";
     isAdd.value = false;
@@ -345,7 +384,12 @@
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
-  // 删除角色--------------
+
+  /**
+   * 删除角色操作。
+   *
+   * @param {RoleItem} row - 要删除的角色数据。
+   */
   const toDelRole = (row: RoleItem) => {
     elMessageBoxConfirm(
       `删除角色:${row.roleName} , ID:${row.roleId}`,
@@ -360,27 +404,27 @@
     );
   };
 
-  // 抽屉可见性
-  const drawerVisible = ref(false);
+  /**
+   * 抽屉相关状态和方法。
+   */
+  const drawerVisible = ref(false); // 抽屉可见性
+  const currentRoleId = ref<number>(); // 当前选中的角色ID
+  const allocatedUsers = ref<UserItem[]>([]); // 已授权用户列表
+  const allocatedPageNum = ref(1); // 已授权用户当前页码
+  const allocatedPageSize = ref(10); // 已授权用户每页数量
+  const allocatedTotal = ref(0); // 已授权用户总数
+  const selectedAllocatedUsers = ref([]); // 已授权用户选中项
+  const unallocatedUsers = ref<UserItem[]>([]); // 未授权用户列表
+  const unallocatedPageNum = ref(1); // 未授权用户当前页码
+  const unallocatedPageSize = ref(10); // 未授权用户每页数量
+  const unallocatedTotal = ref(0); // 未授权用户总数
+  const selectedUnallocatedUsers = ref([]); // 未授权用户选中项
 
-  // 当前选中的角色ID
-  const currentRoleId = ref<number>();
-
-  // 已授权用户列表状态
-  const allocatedUsers = ref<UserItem[]>([]);
-  const allocatedPageNum = ref(1);
-  const allocatedPageSize = ref(10);
-  const allocatedTotal = ref(0);
-  const selectedAllocatedUsers = ref([]);
-
-  // 未授权用户列表状态
-  const unallocatedUsers = ref<UserItem[]>([]);
-  const unallocatedPageNum = ref(1);
-  const unallocatedPageSize = ref(10);
-  const unallocatedTotal = ref(0);
-  const selectedUnallocatedUsers = ref([]);
-
-  // 打开抽屉
+  /**
+   * 打开用户授权管理抽屉。
+   *
+   * @param {number} roleId - 当前角色ID。
+   */
   const openDrawer = async (roleId: number) => {
     debugLog("打开抽屉, 角色ID=>", roleId);
     currentRoleId.value = roleId;
@@ -389,7 +433,9 @@
     drawerVisible.value = true;
   };
 
-  // 获取已授权用户列表
+  /**
+   * 获取已授权用户列表。
+   */
   const fetchAllocatedUsers = async () => {
     const res = await getAuthUserAllocatedList({
       pageNum: allocatedPageNum.value,
@@ -404,7 +450,9 @@
     }
   };
 
-  // 获取未授权用户列表
+  /**
+   * 获取未授权用户列表。
+   */
   const fetchUnallocatedUsers = async () => {
     const res = await getAuthUserUnallocatedList({
       pageNum: unallocatedPageNum.value,
@@ -418,11 +466,20 @@
       unallocatedUsers.value = res.rows;
     }
   };
+
+  /**
+   * 重置选中项。
+   */
   const resetSelection = () => {
     selectedAllocatedUsers.value = [];
     selectedUnallocatedUsers.value = [];
   };
-  // 取消授权
+
+  /**
+   * 取消用户授权。
+   *
+   * @param {UserItem[]} users - 要取消授权的用户列表。
+   */
   const cancelAuthorization = async (users: UserItem[]) => {
     debugLog("勾选了这些用户:", toRaw(users));
     const userIds = users.map((user) => user.userId!);
@@ -443,7 +500,11 @@
     }
   };
 
-  // 授权
+  /**
+   * 授权用户。
+   *
+   * @param {UserItem[]} users - 要授权的用户列表。
+   */
   const grantAuthorization = async (users: UserItem[]) => {
     debugLog("勾选了这些用户:", toRaw(users));
     const userIds = users.map((user) => user.userId!);

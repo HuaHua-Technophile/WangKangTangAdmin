@@ -55,14 +55,43 @@
 </template>
 
 <script setup lang="ts">
+  /**
+   * @fileoverview 用户列表组件逻辑脚本。
+   * 提供了分页、选中用户操作以及触发自定义事件的功能。
+   * 使用 Vue 3 的组合式 API 和 TypeScript 提高代码的类型安全性和可读性。
+   */
+
+  // 引入类型和工具函数
   import { UserItem } from "@/types/system/user";
   import { toRaw } from "vue";
 
+  /**
+   * 组件的 props 定义，包含用户列表、分页信息和操作按钮文本。
+   */
   const props = withDefaults(
     defineProps<{
+      /**
+       * 用户列表数据
+       * @type {UserItem[]}
+       */
       users: UserItem[];
+
+      /**
+       * 总记录数
+       * @type {number}
+       */
       total: number;
+
+      /**
+       * 每页显示的记录数
+       * @type {number}
+       */
       pageSize: number;
+
+      /**
+       * 操作按钮的文本
+       * @type {string}
+       */
       actionText: string;
     }>(),
     {
@@ -72,24 +101,58 @@
     }
   );
 
+  /**
+   * 当前页码，支持双向绑定。
+   * @model currentPage
+   */
   const currentPage = defineModel<number>("currentPage");
+
+  /**
+   * 当前选中的用户列表，支持双向绑定。
+   * @model selectedUsers
+   * @default []
+   */
   const selectedUsers = defineModel<UserItem[]>("selectedUsers", {
     default: [],
   });
 
+  /**
+   * 处理用户选中状态变化。
+   * 将选中的用户列表更新到 `selectedUsers` 中。
+   *
+   * @param {UserItem[]} selection - 当前选中的用户列表。
+   */
   const handleSelectionChange = (selection: UserItem[]) => {
     selectedUsers.value = selection.map((item) => toRaw(item));
   };
 
+  /**
+   * 处理分页切换事件。
+   * 更新当前页码。
+   *
+   * @param {number} page - 当前页码。
+   */
   const handleCurrentChange = (page: number) => {
     currentPage.value = page;
   };
 
-  // 触发action事件，并传递选中的用户
+  /**
+   * 定义组件的自定义事件。
+   * @event action - 当点击操作按钮时触发，传递选中的用户列表。
+   * @param {UserItem[]} users - 当前选中的用户列表。
+   */
   const emit = defineEmits<{
+    /**
+     * 触发操作事件
+     * @param {UserItem[]} users - 当前选中的用户列表
+     */
     (e: "action", users: UserItem[]): void;
   }>();
 
+  /**
+   * 处理操作按钮的点击事件。
+   * 如果有选中的用户，则触发 `action` 事件并传递选中的用户列表。
+   */
   const handleAction = () => {
     if (selectedUsers.value.length) emit("action", selectedUsers.value);
   };
