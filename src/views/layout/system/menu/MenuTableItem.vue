@@ -85,62 +85,111 @@
     </template>
   </el-table-column>
 </template>
+
 <script lang="ts" setup>
-  import { delMenu, editMenu, getMenuTreeSelect } from "@/api/system/menu";
-  import { MenuItem } from "@/types/system/menu";
-  import { debugLog } from "@/utils/debug";
-  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
-  import { formatTreeSelectByTree } from "@/utils/el-select/formatTreeSelectByTree";
+  /** * @fileoverview 菜单管理的操作逻辑。 *
+包括修改菜单、删除菜单以及相关表单和数据的处理。 * 使用 Vue 3 组合式 API 和
+TypeScript 实现，结合 Element Plus 的 UI 组件。 */
+
+  import { delMenu, editMenu, getMenuTreeSelect } from "@/api/system/menu"; // 菜单 API
+  import { MenuItem } from "@/types/system/menu"; // 菜单类型
+  import { debugLog } from "@/utils/debug"; // 调试日志工具
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm"; // 确认框工具
+  import { formatTreeSelectByTree } from "@/utils/el-select/formatTreeSelectByTree"; // 树形选择格式化工具
   import {
     getTagTypeByDictData,
     getLabelByDictData,
-  } from "@/utils/system/dict/dictDataToOptions";
-  import { AxiosResponse } from "axios";
-  import { ElMessage } from "element-plus";
-  import { onBeforeMount, reactive } from "vue";
-  import { useDictStore } from "@/stores/dictData";
-  import { TreeSelectItem } from "@/types/treeSelect";
+  } from "@/utils/system/dict/dictDataToOptions"; // 字典数据工具
+  import { AxiosResponse } from "axios"; // Axios 类型
+  import { ElMessage } from "element-plus"; // Element Plus 消息提示
+  import { onBeforeMount, reactive } from "vue"; // Vue 组合式 API
+  import { useDictStore } from "@/stores/dictData"; // 字典数据状态管理
+  import { TreeSelectItem } from "@/types/treeSelect"; // 树选择项类型
+
+  /**
+   * 组件接收的 props 定义。
+   * @property {() => void} fetchMenuList - 重新获取菜单列表的方法。
+   */
   const props = defineProps<{
     fetchMenuList: () => void;
   }>();
 
-  // 字典数据--------------------
+  /**
+   * 字典数据状态管理。
+   * 用于获取系统字典数据。
+   */
   const dictStore = useDictStore();
+
+  /**
+   * 在组件挂载前获取字典数据。
+   */
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_normal_disable", "sys_show_hide");
   });
 
-  // 表单-----------------------
+  /**
+   * 添加/编辑弹窗的可见性。
+   */
   const A_EVisible = defineModel<boolean>("A_EVisible");
+
+  /**
+   * 添加/编辑弹窗的标题。
+   */
   const A_ETitle = defineModel<string>("A_ETitle");
+
+  /**
+   * 是否为添加操作。
+   */
   const isAdd = defineModel<boolean>("isAdd");
+
+  /**
+   * 添加/编辑的请求方法。
+   */
   const A_EFun =
     defineModel<(params: MenuItem) => Promise<AxiosResponse>>("A_EFun");
+
+  /**
+   * 表单数据。
+   */
   const A_EFormData = defineModel<MenuItem>("A_EFormData");
+
+  /**
+   * 菜单树选择数据。
+   */
   const MenuTreeSelect = defineModel<TreeSelectItem[]>("MenuTreeSelect");
 
-  // 切换编辑状态------------------
+  /**
+   * 切换到编辑菜单状态。
+   * 初始化表单数据并打开编辑菜单弹窗。
+   * @param {MenuItem} row - 要编辑的菜单项数据。
+   */
   const toEditMenu = async (row: MenuItem) => {
     A_ETitle.value = "修改菜单";
     isAdd.value = false;
     A_EFun.value = editMenu;
     debugLog("点击了这一行=>", row);
+
+    // 初始化表单数据
     A_EFormData.value = reactive<MenuItem>({
       menuId: row.menuId,
       menuName: row.menuName,
-      menuType: row.menuType, //M目录 C菜单  F按钮
+      menuType: row.menuType, // M目录 C菜单 F按钮
       orderNum: row.orderNum,
       parentId: row.parentId,
       path: row.path,
       component: row.component,
-      perms: row.perms, //权限字符串
-      icon: row.icon, //图标
+      perms: row.perms, // 权限字符串
+      icon: row.icon, // 图标
       isFrame: row.isFrame,
       isCache: row.isCache,
-      visible: row.visible, //0显示 1隐藏
-      status: row.status, //0正常 1停用
+      visible: row.visible, // 0显示 1隐藏
+      status: row.status, // 0正常 1停用
     });
+
+    // 打开弹窗
     A_EVisible.value = true;
+
+    // 获取菜单树选择数据
     const res = (await getMenuTreeSelect()).data;
     MenuTreeSelect.value = await formatTreeSelectByTree({
       flat: res,
@@ -149,16 +198,23 @@
     debugLog("下拉树菜单列表=>", res, "格式化后=>", MenuTreeSelect.value);
   };
 
-  // 直接删除-------------------
+  /**
+   * 删除菜单。
+   * 弹出确认框并执行删除操作。
+   * @param {MenuItem} row - 要删除的菜单项数据。
+   */
   const toDelMenu = (row: MenuItem) => {
     elMessageBoxConfirm(
-      `删除菜单:${row.menuName} , ID:${row.menuId}`,
+      `删除菜单:${row.menuName} , ID:${row.menuId}`, // 确认框内容
       async () => {
         if (row.menuId) {
-          const res = await delMenu(row.menuId);
+          const res = await delMenu(row.menuId); // 调用删除接口
           debugLog("删除菜单结果=>", res);
-          if (res.code === 200) props.fetchMenuList();
-          else ElMessage.error(res.msg);
+          if (res.code === 200) {
+            props.fetchMenuList(); // 删除成功后重新获取菜单列表
+          } else {
+            ElMessage.error(res.msg); // 显示错误消息
+          }
         }
       }
     );

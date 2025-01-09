@@ -40,11 +40,19 @@
   </el-table>
 </template>
 <script lang="ts" setup>
-  import { useThemeStore } from "@/stores/theme";
+  import { useThemeStore } from "@/stores/theme"; // 引入主题状态管理
 
+  /**
+   * 组件接收的 props 定义。
+   * @property {any[]} [data] - 表格数据，可选。
+   * @property {number} [level=1] - 表格层级，默认为 1。
+   */
   const props = withDefaults(defineProps<{ data?: any[]; level?: number }>(), {
-    level: 1,
+    level: 1, // 默认值
   });
 
+  /**
+   * 主题状态管理，通过 Pinia 获取是否为暗黑模式。
+   */
   const themeStore = useThemeStore();
 </script>
