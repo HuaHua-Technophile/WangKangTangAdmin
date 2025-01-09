@@ -1,3 +1,8 @@
+/**
+ * @file dictApi.ts
+ * @description 定义与字典类型和字典数据相关的API请求方法，支持字典的增删改查功能。
+ */
+
 import { customRequest } from "@/api/instance";
 import {
   DictDataItem,
@@ -6,7 +11,11 @@ import {
   DictTypeParams,
 } from "@/types/system/dict";
 
-// 1. 查询字典类型列表
+/**
+ * @function getDictTypeList
+ * @description 查询字典类型列表
+ * @param {DictTypeParams} params - 查询参数，包括分页信息和筛选条件
+ */
 export const getDictTypeList = (params: DictTypeParams) => {
   return customRequest<DictTypeItem[]>(
     {
@@ -18,7 +27,11 @@ export const getDictTypeList = (params: DictTypeParams) => {
   );
 };
 
-// 2. 删除字典类型
+/**
+ * @function delDictTypes
+ * @description 删除字典类型
+ * @param {number[]} dictIds - 要删除的字典类型ID数组
+ */
 export const delDictTypes = (dictIds: number[]) => {
   return customRequest(
     {
@@ -29,7 +42,11 @@ export const delDictTypes = (dictIds: number[]) => {
   );
 };
 
-// 3. 新增字典类型
+/**
+ * @function addDictType
+ * @description 新增字典类型
+ * @param {Omit<DictTypeItem, "dictId">} data - 新增的字典类型数据，省略dictId字段
+ */
 export const addDictType = (data: Omit<DictTypeItem, "dictId">) => {
   return customRequest(
     {
@@ -41,7 +58,11 @@ export const addDictType = (data: Omit<DictTypeItem, "dictId">) => {
   );
 };
 
-// 4. 修改字典类型
+/**
+ * @function editDictType
+ * @description 修改字典类型
+ * @param {DictTypeItem} data - 修改后的字典类型数据
+ */
 export const editDictType = (data: DictTypeItem) => {
   return customRequest(
     {
@@ -53,7 +74,11 @@ export const editDictType = (data: DictTypeItem) => {
   );
 };
 
-// 1. 查询字典数据列表
+/**
+ * @function getDictDataList
+ * @description 查询字典数据列表
+ * @param {DictDataParams} params - 查询参数，包括分页信息和筛选条件
+ */
 export const getDictDataList = (params: DictDataParams) => {
   return customRequest<DictDataItem[]>(
     {
@@ -65,7 +90,11 @@ export const getDictDataList = (params: DictDataParams) => {
   );
 };
 
-// 2. 删除字典数据
+/**
+ * @function delDictData
+ * @description 删除字典数据
+ * @param {number[]} dictCodes - 要删除的字典数据的唯一标识符数组
+ */
 export const delDictData = (dictCodes: number[]) => {
   return customRequest(
     {
@@ -76,7 +105,11 @@ export const delDictData = (dictCodes: number[]) => {
   );
 };
 
-// 3. 新增字典数据
+/**
+ * @function addDictData
+ * @description 新增字典数据
+ * @param {Omit<DictDataItem, "dictCode">} data - 新增的字典数据，省略dictCode字段
+ */
 export const addDictData = (data: Omit<DictDataItem, "dictCode">) => {
   return customRequest(
     {
@@ -88,7 +121,11 @@ export const addDictData = (data: Omit<DictDataItem, "dictCode">) => {
   );
 };
 
-// 4. 修改字典数据
+/**
+ * @function editDictData
+ * @description 修改字典数据
+ * @param {DictDataItem} data - 修改后的字典数据
+ */
 export const editDictData = (data: DictDataItem) => {
   return customRequest(
     {
@@ -100,7 +137,11 @@ export const editDictData = (data: DictDataItem) => {
   );
 };
 
-// 5.系统选单中，获取字典数据
+/**
+ * @function getDictDataByDictType
+ * @description 根据字典类型获取字典数据
+ * @param {string} dictType - 字典类型标识
+ */
 export const getDictDataByDictType = (dictType: string) => {
   return customRequest<DictDataItem[]>(
     {

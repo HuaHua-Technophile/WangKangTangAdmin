@@ -115,8 +115,10 @@
         <span class="ms-2" v-if="isEditingDictType && A_EFormData.dictId">
           ID:{{ A_EFormData.dictId }}
         </span>
-        <span class="ms-2" v-if="!isEditingDictType && dictDataForm.dictCode">
-          ID:{{ dictDataForm.dictCode }}
+        <span
+          class="ms-2"
+          v-if="!isEditingDictType && dictDataFormData.dictCode">
+          ID:{{ dictDataFormData.dictCode }}
         </span>
       </template>
 
@@ -147,25 +149,25 @@
       <!-- 字典数据表单 -->
       <el-form
         v-else
-        :model="dictDataForm"
+        :model="dictDataFormData"
         label-width="auto"
         :rules="dictDataRules"
         ref="dictDataFormRef">
         <el-form-item label="父字典类型" prop="dictType">
-          <el-input v-model="dictDataForm.dictType" disabled />
+          <el-input v-model="dictDataFormData.dictType" disabled />
         </el-form-item>
         <el-form-item label="数据标签" prop="dictLabel">
-          <el-input v-model="dictDataForm.dictLabel" clearable />
+          <el-input v-model="dictDataFormData.dictLabel" clearable />
         </el-form-item>
         <el-form-item label="数据键值" prop="dictValue">
-          <el-input v-model="dictDataForm.dictValue" clearable />
+          <el-input v-model="dictDataFormData.dictValue" clearable />
         </el-form-item>
         <div class="d-flex align-items-center justify-content-between">
           <el-form-item label="显示排序" prop="dictSort">
-            <el-input-number v-model="dictDataForm.dictSort" :min="0" />
+            <el-input-number v-model="dictDataFormData.dictSort" :min="0" />
           </el-form-item>
           <el-form-item label="状态" prop="status">
-            <el-radio-group v-model="dictDataForm.status">
+            <el-radio-group v-model="dictDataFormData.status">
               <el-radio-button
                 v-for="i in dictStore.dictData.sys_normal_disable"
                 :value="i.dictValue"
@@ -175,11 +177,11 @@
           </el-form-item>
         </div>
         <el-form-item label="样式属性" prop="cssClass">
-          <el-input v-model="dictDataForm.cssClass" clearable />
+          <el-input v-model="dictDataFormData.cssClass" clearable />
         </el-form-item>
         <el-form-item label="回显样式" prop="listClass">
           <el-select
-            v-model="dictDataForm.listClass"
+            v-model="dictDataFormData.listClass"
             placeholder="可选择回显样式">
             <el-option label="默认(default)" value="default" />
             <el-option label="主要(primary)" value="primary" />
@@ -246,15 +248,25 @@
     </el-drawer>
   </div>
 </template>
-
 <script setup lang="ts">
+  /**
+   * @file Dict Management Component
+   * @description 负责字典类型和字典数据的管理，包括增删改查功能。
+   * @module DictManagement
+   * @author
+   * @date
+   */
+
+  // 导入Vue相关API
   import { ref, reactive, onMounted, onBeforeMount } from "vue";
+  // 导入Element Plus组件类型
   import {
     ElMessage,
     FormInstance,
     FormRules,
     TableInstance,
   } from "element-plus";
+  // 导入API函数
   import {
     getDictTypeList,
     delDictTypes,
@@ -265,7 +277,9 @@
     editDictData,
     addDictData,
   } from "@/api/system/dict";
+  // 导入类型定义
   import { DictDataItem, DictTypeItem } from "@/types/system/dict";
+  // 导入工具函数
   import {
     validateLowerCaseAlphaNumericUnderscore,
     validateNoChineseOrSpaces,
@@ -273,6 +287,7 @@
   import { debugLog } from "@/utils/debug";
   import { cloneDeep } from "lodash";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
+  // 导入状态管理
   import { usePaginationStore } from "@/stores/pagination";
   import { useDictStore } from "@/stores/dictData";
   import {
@@ -280,20 +295,28 @@
     getLabelByDictData,
   } from "@/utils/system/dict/dictDataToOptions";
 
-  // 字典数据---------------
+  /**
+   * @description 初始化字典数据
+   */
   const dictStore = useDictStore();
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_normal_disable");
   });
-  // 搜索表单------------------------
+
+  // 搜索表单状态
   const queryParams = reactive<DictTypeItem>({
     status: "",
   });
+
+  // 字典类型列表及分页状态
   const dictTypeList = ref<DictTypeItem[]>();
   const total = ref(0);
   const paginationStore = usePaginationStore();
   const currentPage = ref(1);
-  // 获取字典类型列表--------------------------
+
+  /**
+   * @description 获取字典类型列表
+   */
   const fetchDictTypeList = async () => {
     const res = await getDictTypeList({
       pageNum: currentPage.value,
@@ -304,15 +327,23 @@
     if (res.rows && res.total !== undefined) {
       dictTypeList.value = res.rows;
       total.value = res.total;
-    } else ElMessage.error(res.msg || "获取字典类型列表失败");
+    } else {
+      ElMessage.error(res.msg || "获取字典类型列表失败");
+    }
   };
+
+  // 页面挂载时获取字典类型列表
   onMounted(fetchDictTypeList);
+
+  /**
+   * @description 刷新字典类型列表
+   */
   const refreshList = () => {
     currentPage.value = 1;
     fetchDictTypeList();
   };
 
-  // 字典类型--------------------
+  // 字典类型表单状态
   const A_EVisible = ref(false);
   const A_ETitle = ref("");
   const isEditingDictType = ref(true);
@@ -323,7 +354,9 @@
     status: "0",
   };
 
-  // 新增字典类型-------------------------------
+  /**
+   * @description 新增字典类型
+   */
   const toAddDictType = () => {
     isEditingDictType.value = true;
     A_ETitle.value = "新增字典类型";
@@ -332,7 +365,10 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 编辑字典类型-----------------------
+  /**
+   * @description 编辑字典类型
+   * @param {DictTypeItem} row - 字典类型数据
+   */
   const toEditDictType = (row: DictTypeItem) => {
     isEditingDictType.value = true;
     A_ETitle.value = "编辑字典类型";
@@ -347,14 +383,25 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 删除字典类型--------------------
+  // 选中的字典类型列表
   const selectedDictTypes = ref<DictTypeItem[]>([]);
+
+  /**
+   * @description 处理表格行选择变化
+   * @param {DictTypeItem[]} selection - 当前选中的行
+   */
   const handleSelectionChange = (selection: DictTypeItem[]) => {
     selectedDictTypes.value = selection;
   };
+
+  // 字典类型表格实例
   const dictTable = ref<TableInstance>();
+
+  /**
+   * @description 删除字典类型
+   * @param {DictTypeItem} row - 字典类型数据
+   */
   const toDelDictType = (row: DictTypeItem) => {
-    // 勾选被点击的行
     dictTable.value?.toggleRowSelection(row, true);
     elMessageBoxConfirm(
       `删除以下${
@@ -369,19 +416,23 @@
         if (res.code === 200) {
           ElMessage.success(res.msg);
           fetchDictTypeList();
-        } else ElMessage.error(res.msg || "删除失败");
+        } else {
+          ElMessage.error(res.msg || "删除失败");
+        }
       }
     );
   };
 
-  // 字典数据相关-------------------
+  // 字典数据相关状态
   const drawerVisible = ref(false);
   const currentDictType = ref<DictTypeItem>();
   const dictDataList = ref<DictDataItem[]>([]);
   const dictDataTotal = ref(0);
   const dictDataCurrentPage = ref(1);
 
-  // 获取字典数据列表-------------------
+  /**
+   * @description 获取字典数据列表
+   */
   const fetchDictDataList = async () => {
     if (!currentDictType.value) return;
     const res = await getDictDataList({
@@ -393,31 +444,44 @@
     if (res.rows && res.total !== undefined) {
       dictDataList.value = res.rows;
       dictDataTotal.value = res.total;
-    } else ElMessage.error(res.msg || "获取字典数据列表失败");
+    } else {
+      ElMessage.error(res.msg || "获取字典数据列表失败");
+    }
   };
+
+  /**
+   * @description 刷新字典数据列表
+   */
   const refreshList2 = () => {
     currentPage.value = 1;
     fetchDictDataList();
   };
 
-  // 打开字典数据抽屉---------------
+  /**
+   * @description 打开字典数据抽屉
+   * @param {DictTypeItem} row - 字典类型数据
+   */
   const openDictDataDrawer = (row: DictTypeItem) => {
     currentDictType.value = row;
     drawerVisible.value = true;
     dictDataCurrentPage.value = 1;
     fetchDictDataList();
   };
-  // 字典数据表单--------------
-  let dictDataForm: DictDataItem;
+
+  // 字典数据表单状态
+  let dictDataFormData: DictDataItem;
   const dictDatadefaultForm: DictDataItem = {
     status: "0",
     dictSort: 0,
   };
-  // 新增字典数据
+
+  /**
+   * @description 新增字典数据
+   */
   const toAddDictData = () => {
     isEditingDictType.value = false;
     A_ETitle.value = "新增字典数据";
-    dictDataForm = reactive({
+    dictDataFormData = reactive({
       dictType: currentDictType.value?.dictType,
       ...dictDatadefaultForm,
     });
@@ -425,11 +489,14 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 编辑字典数据
+  /**
+   * @description 编辑字典数据
+   * @param {DictDataItem} row - 字典数据
+   */
   const toEditDictData = (row: DictDataItem) => {
     isEditingDictType.value = false;
     A_ETitle.value = "编辑字典数据";
-    dictDataForm = reactive({
+    dictDataFormData = reactive({
       dictCode: row.dictCode,
       dictType: row.dictType,
       dictLabel: row.dictLabel,
@@ -443,12 +510,24 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 删除字典数据
+  // 选中的字典数据列表
   const selectedDictData = ref<DictDataItem[]>([]);
-  const dictDataTable = ref<TableInstance>();
+
+  /**
+   * @description 处理字典数据表格行选择变化
+   * @param {DictDataItem[]} selection - 当前选中的行
+   */
   const handleDictDataSelectionChange = (selection: DictDataItem[]) => {
     selectedDictData.value = selection;
   };
+
+  // 字典数据表格实例
+  const dictDataTable = ref<TableInstance>();
+
+  /**
+   * @description 删除字典数据
+   * @param {DictDataItem} row - 字典数据
+   */
   const toDelDictData = (row: DictDataItem) => {
     dictDataTable.value?.toggleRowSelection(row, true);
     elMessageBoxConfirm(
@@ -464,12 +543,14 @@
         if (res.code === 200) {
           ElMessage.success(res.msg);
           fetchDictDataList();
-        } else ElMessage.error(res.msg || "删除失败");
+        } else {
+          ElMessage.error(res.msg || "删除失败");
+        }
       }
     );
   };
 
-  // 表单提交-------------------
+  // 表单引用及校验规则
   const A_EFormRef = ref<FormInstance>();
   const dictDataFormRef = ref<FormInstance>();
   const rules: FormRules = {
@@ -506,6 +587,10 @@
       { max: 100, message: "样式属性长度不能超过100个字符", trigger: "blur" },
     ],
   };
+
+  /**
+   * @description 表单提交处理
+   */
   const handleSubmit = async () => {
     const formRef = isEditingDictType.value
       ? A_EFormRef.value
@@ -513,21 +598,24 @@
     formRef?.validate(async (valid) => {
       if (valid) {
         let res;
-        if (isEditingDictType.value)
+        if (isEditingDictType.value) {
           res = await (A_EFormData.dictId ? editDictType : addDictType)(
             A_EFormData
           );
-        else
-          res = await (dictDataForm.dictCode ? editDictData : addDictData)(
-            dictDataForm
+        } else {
+          res = await (dictDataFormData.dictCode ? editDictData : addDictData)(
+            dictDataFormData
           );
+        }
 
         debugLog(`${A_ETitle.value}结果=>`, res);
         if (res.code === 200) {
           A_EVisible.value = false;
           ElMessage.success(res.msg);
           isEditingDictType.value ? fetchDictTypeList() : fetchDictDataList();
-        } else ElMessage.error(res.msg || "提交失败");
+        } else {
+          ElMessage.error(res.msg || "提交失败");
+        }
       }
     });
   };
