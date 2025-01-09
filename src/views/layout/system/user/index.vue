@@ -217,6 +217,14 @@
   </div>
 </template>
 <script setup lang="ts">
+  /**
+   * @file 用户管理页面逻辑
+   * @description 提供用户管理页面的核心逻辑，包括用户列表的获取、添加、修改、删除以及密码重置等功能。
+   * @module views/system/user
+   * @author [您的名字]
+   * @date [更新日期]
+   */
+
   import { ref, reactive, onMounted, onBeforeMount } from "vue";
   import {
     ElMessage,
@@ -246,22 +254,33 @@
   } from "@/utils/system/dict/dictDataToOptions";
   import { getConfigValueByConfigKey } from "@/api/system/config";
 
-  // 字典数据------------------
+  /**
+   * @description 字典数据管理
+   */
   const dictStore = useDictStore();
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_normal_disable", "sys_user_sex");
   });
-  // 搜索用户列表------------------
+
+  /**
+   * @description 用户列表查询参数
+   */
   const queryParams = reactive<
     Pick<UserItem, "phonenumber" | "userName" | "status">
   >({
     status: "",
   });
+
   const currentPage = ref(1);
   const paginationStore = usePaginationStore();
   const total = ref(0);
   const userList = ref<UserItem[]>([]);
-  // 获取用户列表
+
+  /**
+   * @description 获取用户列表
+   * @async
+   * @function fetchUserList
+   */
   const fetchUserList = async () => {
     const res = await getUserList({
       pageNum: currentPage.value,
@@ -272,16 +291,25 @@
     if (res.code === 200) {
       if (res.rows) userList.value = res.rows;
       if (res.total) total.value = res.total;
-    } else ElMessage.error(res.msg || "获取用户列表失败");
+    } else {
+      ElMessage.error(res.msg || "获取用户列表失败");
+    }
   };
+
+  /**
+   * @description 刷新用户列表
+   */
   const refreshList = () => {
     currentPage.value = 1;
     fetchUserList();
   };
+
   // 组件挂载时获取用户列表
   onMounted(fetchUserList);
 
-  // 添加/修改表单--------------
+  /**
+   * @description 添加或修改用户表单逻辑
+   */
   const isAdd = ref(true);
   const A_EVisible = ref(false);
   const A_ETitle = ref("");
@@ -298,6 +326,9 @@
   let A_EFormData: UserFormData;
   let A_EFun: (data: UserItem) => Promise<AxiosResponse>;
 
+  /**
+   * @description 表单验证规则
+   */
   const rules: FormRules = {
     userName: userNameRule,
     nickName: [{ required: true, message: "请输入昵称", trigger: "blur" }],
@@ -341,9 +372,13 @@
     status: [{ required: true, message: "请选择状态", trigger: "change" }],
   };
 
-  // 提交表单--------------------------
   const A_EFormRef = ref<FormInstance>();
 
+  /**
+   * @description 提交表单
+   * @async
+   * @function submitForm
+   */
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
@@ -353,12 +388,16 @@
           ElMessage.success(`${A_ETitle.value}成功`);
           A_EVisible.value = false;
           fetchUserList();
-        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+        } else {
+          ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+        }
       }
     });
   };
 
-  // 添加用户-----------------------
+  /**
+   * @description 添加用户
+   */
   const toAddUser = () => {
     A_ETitle.value = "添加用户";
     isAdd.value = true;
@@ -368,7 +407,10 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 修改用户------------
+  /**
+   * @description 修改用户
+   * @param {UserItem} data - 用户数据
+   */
   const toEditUser = (data: UserItem) => {
     A_ETitle.value = "修改用户";
     isAdd.value = false;
@@ -388,18 +430,28 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 删除用户--------------
+  /**
+   * @description 删除用户
+   */
   const selectedUsers = ref<UserItem[]>([]);
   const userTable = ref<TableInstance>();
-  // 定义选择行的条件
   const selectable = (row: any) => {
     return !row.admin; // 如果不是管理员，则可以选择
   };
+
+  /**
+   * @description 处理表格行选中
+   * @param {UserItem[]} selection - 选中的用户列表
+   */
   const handleSelectionChange = (selection: UserItem[]) => {
     selectedUsers.value = selection;
   };
+
+  /**
+   * @description 删除选中的用户
+   * @param {UserItem} row - 用户数据
+   */
   const toDelUser = (row: UserItem) => {
-    // 勾选被点击的行
     userTable.value?.toggleRowSelection(row, true);
     elMessageBoxConfirm(
       `删除以下${selectedUsers.value.length}个用户ID: ${selectedUsers.value.map(
@@ -411,15 +463,22 @@
           .filter((id) => id !== undefined);
         const res = await delUser(userIds);
         if (res.code === 200) {
-          ElMessage.success("删除成功"); // 清空选中
+          ElMessage.success("删除成功");
           selectedUsers.value = [];
           fetchUserList();
-        } else ElMessage.error(res.msg || "删除失败");
+        } else {
+          ElMessage.error(res.msg || "删除失败");
+        }
       }
     );
   };
 
-  // 重置密码-----------------
+  /**
+   * @description 重置用户密码
+   * @async
+   * @function toResetPassword
+   * @param {number} userId - 用户ID
+   */
   const toResetPassword = async (userId: number) => {
     const configValueRes = await getConfigValueByConfigKey(
       "sys.user.initPassword"
@@ -432,9 +491,13 @@
           debugLog("重置密码结果=>", res);
           if (res.code === 200) {
             ElMessage.success("重置密码成功");
-          } else ElMessage.error(res.msg || "重置密码失败");
+          } else {
+            ElMessage.error(res.msg || "重置密码失败");
+          }
         }
       );
-    } else ElMessage.error("获取默认密码配置失败");
+    } else {
+      ElMessage.error("获取默认密码配置失败");
+    }
   };
 </script>
