@@ -1,7 +1,3 @@
-/** * @file MainLayout.vue * @description
-主布局组件，包含侧边菜单、顶栏和内容区域。 * @author Your Name * @date
-2023-10-06 */
-
 <template>
   <el-container class="vw-100 vh-100">
     <!-- 左侧菜单 -->
