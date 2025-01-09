@@ -131,16 +131,38 @@
   import { onMounted, reactive, ref } from "vue";
   import { useRouter } from "vue-router";
 
-  // 搜索参数-------------------------
+  /**
+   * @description 搜索查询参数
+   * @type {Pick<AttributeCategoryItem, "name">}
+   */
   const queryParams = reactive<Pick<AttributeCategoryItem, "name">>({
     name: "",
   });
+
+  /**
+   * @description 当前页码
+   */
   const currentPage = ref(1);
+
+  /**
+   * @description 分页存储实例
+   */
   const paginationStore = usePaginationStore();
+
+  /**
+   * @description 总记录数
+   */
   const total = ref(0);
+
+  /**
+   * @description 属性分类列表数据
+   */
   const attributeCategoryList = ref<AttributeCategoryItem[]>([]);
 
-  // 获取药品属性分类列表--------------------
+  /**
+   * @description 获取药品属性分类列表
+   * @async
+   */
   const fetchAttributeCategoryList = async () => {
     const res = await getAttributeCategoryList({
       pageNum: currentPage.value,
@@ -153,16 +175,27 @@
       if (res.total) total.value = res.total;
     } else ElMessage.error(res.msg || "获取药品属性分类列表失败");
   };
+
+  /**
+   * @description 刷新列表数据
+   */
   const refreshList = () => {
     currentPage.value = 1;
     fetchAttributeCategoryList();
   };
+
   onMounted(fetchAttributeCategoryList);
 
-  // 添加/修改表单相关逻辑-----------------------
+  /**
+   * @description 添加/修改表单相关状态
+   */
   const isAdd = ref(true);
   const A_EVisible = ref(false);
   const A_ETitle = ref("");
+
+  /**
+   * @description 默认表单数据
+   */
   const defaultForm: AttributeCategoryItem = {
     name: "",
   };
@@ -170,6 +203,9 @@
   let A_EFormData: AttributeCategoryItem;
   let A_EFun: (data: AttributeCategoryItem) => Promise<AxiosResponse>;
 
+  /**
+   * @description 表单验证规则
+   */
   const rules: FormRules = {
     name: [
       { required: true, message: "请输入属性分类名称", trigger: "blur" },
@@ -177,8 +213,15 @@
     ],
   };
 
-  // 提交表单----------------------
+  /**
+   * @description 表单引用
+   */
   const A_EFormRef = ref<FormInstance>();
+
+  /**
+   * @description 提交表单
+   * @async
+   */
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
@@ -187,30 +230,32 @@
         if (res.code === 200) {
           ElMessage.success(`${A_ETitle.value}成功`);
           A_EVisible.value = false;
-          // 刷新列表
           fetchAttributeCategoryList();
         } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
       }
     });
   };
 
-  // 添加属性分类------------------------
+  /**
+   * @description 打开添加属性分类对话框
+   */
   const toAddAttributeCategory = () => {
     A_ETitle.value = "添加属性分类";
     isAdd.value = true;
-    A_EFun = addAttributeCategory; // 需要您提供对应的API函数
+    A_EFun = addAttributeCategory;
     A_EFormData = reactive(cloneDeep(defaultForm));
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
 
-  // 修改属性分类-------------------
+  /**
+   * @description 打开修改属性分类对话框
+   * @param {AttributeCategoryItem} data - 要修改的属性分类数据
+   */
   const toEditAttributeCategory = (data: AttributeCategoryItem) => {
     A_ETitle.value = "修改属性分类";
     isAdd.value = false;
-    A_EFun = editAttributeCategory; // 需要您提供对应的API函数
-
-    // 只提取需要的属性
+    A_EFun = editAttributeCategory;
     A_EFormData = reactive({
       id: data.id,
       name: data.name,
@@ -219,18 +264,25 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 删除属性分类--------------
+  /**
+   * @description 选中的属性列表
+   */
   const selectedAttributes = ref<AttributeCategoryItem[]>([]);
   const attributeCategoryTable = ref<TableInstance>();
 
-  // 选择变化时的处理函数
+  /**
+   * @description 表格选择变化处理函数
+   * @param {AttributeCategoryItem[]} selection - 选中的行数据
+   */
   const handleSelectionChange = (selection: AttributeCategoryItem[]) => {
     selectedAttributes.value = selection;
   };
 
-  // 删除操作
+  /**
+   * @description 删除属性分类
+   * @param {AttributeCategoryItem} row - 要删除的属性分类行数据
+   */
   const toDelAttributeCategory = (row: AttributeCategoryItem) => {
-    // 勾选被点击的行
     attributeCategoryTable.value?.toggleRowSelection(row, true);
 
     elMessageBoxConfirm(
@@ -246,17 +298,20 @@
         debugLog("删除属性分类结果=>", res);
         if (res.code === 200) {
           ElMessage.success("删除成功");
-          // 清空选中
           selectedAttributes.value = [];
-          // 重新获取列表数据
           fetchAttributeCategoryList();
         } else ElMessage.error(res.msg || "删除失败");
       }
     );
   };
 
-  // 跳转查看具体的规格/参数
   const router = useRouter();
+
+  /**
+   * @description 跳转到规格/参数详情页
+   * @param {AttributeCategoryItem} row - 当前行数据
+   * @param {0 | 1} type - 跳转类型：0-规格，1-参数
+   */
   const handleViewAttribute = (row: AttributeCategoryItem, type: 0 | 1) => {
     router.push({
       name: "Attribute",

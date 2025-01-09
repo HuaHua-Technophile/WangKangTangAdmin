@@ -11,21 +11,21 @@ import { SKUItem } from "@/types/product/product";
  * @async
  * @function getInventoryByStoreId
  * @param {number} storeId - 分店ID
- * @param {number} produceId - 药品ID
+ * @param {number} productId - 药品ID
  * @returns {Promise<Pick<SKUItem, "id" | "stock">[]>} 返回包含SKU ID和库存数量的数组
  * @throws {Error} 当API请求失败时抛出错误
  * @example
  * // 获取ID为1的分店中ID为100的药品库存
  * const inventory = await getInventoryByStoreId(1, 100);
  */
-export const getInventoryByStoreId = (storeId: number, produceId: number) => {
+export const getInventoryByStoreId = (storeId: number, productId: number) => {
   return customRequest<Pick<SKUItem, "id" | "stock">[]>(
     {
       method: "GET",
       url: `/inventoryManagement/getInventoryByStoreId`,
-      params: { storeId, produceId },
+      params: { storeId, productId },
     },
-    `获取分店ID:${storeId} 的药品ID:${produceId} 的SKU-库存`
+    `获取分店ID:${storeId} 的药品ID:${productId} 的SKU-库存`
   );
 };
 

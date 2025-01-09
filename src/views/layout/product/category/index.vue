@@ -164,13 +164,21 @@
     TableInstance,
   } from "element-plus";
   import { cloneDeep } from "lodash";
-  import { computed, onMounted, reactive, ref, toRaw } from "vue";
-
+  import { computed, ComputedRef, onMounted, reactive, ref, toRaw } from "vue";
+  /** API基础URL */
   const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
 
-  // 请求参数设置------------
+  /**
+   * 查询参数对象
+   */
   const queryParams = reactive<Pick<CategoryItem, "name" | "status">>({});
+  /** 分类树形数据 */
   const categoryTree = ref<CategoryItem[]>();
+  /**
+   * 获取分类列表数据
+   * @async
+   * @function fetchCategoryList
+   */
   const fetchCategoryList = async () => {
     const res = await getCategoryList({
       pageNum: 1,
@@ -183,18 +191,28 @@
       debugLog("处理后的药品分类=>", toRaw(categoryTree.value));
     } else ElMessage.error(res.msg || "获取药品分类列表失败");
   };
+  // 组件挂载时获取列表数据
   onMounted(fetchCategoryList);
 
-  // 添加/修改弹窗------------------------
+  /** 添加/修改弹窗可见性 */
   const A_EVisible = ref(false);
+  /** 弹窗标题 */
   const A_ETitle = ref("");
+  /** 是否为添加操作 */
   const isAdd = ref(true);
-  // 默认表单---------------------
+  /**
+   * 默认表单数据
+   * @type {CategoryItem}
+   */
   const defaultForm: CategoryItem = {
     name: "",
     status: 1,
     sort: 0,
   };
+  /**
+   * 表单验证规则
+   * @type {FormRules}
+   */
   const rules: FormRules = {
     name: [
       { required: true, message: "请输入分类名称", trigger: "blur" },
@@ -205,16 +223,26 @@
     ],
     status: [{ required: true, message: "请选择分类状态", trigger: "change" }],
   };
+  /** 表单数据对象 */
   const A_EFormData = reactive<CategoryItem>(cloneDeep(defaultForm));
+  /** 分类树形选择数据 */
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
-  const showClearBtn = computed(() => {
+  /**
+   * 是否显示清除按钮
+   * @type {ComputedRef<boolean>}
+   */
+  const showClearBtn: ComputedRef<boolean> = computed(() => {
     return (
       A_EFormData.icon !== undefined &&
       A_EFormData.icon !== "#" &&
       A_EFormData.icon !== ""
     );
   });
-  // 添加/修改方法
+  /**
+   * 添加分类操作
+   * @async
+   * @function toAddCategory
+   */
   const toAddCategory = async () => {
     A_ETitle.value = "添加药品分类";
     isAdd.value = true;
@@ -237,6 +265,12 @@
       });
     debugLog("处理后的药品分类树形选单=>", categoryTreeSelect.value);
   };
+  /**
+   * 修改分类操作
+   * @async
+   * @function toEditCategory
+   * @param {CategoryItem} row - 需要修改的分类数据
+   */
   const toEditCategory = async (row: CategoryItem) => {
     A_ETitle.value = "修改药品分类";
     isAdd.value = false;
@@ -256,7 +290,10 @@
       });
     debugLog("处理后的药品分类树形选单=>", categoryTreeSelect.value);
   };
-
+  /**
+   * 清除图片
+   * @function clearImg
+   */
   const clearImg = () => {
     debugLog("清除了当前分类的所选图片");
     A_EFormData.icon = "";
@@ -264,21 +301,37 @@
   };
 
   // 裁剪图片-------------------------
+  /** 裁剪后的文件 */
   const croppedFile = ref<File>();
-  const A_EImgUrl = computed(() =>
+  /**
+   * 图片URL计算属性
+   * @type {ComputedRef<string>}
+   */
+  const A_EImgUrl: ComputedRef<string> = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
       : BASEURL + A_EFormData.miniImg
   );
-  const A_EImgPreviewSrcList = computed(() =>
+  /**
+   * 图片预览列表计算属性
+   * @type {ComputedRef<string[]>}
+   */
+  const A_EImgPreviewSrcList: ComputedRef<string[]> = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
       : [BASEURL + A_EFormData.icon]
   );
 
   // 提交表单---------------------
+  /** 表单引用 */
   const A_EFormRef = ref<FormInstance>();
+  /** 图片裁剪组件引用 */
   const cropperUploadRef = ref();
+  /**
+   * 提交表单
+   * @async
+   * @function submitForm
+   */
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
@@ -311,16 +364,24 @@
     });
   };
 
-  // 药品分类表格和选中项
+  /** 选中的分类列表 */
   const selectedCategories = ref<CategoryItem[]>([]);
+  /** 表格实例引用 */
   const categoryTable = ref<TableInstance>();
-
-  // 多选变化处理
+  /**
+   * 处理表格多选变化
+   * @function handleCategorySelectionChange
+   * @param {CategoryItem[]} selection - 选中的行数据数组
+   */
   const handleCategorySelectionChange = (selection: CategoryItem[]) => {
     selectedCategories.value = selection;
   };
-
-  // 删除单个药品分类
+  /**
+   * 删除分类
+   * @async
+   * @function toDelCategorie
+   * @param {CategoryItem} row - 需要删除的分类数据
+   */
   const toDelCategorie = (row: CategoryItem) => {
     // 勾选被点击的行
     categoryTable.value?.toggleRowSelection(row, true);

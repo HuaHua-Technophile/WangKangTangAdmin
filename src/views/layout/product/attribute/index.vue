@@ -195,6 +195,19 @@
   import { cloneDeep } from "lodash";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
 
+  /**
+   * @typedef {Object} AttributeItem 商品属性项接口
+   * @property {number} productAttributeCategoryId 属性分类ID
+   * @property {0 | 1} type 属性类型(0:规格 1:参数)
+   * @property {string} name 属性名称
+   * @property {number} selectType 选择类型(0:唯一 1:单选 2:多选)
+   * @property {number} inputType 录入方式(0:手工录入 1:列表选择)
+   * @property {string} inputList 可选值列表
+   * @property {number} sort 排序值
+   * @property {0 | 1} relatedStatus 药品属性关联状态
+   * @property {0 | 1} handAddStatus 是否支持手动新增
+   */
+
   // 验证路由参数-----------------------------------
   useRouteParamsValidation({
     requiredParams: ["cid", "type", "father"],
@@ -202,12 +215,16 @@
   const route = useRoute();
   const router = useRouter();
 
-  // 表格数据
+  /**
+   * 表格数据相关的响应式引用
+   */
   const attributeList = ref<AttributeItem[]>([]);
   const currentPage = ref(1);
   const total = ref(0);
   const paginationStore = usePaginationStore();
-  // 查询参数
+  /**
+   * 查询参数 - 属性类型(0:规格 1:参数)
+   */
   const type = ref<0 | 1>();
   const defaultForm: AttributeItem = {
     productAttributeCategoryId: 0, // 需要从父组件传入
@@ -220,7 +237,8 @@
     relatedStatus: 0,
     handAddStatus: 0,
   };
-  // 获取属性列表
+  /**
+   * 处理属性类型切换 */
   const fetchAttributeList = async () => {
     const cid = route.query.cid as string;
     if (!cid) {
@@ -265,19 +283,27 @@
     });
   };
 
-  // 表单相关逻辑--------------------
+  /**
+   * 表单相关的响应式状态
+   */
   const isAdd = ref(true);
   const A_EVisible = ref(false);
   const A_ETitle = ref("");
   let A_EFormData: AttributeItem = reactive(cloneDeep(defaultForm));
 
-  // 计算属性：将字符串转换为数组
+  /**
+   * 计算属性：inputList字符串与数组的转换
+   */
   const inputListArray = computed({
     get: () => (A_EFormData.inputList ? A_EFormData.inputList.split(",") : []),
     set: (newValue: string[]) => {
       A_EFormData.inputList = newValue.join(",");
     },
   });
+  /**
+   * 表单验证规则
+   * @type {FormRules}
+   */
   const rules: FormRules = {
     name: [
       { required: true, message: "请输入属性名称", trigger: "blur" },
@@ -313,7 +339,11 @@
     ],
   };
 
-  // 提交表单----------------------------------------------
+  /**
+   * 表单提交处理
+   * @async
+   * @returns {Promise<void>}
+   */
   const A_EFormRef = ref<FormInstance>();
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
@@ -331,7 +361,10 @@
       }
     });
   };
-  // 添加属性
+  /**
+   * 添加属性处理
+   * @returns {void}
+   */
   const toAddAttribute = () => {
     isAdd.value = true;
     A_ETitle.value = type.value == 0 ? "添加规格" : "添加参数";
@@ -342,7 +375,10 @@
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
-  // 修改属性
+  /**
+   * 修改属性处理
+   * @param {AttributeItem} data - 要修改的属性数据
+   */
   const toEditAttribute = (data: AttributeItem) => {
     A_ETitle.value = type.value == 0 ? "修改规格" : "修改参数";
     isAdd.value = false;
@@ -351,16 +387,22 @@
     A_EFormRef.value?.clearValidate();
   };
 
-  // 声明选中的属性数组和表格引用
+  /**
+   * 选中的属性数组和表格引用
+   */
   const selectedAttributes = ref<AttributeItem[]>([]);
   const attributeTable = ref<TableInstance>();
-
-  // 表格选择改变处理函数
+  /**
+   * 处理表格选择变化
+   * @param {AttributeItem[]} selection - 选中的行数据数组
+   */
   const handleAttributeSelectionChange = (selection: AttributeItem[]) => {
     selectedAttributes.value = selection;
   };
-
-  // 删除属性处理函数
+  /**
+   * 删除属性处理
+   * @param {AttributeItem} row - 要删除的属性行数据
+   */
   const toDelAttribute = (row: AttributeItem) => {
     // 选中当前行
     attributeTable.value?.toggleRowSelection(row, true);
