@@ -565,6 +565,9 @@
   } from "@/api/product/SKUStock";
 
   // 查询参数-----------------------
+  /**
+   * @description 查询参数对象
+   */
   const queryParams = reactive<
     Pick<
       ProductItem,
@@ -576,13 +579,24 @@
     recommendStatus: undefined,
     isPrescription: undefined,
   });
-  const currentPage = ref(1);
+  /**
+   * @description 当前页码
+   */
+  const currentPage = ref<number>(1);
   const paginationStore = usePaginationStore();
   const total = ref(0);
+  /**
+   * @description 商品列表数据
+   */
   const productList = ref<ProductItem[]>([]);
 
   // 获取药品列表--------------------
-  const fetchProductList = async () => {
+  /**
+   * @description 获取药品列表数据
+   * @async
+   * @returns {Promise<void>}
+   */
+  const fetchProductList = async (): Promise<void> => {
     const res = await getProductList({
       pageNum: currentPage.value,
       pageSize: paginationStore.pageSize,
@@ -604,10 +618,17 @@
   });
 
   // 获取分类选项数据------------------------
+  /**
+   * @description 分类Map，用于存储分类ID和名称的映射关系
+   */
   const categoryMap = ref<Map<number, string>>(new Map());
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
-
-  const fetchCategoryOptions = async () => {
+  /**
+   * @description 获取分类选项数据
+   * @async
+   * @returns {Promise<void>}
+   */
+  const fetchCategoryOptions = async (): Promise<void> => {
     const res = await getCategoryList({
       pageNum: 1,
       pageSize: 99999,
@@ -800,7 +821,12 @@
     });
     debugLog("生成了SKU列表", toRaw(A_EFormData.skuStockList));
   };
-  // 辅助函数：生成笛卡尔积
+  /**
+   * @description 生成SKU列表的笛卡尔积
+   * @template T
+   * @param {T[][]} arrays - 输入的多维数组
+   * @returns {T[][]} 笛卡尔积结果
+   */
   const cartesianProduct = <T>(arrays: T[][]): T[][] => {
     if (arrays.length === 0) return []; //空数组
     if (arrays.length === 1) return arrays[0].map((item) => [item]); //一维数组转换为二维数组
@@ -816,7 +842,10 @@
       [] as T[][]
     );
   };
-  // 解析 spData 的所有规格名
+  /**
+   * @description 获取规格名称列表
+   * @returns {string[]} 规格名称数组
+   */
   const specNames = computed(() => {
     if (!A_EFormData.skuStockList.length) return [];
     const firstSpData = JSON.parse(A_EFormData.skuStockList[0].spData);
@@ -841,6 +870,10 @@
   // 裁剪图片相关------------------
   const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
   const croppedFile = ref<File>();
+  /**
+   * @description 获取商品封面图URL
+   * @returns {string} 图片URL
+   */
   const A_EFirstImgUrl = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
@@ -855,8 +888,22 @@
   // 多选图片上传----------------------
   const IMAGE_FORMATS = import.meta.env.VITE_APP_IMAGE_FORMATS;
   const fileList = ref<UploadFile[]>([]);
+  /**
+   * @description 最大文件大小（3MB）
+   * @constant
+   */
   const MAX_FILE_SIZE = 3 * 1024 * 1024;
+  /**
+   * @description 最大图片分辨率
+   * @constant
+   */
   const MAX_RESOLUTION = 3840;
+  /**
+   * @description 验证上传图片的格式、大小和分辨率
+   * @param {UploadStatus} status - 上传状态
+   * @param {UploadRawFile} file - 上传的文件对象
+   * @returns {Promise<boolean>} 验证结果
+   */
   const validateImage = async (
     status: UploadStatus,
     file: UploadRawFile
@@ -1015,7 +1062,11 @@
       await fetchAttributeList(res.data.productAttributeCategoryList[0].id);
       A_EFormData.skuStockList = res.data.skuStockList;
 
-      // 处理单个属性值的函数
+      /**
+       * @description 处理商品属性值
+       * @param {AttributeItemUsing} attr - 属性对象
+       * @param {string} value - 属性值
+       */
       const handleAttributeValue = (
         attr: AttributeItemUsing,
         value: string
@@ -1082,8 +1133,15 @@
   };
 
   // 提交表单-------------------------------
+  /**
+   * @description 表单引用
+   */
   const A_EFormRef = ref<FormInstance>();
   const cropperUploadRef = ref();
+  /**
+   * @description 提交表单
+   * @async
+   */
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (!valid) return;
@@ -1190,6 +1248,10 @@
   };
 
   // 上架/下架商品-------------------
+  /**
+   * @description 切换商品上架状态前的确认操作
+   * @param {ProductItem} row - 当前操作的商品行数据
+   */
   const beforeToggleStatus = async (row: ProductItem) => {
     // 选中当前行
     productTable.value?.toggleRowSelection(row, true);
@@ -1316,6 +1378,10 @@
       });
     }
   };
+  /**
+   * @description 更新商品库存
+   * @async
+   */
   const editStock = async () => {
     const res = await updateInventoryQuantity(
       currentStoreId.value!,
