@@ -175,6 +175,12 @@
   </div>
 </template>
 <script lang="ts" setup>
+  /**
+   * @file notice-management.vue
+   * @description 通知/公告管理模块，提供通知/公告的查询、添加、编辑和删除功能。
+   * 使用 Vue 3 组合式 API 编写，集成 Element Plus 组件库。
+   */
+
   import { ref, reactive, onMounted, onBeforeMount } from "vue";
   import { useDictStore } from "@/stores/dictData";
   import { usePaginationStore } from "@/stores/pagination";
@@ -194,21 +200,49 @@
   import { debugLog } from "@/utils/debug";
   import { cloneDeep } from "lodash";
   import { AxiosResponse } from "axios";
+
   // 字典数据------------------
+  /**
+   * @const {ReturnType<typeof useDictStore>} dictStore - 字典数据存储，用于获取通知类型和状态的字典数据。
+   */
   const dictStore = useDictStore();
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_notice_type", "sys_notice_status");
   });
 
   // 请求参数设置------------
+  /**
+   * @const {ReactiveObject} queryParams - 查询参数，包括通知标题、创建人和通知类型。
+   */
   const queryParams = reactive<
     Pick<NoticeItem, "noticeTitle" | "createBy" | "noticeType">
   >({});
+
+  /**
+   * @const {Ref<NoticeItem[]>} noticeList - 通知/公告列表数据。
+   */
   const noticeList = ref<NoticeItem[]>([]);
+
+  /**
+   * @const {Ref<number>} total - 通知/公告总数。
+   */
   const total = ref(0);
+
+  /**
+   * @const {ReturnType<typeof usePaginationStore>} paginationStore - 分页数据存储。
+   */
   const paginationStore = usePaginationStore();
+
+  /**
+   * @const {Ref<number>} currentPage - 当前页码。
+   */
   const currentPage = ref(1);
 
+  /**
+   * 查询通知/公告列表
+   * @async
+   * @function fetchNoticeList
+   */
   const fetchNoticeList = async () => {
     const res = await getNoticeList({
       pageNum: currentPage.value,
@@ -221,24 +255,60 @@
       total.value = res.total;
     } else ElMessage.error(res.msg || "获取通知/公告列表失败");
   };
+
+  /**
+   * 初始化时加载通知/公告列表
+   */
   onMounted(fetchNoticeList);
+
+  /**
+   * 刷新通知/公告列表
+   * @function refreshList
+   */
   const refreshList = () => {
     currentPage.value = 1;
     fetchNoticeList();
   };
 
   // 添加/修改通知/公告表单----------------
+  /**
+   * @const {Ref<boolean>} isAdd - 当前操作是否为新增。
+   */
   const isAdd = ref(true);
+
+  /**
+   * @const {Ref<boolean>} A_EVisible - 添加/编辑对话框的显示状态。
+   */
   const A_EVisible = ref(false);
+
+  /**
+   * @const {Ref<string>} A_ETitle - 添加/编辑对话框的标题。
+   */
   const A_ETitle = ref("");
+
+  /**
+   * @const {NoticeItem} defaultForm - 添加/编辑表单的默认数据。
+   */
   const defaultForm: NoticeItem = {
     noticeTitle: "",
     noticeType: "",
     noticeContent: "",
     status: "",
   };
+
+  /**
+   * @let {NoticeItem} A_EFormData - 添加/编辑表单数据。
+   */
   let A_EFormData: NoticeItem;
+
+  /**
+   * @let {(data: NoticeItem) => Promise<AxiosResponse>} A_EFun - 当前操作的请求函数（新增或编辑）。
+   */
   let A_EFun: (data: NoticeItem) => Promise<AxiosResponse>;
+
+  /**
+   * @const {FormRules} rules - 表单验证规则。
+   */
   const rules: FormRules = {
     noticeTitle: [
       { required: true, message: "请输入通知/公告标题", trigger: "blur" },
@@ -254,7 +324,16 @@
   };
 
   // 提交表单-----------------
+  /**
+   * @const {Ref<any>} A_EFormRef - 表单的引用，用于操作表单实例。
+   */
   const A_EFormRef = ref();
+
+  /**
+   * 提交表单
+   * @async
+   * @function submitForm
+   */
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
@@ -270,6 +349,10 @@
   };
 
   // 打开新增通知/公告对话框-----------
+  /**
+   * 打开新增通知/公告对话框
+   * @function toAddNotice
+   */
   const toAddNotice = () => {
     A_ETitle.value = "新增通知/公告";
     isAdd.value = true;
@@ -280,6 +363,11 @@
   };
 
   // 打开编辑通知/公告对话框-------------
+  /**
+   * 打开编辑通知/公告对话框
+   * @function toEditNotice
+   * @param {NoticeItem} row - 当前选中的通知/公告数据。
+   */
   const toEditNotice = (row: NoticeItem) => {
     A_ETitle.value = "修改通知/公告";
     isAdd.value = false;
@@ -296,13 +384,31 @@
   };
 
   // 删除通知/公告--------------
+  /**
+   * @const {Ref<NoticeItem[]>} selectedNotices - 当前选中的通知/公告列表。
+   */
   const selectedNotices = ref<NoticeItem[]>([]);
+
+  /**
+   * @const {Ref<TableInstance>} noticeTable - 表格实例的引用，用于操作表格。
+   */
   const noticeTable = ref<TableInstance>();
+
+  /**
+   * 处理表格行的选择变化
+   * @function handleSelectionChange
+   * @param {NoticeItem[]} selection - 当前选中的通知/公告列表。
+   */
   const handleSelectionChange = (selection: NoticeItem[]) => {
     selectedNotices.value = selection;
   };
+
+  /**
+   * 删除通知/公告
+   * @function toDelNotice
+   * @param {NoticeItem} row - 要删除的通知/公告数据。
+   */
   const toDelNotice = (row: NoticeItem) => {
-    // 勾选被点击的行
     noticeTable.value?.toggleRowSelection(row, true);
     elMessageBoxConfirm(
       `删除以下${
