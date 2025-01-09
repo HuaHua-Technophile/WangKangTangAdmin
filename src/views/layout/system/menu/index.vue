@@ -195,38 +195,63 @@
     </A_EDialog>
   </div>
 </template>
+
 <script lang="ts" setup>
-  import { GetMenuListParams, MenuItem } from "@/types/system/menu";
-  import { debugLog } from "@/utils/debug";
-  import { onBeforeMount, onMounted, reactive, ref, toRaw } from "vue";
-  import { addMenu, getMenuTreeSelect, getMenuList } from "@/api/system/menu";
-  import CustomMenuTable from "./CustomMenuTable.vue";
-  import MenuTableItem from "./MenuTableItem.vue";
-  import { AxiosResponse } from "axios";
-  import { formatTreeSelectByTree } from "@/utils/el-select/formatTreeSelectByTree";
-  import { ElMessage, FormInstance, FormRules } from "element-plus";
-  import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
-  import { useDictStore } from "@/stores/dictData";
-  import { TreeSelectItem } from "@/types/treeSelect";
-  // 请求字典----------------
+  /** * @fileoverview 菜单管理模块的逻辑处理。 *
+包含菜单列表的获取、菜单树的构建、添加/修改菜单的表单逻辑及相关验证规则。 * 使用
+Vue 3 组合式 API 和 TypeScript 实现。 */
+
+  import { GetMenuListParams, MenuItem } from "@/types/system/menu"; // 引入菜单相关类型
+  import { debugLog } from "@/utils/debug"; // 调试日志工具
+  import { onBeforeMount, onMounted, reactive, ref, toRaw } from "vue"; // Vue 3 组合式 API
+  import { addMenu, getMenuTreeSelect, getMenuList } from "@/api/system/menu"; // 菜单 API
+  import CustomMenuTable from "./CustomMenuTable.vue"; // 自定义菜单表格组件
+  import MenuTableItem from "./MenuTableItem.vue"; // 菜单表格项组件
+  import { AxiosResponse } from "axios"; // Axios 类型
+  import { formatTreeSelectByTree } from "@/utils/el-select/formatTreeSelectByTree"; // 树形选择格式化工具
+  import { ElMessage, FormInstance, FormRules } from "element-plus"; // Element Plus 组件和类型
+  import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression"; // 表单验证规则
+  import { useDictStore } from "@/stores/dictData"; // 字典数据状态管理
+  import { TreeSelectItem } from "@/types/treeSelect"; // 树选择项类型
+
+  /**
+   * 引用字典数据状态管理，用于获取系统字典数据。
+   */
   const dictStore = useDictStore();
+
+  /**
+   * 在组件挂载前请求字典数据。
+   */
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_normal_disable");
   });
-  // 请求菜单列表-----------
+
+  /**
+   * 菜单树数据
+   * @type {Ref<MenuItem[]>}
+   */
   const menuTree = ref();
+
+  /**
+   * 查询参数
+   */
   const queryParams = ref<GetMenuListParams>({});
+
+  /**
+   * 构建菜单树结构
+   * @param {MenuItem[]} items - 菜单项数组
+   */
   const buildTree = (items: MenuItem[]) => {
     const itemMap: Map<number, MenuItem> = new Map();
     const rootItems: MenuItem[] = [];
 
-    // 第一步: 创建一个以 menuId 为键的 Map
+    // 创建一个以 menuId 为键的 Map
     items.forEach((item) => {
       if (item.menuId !== undefined)
         itemMap.set(item.menuId, { ...item, children: [] });
     });
 
-    // 第二步: 构建树形结构
+    // 构建树形结构
     items.forEach((item) => {
       if (item.menuId !== undefined) {
         const treeItem = itemMap.get(item.menuId)!;
@@ -234,18 +259,21 @@
           item.parentId === 0 ||
           (item.parentId !== undefined && !itemMap.has(item.parentId))
         )
-          rootItems.push(treeItem);
-        // 如果是根节点(parentId为0)或父节点不存在,则添加到根数组
+          rootItems.push(treeItem); // 根节点
         else if (item.parentId !== undefined) {
-          // 否则,将当前节点添加到父节点的children数组中
           const parentItem = itemMap.get(item.parentId);
-          if (parentItem) parentItem.children?.push(treeItem);
+          if (parentItem) parentItem.children?.push(treeItem); // 子节点
         }
       }
     });
 
     return rootItems;
   };
+
+  /**
+   * 获取菜单列表
+   * 通过 API 获取菜单列表并构建树形结构。
+   */
   const fetchMenuList = async () => {
     const res = (await getMenuList(queryParams.value)).data;
     debugLog("获取到菜单列表=>", res);
@@ -253,26 +281,46 @@
     menuTree.value = buildTree(res);
     debugLog("转换后的菜单目录=>", toRaw(menuTree.value));
   };
+
+  /**
+   * 在组件挂载时执行菜单列表的获取。
+   */
   onMounted(fetchMenuList);
 
-  // 添加/修改弹窗----------------
+  /**
+   * 添加/修改弹窗
+   */
   const A_EVisible = ref(false);
+
+  /**
+   * 添加/修改弹窗标题
+   */
   const A_ETitle = ref("");
+
+  /**
+   * 是否为添加操作
+   */
   const isAdd = ref(true);
 
-  // 表单-----------
+  /**
+   * 默认表单数据
+   * @type {MenuItem}
+   */
   const defaultForm: MenuItem = {
     menuName: "",
-    menuType: "C", //M目录 C菜单  F按钮
+    menuType: "C", // M目录 C菜单 F按钮
     parentId: 0,
     orderNum: 0,
-
-    visible: "0", //0显示 1隐藏
-    status: "0", //0正常 1停用
-    isFrame: "1", //是否外链
-    isCache: "0", //是否缓存
+    visible: "0", // 0显示 1隐藏
+    status: "0", // 0正常 1停用
+    isFrame: "1", // 是否外链
+    isCache: "0", // 是否缓存
   };
 
+  /**
+   * 表单验证规则
+   * @type {FormRules}
+   */
   const rules: FormRules = {
     menuName: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
     orderNum: [{ required: true, message: "请输入排序", trigger: "blur" }],
@@ -286,13 +334,10 @@
           value: string,
           callback: (arg0?: Error) => void
         ) => {
-          // 首先检查是否为按钮类型
           if (A_EFormData.menuType === "F") {
-            callback(); // 如果是按钮类型，直接通过验证
+            callback(); // 按钮类型无需验证路径
             return;
           }
-
-          // 检查是否为空（仅针对目录或菜单）
           if (
             (A_EFormData.menuType === "M" || A_EFormData.menuType === "C") &&
             !value
@@ -300,8 +345,6 @@
             callback(new Error("若是目录或菜单,则路径不可为空"));
             return;
           }
-
-          // 如果有值，则验证格式
           if (value) {
             const regex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
             if (!regex.test(value)) {
@@ -311,8 +354,6 @@
               return;
             }
           }
-
-          // 通过所有验证
           callback();
         },
         trigger: "blur",
@@ -322,11 +363,28 @@
     perms: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
     icon: [{ validator: validateNoChineseOrSpaces, trigger: "blur" }],
   };
+
+  /**
+   * 表单数据
+   * @type {MenuItem}
+   */
   let A_EFormData: MenuItem;
+
+  /**
+   * 菜单树下拉选择数据
+   */
   const menuTreeSelect = ref<TreeSelectItem[]>();
+
+  /**
+   * 添加/修改菜单的请求方法
+   * @type {(data: MenuItem) => Promise<AxiosResponse>}
+   */
   let A_EFun: (data: MenuItem) => Promise<AxiosResponse>;
 
-  // 提交修改/添加-------------
+  /**
+   * 添加菜单
+   * 初始化表单数据并打开添加菜单弹窗。
+   */
   const toAddMenu = async () => {
     A_ETitle.value = "添加菜单";
     isAdd.value = true;
@@ -341,8 +399,16 @@
     });
     debugLog("下拉树菜单列表=>", res, "格式化后=>", menuTreeSelect.value);
   };
+
+  /**
+   * 表单引用
+   */
   const A_EFormRef = ref<FormInstance>();
 
+  /**
+   * 提交表单
+   * 验证表单数据并提交添加/修改请求。
+   */
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
