@@ -1,27 +1,54 @@
+/**
+ * Node.js 环境的 TypeScript 配置文件
+ * @description 该配置文件专门用于 Node.js 环境下的 TypeScript 编译选项，主要用于构建工具（如 Vite）的配置文件
+ * @see {@link https://www.typescriptlang.org/tsconfig} TypeScript 配置文档
+ */
 {
   "compilerOptions": {
+    /** @description 指定 ECMAScript 目标版本为 ES2022 */
     "target": "ES2022",
+    /** @description 指定要包含的库文件，使用最新的 ES2023 特性 */
     "lib": ["ES2023"],
+    /** @description 指定模块代码生成方式为 ESNext */
     "module": "ESNext",
+    /** @description 跳过声明文件的类型检查，提升编译性能 */
     "skipLibCheck": true,
 
     /* Bundler mode */
+    /** @description 指定模块解析策略为 bundler，适用于 Vite 等现代打包工具 */
     "moduleResolution": "bundler",
+    /** @description 允许在导入语句中使用 TypeScript 文件扩展名 */
     "allowImportingTsExtensions": true,
+    /** @description 确保每个文件都被视为独立的模块 */
     "isolatedModules": true,
+    /** @description 强制模块检测 */
     "moduleDetection": "force",
+    /** @description 不生成输出文件，由 Vite 负责构建 */
     "noEmit": true,
 
     /* Linting */
+    /** @description 启用所有严格类型检查选项 */
     "strict": true,
+    /** @description 报告未使用的局部变量 */
     "noUnusedLocals": true,
+    /** @description 报告未使用的参数 */
     "noUnusedParameters": true,
+    /** @description 防止 switch 语句中的 case 贯穿 */
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": ".", // This must be specified if "paths" is.
+    /** @description 设置基准目录，用于解析非相对模块名称 */
+    "baseUrl": ".",
+    /**
+     * @description 设置模块路径别名
+     * @example 使用 '@/components' 代替 'src/components'
+     */
     "paths": {
       "@/*": ["src/*"]
     }
   },
+  /**
+   * @description 指定要包含的文件
+   * @type {string[]}
+   */
   "include": ["vite.config.ts"]
 }

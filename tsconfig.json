@@ -1,7 +1,23 @@
+/**
+ * TypeScript 项目引用配置文件
+ * @description 该配置文件用于设置 TypeScript 项目引用，实现项目的模块化管理
+ * @see {@link https://www.typescriptlang.org/docs/handbook/project-references.html} 项目引用官方文档
+ */
 {
+  /**
+   * @description 指定要编译的文件列表，空数组表示不直接编译任何文件
+   * @type {string[]}
+   */
   "files": [],
+
+  /**
+   * @description 项目引用配置，指定子项目的 tsconfig 文件路径
+   * @type {Array<{path: string}>}
+   */
   "references": [
+    /** @description 应用程序主要源代码的 TypeScript 配置 */
     { "path": "./tsconfig.app.json" },
+    /** @description Node.js 相关代码(如构建脚本)的 TypeScript 配置 */
     { "path": "./tsconfig.node.json" }
   ]
 }

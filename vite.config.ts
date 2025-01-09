@@ -1,3 +1,9 @@
+/**
+ * Vite 配置文件
+ * @description 配置 Vite 构建工具的各项功能，包括插件、CSS 预处理、路径别名等
+ * @see {@link https://vitejs.dev/config/} Vite配置文档
+ */
+
 import { defineConfig } from "vite";
 import path from "path";
 import vue from "@vitejs/plugin-vue";
@@ -6,24 +12,39 @@ import Components from "unplugin-vue-components/vite";
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 // import ElementPlus from "unplugin-element-plus/vite";
 
-// https://vitejs.dev/config/
 export default defineConfig({
+  /** @description 配置 Vite 插件 */
   plugins: [
+    /** @description 启用 Vue 3 支持 */
     vue(),
+    /**
+     * @description 自动导入 API 配置
+     * @see {@link https://github.com/antfu/unplugin-auto-import}
+     */
     AutoImport({
       resolvers: [ElementPlusResolver()],
+      /**
+       * @description 配置需要自动导入的模块
+       * @type {Array<string | Record<string, string[]>>}
+       */
       imports: [
-        "vue", //自动导入ref,reactive,onMounted等
-        "vue-router", //自动导入路由相关api
+        "vue", // 自动导入ref,reactive,onMounted等
+        "vue-router", // 自动导入路由相关api
         { "@/utils/debug": ["debugLog", "debugWarn", "debugError"] }, // 自动导入 debug
       ],
+      /** @description 生成类型声明文件 */
       dts: true, // 这将生成 'auto-imports.d.ts' 文件
     }),
+    /**
+     * @description 自动导入组件配置
+     * @see {@link https://github.com/antfu/unplugin-vue-components}
+     */
     Components({
       resolvers: [
         ElementPlusResolver({
           importStyle: "sass",
-          directives: true, //自动导入 Element Plus 的指令（如 v-loading、v-tooltip 等）
+          /** @description 自动导入 Element Plus 的指令 */
+          directives: true,
           // version: "2.1.5",
         }),
       ],
@@ -31,23 +52,31 @@ export default defineConfig({
     /* ElementPlus({
       useSource: true,
     }), */
-    /*如何按需导入的情况下仍然让亮色模式下,支持自定义主题色?
-    因为按需导入时,仅导入每个组件的style,而在全局main.ts中写的scss覆盖就不会生效
-    如果要在vite按需导入的同时修改elementPlus主题色,必须写明以下css内容
-
-    https://juejin.cn/post/7264952002706096164#heading-3
-    
-    https://element-plus.org/zh-CN/guide/theming.html#%E5%A6%82%E4%BD%95%E8%A6%86%E7%9B%96%E5%AE%83%EF%BC%9F */
   ],
+
+  /**
+   * @description CSS 相关配置
+   * @see {@link https://vitejs.dev/config/shared-options.html#css}
+   */
   css: {
     preprocessorOptions: {
       scss: {
+        /** @description 全局引入自定义 Element Plus 主题样式 */
         additionalData: `@use "@/style/customElementPlusLight.scss" as *;`,
       },
     },
   },
+
+  /**
+   * @description 定义全局常量替换方式
+   * @see {@link https://vitejs.dev/config/shared-options.html#define}
+   */
   define: {},
-  // 路径别名
+
+  /**
+   * @description 解析配置
+   * @see {@link https://vitejs.dev/config/shared-options.html#resolve}
+   */
   resolve: {
     /* alias: [
       {
@@ -56,11 +85,22 @@ export default defineConfig({
       },
     ],
     extensions: [".ts", ".js", ".vue", ".json"], */
+
+    /**
+     * @description 路径别名配置
+     * @example import { foo } from '@/components/foo'
+     */
     alias: {
       "@/": `${path.resolve(__dirname, "src")}/`,
     },
   },
+
+  /**
+   * @description 构建配置
+   * @see {@link https://vitejs.dev/config/build-options.html}
+   */
   build: {
+    /** @description 设置构建目标的 ES 版本 */
     target: "esnext", // 或者更高版本 'esnext'
   },
 });

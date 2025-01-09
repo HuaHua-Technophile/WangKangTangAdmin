@@ -21,8 +21,41 @@
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
+  /**
+   * 404页面组件的业务逻辑
+   * @module NotFound
+   */
+
   import "animate.css";
   import { useRouter } from "vue-router";
+
+  /**
+   * Vue Router实例，用于页面导航
+   * @constant {import('vue-router').Router}
+   */
   const router = useRouter();
 </script>
+
+<!--
+以下是组件的样式依赖说明：
+1. Bootstrap 5 提供的工具类:
+   - vh-100, vw-100: 设置容器高度和宽度为100%视口
+   - d-flex, align-items-center, justify-content-center: Flexbox布局
+   - text-center: 文本居中
+   - p-5: 内边距
+   - my-4: 垂直外边距
+   - fs-5: 字体大小
+   - text-body-secondary, text-body-tertiary: 文本颜色
+   - fw-bold: 字体粗细
+
+2. Animate.css 提供的动画类:
+   - animate__animated: 基础动画类
+   - animate__bounce: 弹跳动画
+   - animate__slow: 减慢动画速度
+   - animate__infinite: 无限循环动画
+
+3. Element Plus 组件:
+   - el-button: Element Plus的按钮组件
+-->
