@@ -44,7 +44,15 @@
     </el-dialog>
   </div>
 </template>
+
 <script setup lang="ts">
+  /**
+   * 文件级别注释:
+   * 这是一个图片上传和裁剪组件，基于Element Plus和Cropper.js实现。
+   * 支持裁剪、生成缩略图、上传裁剪后的图片，并提供文件大小和格式校验。
+   * 配置项通过props传递，确保组件的灵活性。
+   */
+
   import { ref, defineProps, nextTick } from "vue";
   import { ElMessage, UploadFile } from "element-plus";
   import Cropper from "cropperjs";
@@ -52,17 +60,67 @@
   import { debugLog } from "@/utils/debug";
   import { AxiosResponse } from "axios";
 
+  /**
+   * 组件的Props定义
+   */
   const props = withDefaults(
     defineProps<{
+      /**
+       * 上传API函数，接收File类型，并返回Promise<AxiosResponse>
+       */
       uploadApi: (file: File) => Promise<AxiosResponse>;
+
+      /**
+       * 是否显示上传按钮
+       * @default true
+       */
       showUploadBtn?: boolean;
+
+      /**
+       * 是否需要生成缩略图
+       * @default false
+       */
       needThumbnail?: boolean;
+
+      /**
+       * 裁剪宽高比
+       * @default 1
+       */
       aspectRatio?: number;
+
+      /**
+       * 裁剪框的最小宽度或高度
+       * @default 100
+       */
       minCropBoxWidthOrHeight?: number;
+
+      /**
+       * 裁剪图的最大宽度或高度
+       * @default 1920
+       */
       maxWidthOrHeight?: number;
+
+      /**
+       * 上传图片的最大大小（单位MB）
+       * @default 2
+       */
       maxSize?: number;
+
+      /**
+       * 缩略图的最大宽度或高度
+       * @default 100
+       */
       maxThumbnailWidthOrHeight?: number;
+
+      /**
+       * 上传成功的提示消息
+       */
       successMsg?: string;
+
+      /**
+       * 是否显示清除按钮
+       * @default false
+       */
       showClearBtn?: boolean;
     }>(),
     {
@@ -75,9 +133,14 @@
       maxThumbnailWidthOrHeight: 100,
     }
   );
+
   const emit = defineEmits<{
+    /**
+     * 清除事件
+     */
     (event: "clear"): void;
   }>();
+
   // 常量和响应式变量
   const IMAGE_FORMATS = import.meta.env.VITE_APP_IMAGE_FORMATS;
 
@@ -85,23 +148,27 @@
   const previewImageUrl = ref("");
   const cropperImageRef = ref<HTMLImageElement>();
   const cropperInstance = ref<Cropper>();
-  // const croppedFile = ref<File>();
   const croppedFile = defineModel<File>("croppedFile");
   const thumbnailFile = ref<File>();
   const fileName = ref("");
-  // 文件变更处理函数
+
+  /**
+   * 处理文件选择变更
+   * @param uploadFile - 上传的文件对象
+   */
   const handleFileChange = async (uploadFile: UploadFile) => {
     const rawFile = uploadFile.raw;
     if (!rawFile) {
       ElMessage.error("文件读取失败");
       return false;
     }
+
     // 文件大小和类型校验
     if (rawFile.size / 1024 / 1024 > props.maxSize) {
       ElMessage.error(`图片大小不能超过 ${props.maxSize}MB`);
       return false;
     }
-    //图片类型判断
+
     if (
       !IMAGE_FORMATS.split(",").some((type: string) =>
         rawFile.type.toLowerCase().includes(type.replace(".", ""))
@@ -110,9 +177,10 @@
       ElMessage.error("请上传正确的图片格式");
       return false;
     }
-    fileName.value = rawFile.name.split(".")[0];
 
+    fileName.value = rawFile.name.split(".")[0];
     debugLog("选择了文件=>", fileName.value);
+
     const reader = new FileReader();
     reader.readAsDataURL(rawFile);
     reader.onload = (e) => {
@@ -123,8 +191,8 @@
       nextTick(() => {
         if (cropperImageRef.value) {
           cropperInstance.value = new Cropper(cropperImageRef.value, {
-            aspectRatio: props.aspectRatio, //宽高比
-            zoomable: false, // 直接禁用缩放功能
+            aspectRatio: props.aspectRatio, // 宽高比
+            zoomable: false, // 禁用缩放功能
             viewMode: 1, // 限制裁剪框不能超出图片
             minCropBoxWidth:
               props.aspectRatio > 1
@@ -140,7 +208,9 @@
     };
   };
 
-  // 确认裁剪
+  /**
+   * 确认裁剪操作
+   */
   const confirmCrop = async () => {
     if (!cropperInstance.value) return;
 
@@ -168,9 +238,7 @@
 
     // 生成缩略图
     if (props.needThumbnail) {
-      // 生成裁剪图的缩略图canvas
       const thumbnailCanvas = document.createElement("canvas");
-      // 裁剪图的缩略图宽高比自动换算
       const thumbnailCanvasWidth =
         props.aspectRatio > 1
           ? props.maxThumbnailWidthOrHeight
@@ -194,7 +262,7 @@
       const thumbnailBlob = await new Promise<Blob>((resolve) => {
         thumbnailCanvas.toBlob((blob) => resolve(blob!), "image/jpeg");
       });
-      // 为缩略图添加 _thumbnail 后缀
+
       thumbnailFile.value = new File(
         [thumbnailBlob],
         `${fileName.value}_thumbnail`,
@@ -203,15 +271,20 @@
         }
       );
     }
-    cancelCrop(); //确认裁剪后关闭对话框
+    cancelCrop();
   };
-  // 关闭裁剪对话框
+
+  /**
+   * 取消裁剪并关闭对话框
+   */
   const cancelCrop = () => {
     showCropperDialog.value = false;
     cropperInstance.value?.destroy();
   };
 
-  // 上传裁剪图(与缩略图)
+  /**
+   * 上传裁剪后的图片
+   */
   const handleUpload = async () => {
     if (!croppedFile.value) return { croppedRes: null, thumbnailRes: null };
     let croppedRes, thumbnailRes;
@@ -238,7 +311,10 @@
       return { croppedRes: null, thumbnailRes: null };
     }
   };
-  // 重新选择文件
+
+  /**
+   * 清空选择的文件
+   */
   const clearSelection = () => {
     croppedFile.value = undefined;
     thumbnailFile.value = undefined;

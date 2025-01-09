@@ -8,7 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     A_EDialog: typeof import('./src/components/A_EDialog/A_EDialog.vue')['default']
-    CropperUpload: typeof import('./src/components/CropperUpload.vue')['default']
+    CropperUpload: typeof import('./src/components/A_EDialog/CropperUpload.vue')['default']
     CustomFormItemTip: typeof import('./src/components/ElForm/CustomFormItemTip.vue')['default']
     CustomPagination: typeof import('./src/components/DataTable/CustomPagination.vue')['default']
     DataTebleColumnTime: typeof import('./src/components/DataTable/DataTebleColumnTime.vue')['default']
@@ -56,7 +56,7 @@ declare module 'vue' {
     ElTreeSelect: typeof import('element-plus/es')['ElTreeSelect']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     Icon: typeof import('./src/components/Icon.vue')['default']
-    QuillEditor: typeof import('./src/components/QuillEditor.vue')['default']
+    QuillEditor: typeof import('./src/components/ElForm/QuillEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ThemeSwitch: typeof import('./src/components/ThemeSwitch.vue')['default']
