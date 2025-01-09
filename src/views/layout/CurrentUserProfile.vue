@@ -1,3 +1,8 @@
+<!--
+  文件名: UserProfile.vue
+  描述: 用户个人信息管理页面，包括查看、编辑个人信息及修改密码功能。
+  技术栈: Vue 3, TypeScript, Element Plus
+-->
 <template>
   <div class="p-4">
     <el-form :model="userProfileForm" :rules="profileRules" ref="formRef">
@@ -162,7 +167,12 @@
     </A_EDialog>
   </div>
 </template>
+
 <script lang="ts" setup>
+  /** * @file User Profile Management * @description
+本文件用于处理用户个人信息的管理，包括查看、编辑个人信息，修改密码，以及上传头像等功能。
+* @module UserProfile */
+
   import {
     editUserProfile,
     getUserProfile,
@@ -174,25 +184,47 @@
   import { UserItem } from "@/types/system/user";
   import { debugLog } from "@/utils/debug";
   import { passwordRule } from "@/utils/formRegularExpression";
-  import { ElMessage, FormInstance } from "element-plus";
-  import { computed, onBeforeMount, onMounted, reactive, ref } from "vue";
+  import { ElMessage, FormInstance, FormRules } from "element-plus";
+  import {
+    computed,
+    ComputedRef,
+    onBeforeMount,
+    onMounted,
+    reactive,
+    ref,
+  } from "vue";
   import { getLabelByDictData } from "@/utils/system/dict/dictDataToOptions";
 
-  // 字典数据-----------
+  /**
+   * @description 字典数据管理相关逻辑
+   */
   const dictStore = useDictStore();
   onBeforeMount(() => {
     dictStore.fetchDictData("sys_user_sex");
   });
 
-  // 获取详细个人信息-------------------
+  /**
+   * @description 当前用户详细信息
+   */
   const currentUserProfile = ref<UserItem>();
+
+  /**
+   * @description 获取当前用户的详细个人信息
+   * @returns {Promise<void>} 异步获取用户信息
+   */
   const getCurrentUserProfileFun = async () => {
     const res = (await getUserProfile()).data;
     debugLog("详细个人信息=>", res);
     currentUserProfile.value = res;
   };
+
   onMounted(getCurrentUserProfileFun);
-  const formattedLoginDate = computed(() => {
+
+  /**
+   * @description 格式化后的登录时间
+   * @type {ComputedRef<string>}
+   */
+  const formattedLoginDate: ComputedRef<string> = computed(() => {
     return currentUserProfile.value?.loginDate
       ? new Date(currentUserProfile.value.loginDate).toLocaleString()
       : "";
@@ -200,15 +232,30 @@
 
   // 编辑个人信息------------------
 
+  /**
+   * @description 是否正在编辑模式
+   */
   const isEditing = ref(false);
+
+  /**
+   * @description 表单引用，用于校验和重置
+   */
   const formRef = ref<FormInstance>();
+
+  /**
+   * @description 用户个人信息表单数据
+   */
   const userProfileForm = reactive<UserItem>({
     nickName: "",
     email: "",
     phonenumber: "",
     sex: "1",
   });
-  const profileRules = {
+
+  /**
+   * @description 表单校验规则
+   */
+  const profileRules: FormRules = {
     nickName: [{ required: true, message: "请输入昵称", trigger: "blur" }],
     email: [
       { required: true, message: "请输入邮箱地址", trigger: "blur" },
@@ -227,6 +274,10 @@
       },
     ],
   };
+
+  /**
+   * @description 切换编辑模式并提交个人信息
+   */
   const toEditProfileFun = () => {
     if (isEditing.value) {
       formRef.value?.validate(async (valid: boolean) => {
@@ -253,15 +304,34 @@
   };
 
   // 修改密码----------------------
+
+  /**
+   * @description 修改密码对话框显示状态
+   */
   const A_EVisible = ref(false);
+
+  /**
+   * @description 修改密码对话框标题
+   */
   const A_ETitle = ref("修改密码");
 
+  /**
+   * @description 修改密码表单数据
+   */
   const passwordForm = ref({
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+
+  /**
+   * @description 修改密码表单引用
+   */
   const passwordFormRef = ref();
+
+  /**
+   * @description 修改密码表单校验规则
+   */
   const passwordRules = {
     oldPassword: passwordRule,
     newPassword: passwordRule,
@@ -277,6 +347,10 @@
       },
     ],
   };
+
+  /**
+   * @description 打开修改密码对话框
+   */
   const toEditPwdFun = () => {
     A_EVisible.value = true;
 
@@ -287,6 +361,10 @@
     };
     passwordFormRef.value?.resetFields();
   };
+
+  /**
+   * @description 提交修改密码表单
+   */
   const submitForm = () => {
     passwordFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
@@ -302,14 +380,32 @@
   };
 
   // 上传头像-----------------------
+
+  /**
+   * @description 基础接口地址
+   */
   const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+
+  /**
+   * @description 裁剪后的头像文件
+   */
   const croppedFile = ref<File>();
-  const imageUrl = computed(() =>
+
+  /**
+   * @description 当前头像的URL地址
+   * @type {ComputedRef<string>}
+   */
+  const imageUrl: ComputedRef<string> = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
       : baseUrl + currentUserProfile.value?.avatar
   );
-  const previewSrcList = computed(() =>
+
+  /**
+   * @description 头像预览地址列表
+   * @type {ComputedRef<string[]>}
+   */
+  const previewSrcList: ComputedRef<string[]> = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
       : [baseUrl + currentUserProfile.value?.avatar]

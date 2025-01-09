@@ -1,3 +1,7 @@
+/** * @file MainLayout.vue * @description
+主布局组件，包含侧边菜单、顶栏和内容区域。 * @author Your Name * @date
+2023-10-06 */
+
 <template>
   <el-container class="vw-100 vh-100">
     <!-- 左侧菜单 -->
@@ -96,15 +100,28 @@
     </el-container>
   </el-container>
 </template>
+
 <script lang="ts" setup>
+  /**
+   * @module MainLayout
+   * @description 主布局组件逻辑部分，包含状态管理和数据获取。
+   */
+
   import { getInfo } from "@/api/getInfo";
   import { useAuthStore } from "@/stores/auth";
   import { debugLog } from "@/utils/debug";
   import { computed, onMounted, ref, toRaw } from "vue";
+  import { useHistoryStore } from "@/stores/history";
+  import { useRoute } from "vue-router";
+  import { useThemeStore } from "@/stores/theme";
+  import { CustomRouteRecordRaw } from "@/types/router";
 
   const authStore = useAuthStore();
 
-  // 过滤可见路由
+  /**
+   * @constant {ComputedRef<CustomRouteRecordRaw[]>} processedRoutes
+   * @description 过滤并处理动态路由，移除隐藏的路由。
+   */
   const processedRoutes = computed(() => {
     const filteredRoutes = authStore.dynamicRoutes.filter(
       (route) => !route.hidden
@@ -125,30 +142,42 @@
     return result;
   });
 
-  // 个人信息不持久化存储--------------------
+  /**
+   * @constant {string} baseUrl
+   * @description API 基础 URL，从环境变量中获取。
+   */
   const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
 
+  /**
+   * @constant {Ref<any>} userInfo
+   * @description 当前登录用户的信息。
+   */
   const userInfo = ref();
+
+  /**
+   * @function onMounted
+   * @description 组件挂载时获取用户信息。
+   */
   onMounted(async () => {
     userInfo.value = await getInfo();
     debugLog("个人信息=>", toRaw(userInfo.value));
   });
 
-  // 历史路由-----------------
-  import { useHistoryStore } from "@/stores/history";
-  import { useRoute } from "vue-router";
-  import { useThemeStore } from "@/stores/theme";
-  import { CustomRouteRecordRaw } from "@/types/router";
+  // 历史路由状态
   const historyStore = useHistoryStore();
 
-  // 当前激活路由------------
+  // 当前激活路由
   const route = useRoute();
   const activePath = computed(() => route.path);
 
-  // 主题色检测
+  // 主题色状态
   const themeStore = useThemeStore();
 </script>
+
 <style lang="scss" scoped>
+  /**
+ * @description 样式部分，主要针对 Element Plus 组件和自定义样式的调整。
+ */
   .el-menu-item {
     border-radius: 5px;
     margin: 4px 10px;
