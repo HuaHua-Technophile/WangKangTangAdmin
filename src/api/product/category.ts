@@ -1,7 +1,28 @@
+/**
+ * @fileoverview 药品分类相关的 API 请求模块
+ * @module api/product/category
+ */
+
+/**
+ * 导入自定义请求实例
+ * @import customRequest - 封装的请求方法
+ */
 import { customRequest } from "@/api/instance";
+/**
+ * 导入分类相关的类型定义
+ * @import CategoryItem - 分类项目类型
+ * @import CategoryParams - 分类查询参数类型
+ */
 import { CategoryItem, CategoryParams } from "@/types/product/category";
 
-// 1. 新增药品分类
+/**
+ * 新增药品分类
+ * @async
+ * @function addCategory
+ * @param {Omit<CategoryItem, "id">} data - 新增分类的数据，不包含 id 字段
+ * @returns {Promise<any>} 返回后端响应结果
+ * @throws {Error} 请求失败时抛出错误
+ */
 export const addCategory = (data: Omit<CategoryItem, "id">) => {
   return customRequest(
     {
@@ -13,7 +34,14 @@ export const addCategory = (data: Omit<CategoryItem, "id">) => {
   );
 };
 
-// 2. 修改药品分类
+/**
+ * 修改药品分类
+ * @async
+ * @function editCategory
+ * @param {CategoryItem} data - 完整的分类数据，包含 id
+ * @returns {Promise<any>} 返回后端响应结果
+ * @throws {Error} 请求失败时抛出错误
+ */
 export const editCategory = (data: CategoryItem) => {
   return customRequest(
     {
@@ -25,7 +53,14 @@ export const editCategory = (data: CategoryItem) => {
   );
 };
 
-// 3. 查询药品分类列表
+/**
+ * 查询药品分类列表
+ * @async
+ * @function getCategoryList
+ * @param {CategoryParams} params - 查询参数
+ * @returns {Promise<CategoryItem[]>} 返回分类列表数据
+ * @throws {Error} 请求失败时抛出错误
+ */
 export const getCategoryList = (params: CategoryParams) => {
   return customRequest<CategoryItem[]>(
     {
@@ -37,7 +72,14 @@ export const getCategoryList = (params: CategoryParams) => {
   );
 };
 
-// 4. 查询分类列表（排除节点）
+/**
+ * 查询分类列表（排除指定节点）
+ * @async
+ * @function getCategoryListExclude
+ * @param {number} categoryId - 需要排除的分类 ID
+ * @returns {Promise<CategoryItem[]>} 返回排除指定节点后的分类列表
+ * @throws {Error} 请求失败时抛出错误
+ */
 export const getCategoryListExclude = (categoryId: number) => {
   return customRequest<CategoryItem[]>(
     {
@@ -48,7 +90,14 @@ export const getCategoryListExclude = (categoryId: number) => {
   );
 };
 
-// 5. 删除药品分类
+/**
+ * 批量删除药品分类
+ * @async
+ * @function delCategories
+ * @param {number[]} ids - 要删除的分类 ID 数组
+ * @returns {Promise<any>} 返回后端响应结果
+ * @throws {Error} 请求失败时抛出错误
+ */
 export const delCategories = (ids: number[]) => {
   return customRequest(
     {
