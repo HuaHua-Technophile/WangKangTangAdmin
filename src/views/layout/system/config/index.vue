@@ -161,7 +161,7 @@
   import {
     getTagTypeByDictData,
     getLabelByDictData,
-  } from "@/utils/dictDataToOptions";
+  } from "@/utils/system/dict/dictDataToOptions";
   import { AxiosResponse } from "axios";
   import { cloneDeep } from "lodash";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";

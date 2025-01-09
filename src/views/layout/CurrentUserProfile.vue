@@ -176,7 +176,7 @@
   import { passwordRule } from "@/utils/formRegularExpression";
   import { ElMessage, FormInstance } from "element-plus";
   import { computed, onBeforeMount, onMounted, reactive, ref } from "vue";
-  import { getLabelByDictData } from "@/utils/dictDataToOptions";
+  import { getLabelByDictData } from "@/utils/system/dict/dictDataToOptions";
 
   // 字典数据-----------
   const dictStore = useDictStore();

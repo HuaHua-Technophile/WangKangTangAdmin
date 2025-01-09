@@ -189,7 +189,7 @@
   import {
     getTagTypeByDictData,
     getLabelByDictData,
-  } from "@/utils/dictDataToOptions";
+  } from "@/utils/system/dict/dictDataToOptions";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { debugLog } from "@/utils/debug";
   import { cloneDeep } from "lodash";

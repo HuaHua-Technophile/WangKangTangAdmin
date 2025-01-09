@@ -203,7 +203,7 @@
   import CustomMenuTable from "./CustomMenuTable.vue";
   import MenuTableItem from "./MenuTableItem.vue";
   import { AxiosResponse } from "axios";
-  import { formatTreeSelectByTree } from "@/utils/formatTreeSelectByTree";
+  import { formatTreeSelectByTree } from "@/utils/el-select/formatTreeSelectByTree";
   import { ElMessage, FormInstance, FormRules } from "element-plus";
   import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
   import { useDictStore } from "@/stores/dictData";

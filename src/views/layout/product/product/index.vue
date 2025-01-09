@@ -541,7 +541,7 @@
   import { ProductItem, SKUItem } from "@/types/product/product";
   import { TreeSelectItem } from "@/types/treeSelect";
   import { debugLog } from "@/utils/debug";
-  import { formatTreeSelectByFlat } from "@/utils/formatTreeSelectByFlat";
+  import { formatTreeSelectByFlat } from "@/utils/el-select/formatTreeSelectByFlat";
   import { generateCode } from "@/utils/generateCode";
   import { decodeArray, encodeArray } from "@/utils/arrayToString";
   import {

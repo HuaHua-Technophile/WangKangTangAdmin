@@ -218,9 +218,9 @@
   import {
     getTagTypeByDictData,
     getLabelByDictData,
-  } from "@/utils/dictDataToOptions";
+  } from "@/utils/system/dict/dictDataToOptions";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
-  import { formatTreeSelectByTree } from "@/utils/formatTreeSelectByTree";
+  import { formatTreeSelectByTree } from "@/utils/el-select/formatTreeSelectByTree";
   import { validateNoChineseOrSpaces } from "@/utils/formRegularExpression";
   import { AxiosResponse } from "axios";
   import { ElMessage, FormInstance, FormRules } from "element-plus";

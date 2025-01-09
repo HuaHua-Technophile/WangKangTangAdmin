@@ -90,11 +90,11 @@
   import { MenuItem } from "@/types/system/menu";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
-  import { formatTreeSelectByTree } from "@/utils/formatTreeSelectByTree";
+  import { formatTreeSelectByTree } from "@/utils/el-select/formatTreeSelectByTree";
   import {
     getTagTypeByDictData,
     getLabelByDictData,
-  } from "@/utils/dictDataToOptions";
+  } from "@/utils/system/dict/dictDataToOptions";
   import { AxiosResponse } from "axios";
   import { ElMessage } from "element-plus";
   import { onBeforeMount, reactive } from "vue";

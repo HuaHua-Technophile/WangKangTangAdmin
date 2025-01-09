@@ -243,7 +243,7 @@
   import {
     getTagTypeByDictData,
     getLabelByDictData,
-  } from "@/utils/dictDataToOptions";
+  } from "@/utils/system/dict/dictDataToOptions";
   import { getConfigValueByConfigKey } from "@/api/system/config";
 
   // 字典数据------------------

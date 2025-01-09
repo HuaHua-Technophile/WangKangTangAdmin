@@ -278,7 +278,7 @@
   import {
     getTagTypeByDictData,
     getLabelByDictData,
-  } from "@/utils/dictDataToOptions";
+  } from "@/utils/system/dict/dictDataToOptions";
 
   // 字典数据---------------
   const dictStore = useDictStore();

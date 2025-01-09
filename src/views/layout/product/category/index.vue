@@ -155,7 +155,7 @@
   import { TreeSelectItem } from "@/types/treeSelect";
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
-  import { formatTreeSelectByFlat } from "@/utils/formatTreeSelectByFlat";
+  import { formatTreeSelectByFlat } from "@/utils/el-select/formatTreeSelectByFlat";
   import { formatCategoryTreeByFlat } from "@/utils/product/category/format";
   import {
     ElMessage,
