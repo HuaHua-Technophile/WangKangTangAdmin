@@ -156,7 +156,7 @@
   import { debugLog } from "@/utils/debug";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm";
   import { formatTreeSelectByFlat } from "@/utils/el-select/formatTreeSelectByFlat";
-  import { formatCategoryTreeByFlat } from "@/utils/product/category/format";
+  import { formatCategoryTreeByFlat } from "@/utils/product/category/formatCategoryTree";
   import {
     ElMessage,
     FormInstance,
