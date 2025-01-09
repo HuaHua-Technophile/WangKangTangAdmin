@@ -155,11 +155,24 @@
   import { cloneDeep } from "lodash";
   import { onMounted, reactive, ref } from "vue";
 
+  /**
+   * 查询参数对象
+   */
   const queryParams = reactive<StoreItem>({
     storeName: "",
     phone: "",
   });
+
+  /**
+   * 店铺列表数据
+   */
   const storeList = ref<StoreItem[]>();
+
+  /**
+   * 获取店铺列表数据
+   * @async
+   * @function fetchStoreList
+   */
   const fetchStoreList = async () => {
     const res = await getStoreList(queryParams);
     debugLog("获取分店列表=>", res);
@@ -169,9 +182,25 @@
   onMounted(fetchStoreList);
 
   // 表单相关状态--------------------------------------
+  /**
+   * 是否为添加操作的标志
+   */
   const isAdd = ref(true);
+
+  /**
+   * 添加/编辑对话框可见性
+   */
   const A_EVisible = ref(false);
+
+  /**
+   * 添加/编辑对话框标题
+   */
   const A_ETitle = ref("");
+
+  /**
+   * 默认表单数据
+   * @type {StoreItem}
+   */
   const defaultForm: StoreItem = {
     storeName: "",
     phone: "",
@@ -179,8 +208,22 @@
     businessHours: "",
     status: 1,
   };
+  /**
+   * 当前编辑的表单数据
+   * @type {StoreItem}
+   */
   let A_EFormData: StoreItem;
+
+  /**
+   * 当前使用的API函数
+   * @type {Function}
+   */
   let A_EFun: (data: StoreItem) => Promise<AxiosResponse>;
+
+  /**
+   * 表单验证规则
+   * @type {FormRules}
+   */
   const rules: FormRules = {
     storeName: [
       { required: true, message: "请输入店铺名称", trigger: "blur" },
@@ -197,7 +240,15 @@
     address: [{ required: true, message: "请输入店铺地址", trigger: "blur" }],
   };
   // 提交表单-------------------------------
+  /**
+   * 表单引用
+   */
   const A_EFormRef = ref<FormInstance>();
+  /**
+   * 提交表单
+   * @async
+   * @function submitForm
+   */
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
       if (!valid) return;
@@ -218,6 +269,10 @@
   };
 
   // 添加店铺----------------------------
+  /**
+   * 打开添加店铺对话框
+   * @function toAddStore
+   */
   const toAddStore = () => {
     A_ETitle.value = "添加店铺";
     isAdd.value = true;
@@ -228,6 +283,11 @@
   };
 
   // 修改店铺-----------------------------
+  /**
+   * 打开编辑店铺对话框
+   * @function toEditStore
+   * @param {StoreItem} data - 要编辑的店铺数据
+   */
   const toEditStore = (data: StoreItem) => {
     A_ETitle.value = "修改店铺";
     isAdd.value = false;
@@ -250,6 +310,11 @@
   };
 
   // 删除店铺----------------------------
+  /**
+   * 删除店铺
+   * @function toDelStore
+   * @param {StoreItem} data - 要删除的店铺数据
+   */
   const toDelStore = (data: StoreItem) => {
     elMessageBoxConfirm(`删除店铺：${data.storeName}`, async () => {
       const res = await delStore(data.id!);
