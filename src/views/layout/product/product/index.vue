@@ -45,7 +45,6 @@
         <el-button type="primary" @click="toAddProduct">添加药品</el-button>
       </el-form-item>
     </el-form>
-
     <!-- 数据展示 -->
     <el-table
       ref="productTable"
@@ -162,7 +161,6 @@
       @size-change="refreshList"
       @current-change="fetchProductList"
       class="mt-3" />
-
     <!-- 添加/修改弹窗 -->
     <A_EDialog
       v-model:A_EVisible="A_EVisible"

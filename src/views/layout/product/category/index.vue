@@ -193,26 +193,20 @@
   };
   // 组件挂载时获取列表数据
   onMounted(fetchCategoryList);
-
+  // 添加/修改数据-------------------------------
   /** 添加/修改弹窗可见性 */
   const A_EVisible = ref(false);
   /** 弹窗标题 */
   const A_ETitle = ref("");
   /** 是否为添加操作 */
   const isAdd = ref(true);
-  /**
-   * 默认表单数据
-   * @type {CategoryItem}
-   */
+  /** 默认表单数据 */
   const defaultForm: CategoryItem = {
     name: "",
     status: 1,
     sort: 0,
   };
-  /**
-   * 表单验证规则
-   * @type {FormRules}
-   */
+  /** 表单验证规则 */
   const rules: FormRules = {
     name: [
       { required: true, message: "请输入分类名称", trigger: "blur" },
@@ -227,10 +221,7 @@
   const A_EFormData = reactive<CategoryItem>(cloneDeep(defaultForm));
   /** 分类树形选择数据 */
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
-  /**
-   * 是否显示清除按钮
-   * @type {ComputedRef<boolean>}
-   */
+  /** 是否显示清除按钮 */
   const showClearBtn: ComputedRef<boolean> = computed(() => {
     return (
       A_EFormData.icon !== undefined &&

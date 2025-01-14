@@ -10,6 +10,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-guanggaoxiaoxi:before {
+  content: "\e639";
+}
+
 .icon-dingdan:before {
   content: "\e604";
 }
