@@ -57,7 +57,7 @@
             :src="BASEURL + scope.row.pic"
             :preview-src-list="[BASEURL + scope.row.pic]"
             :preview-teleported="true"
-            style="width: 80px; height: 60px; object-fit: cover" />
+            style="width: 60px; height: 60px; object-fit: cover" />
         </template>
       </el-table-column>
       <el-table-column prop="url" label="链接商品ID" />
@@ -140,7 +140,7 @@
         <el-form-item label="轮播图" prop="pic">
           <el-image
             fit="cover"
-            style="width: 150px; height: 112.5px"
+            style="width: 125px; height: 125px"
             :src="A_EImgUrl"
             :preview-src-list="A_EImgPreviewSrcList"
             :preview-teleported="true"
