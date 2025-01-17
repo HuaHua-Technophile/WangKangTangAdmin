@@ -154,7 +154,7 @@
             @clear="clearImg" />
         </el-form-item>
         <el-form-item label="商品ID" prop="url">
-          <el-input-number v-model="A_EFormData.url" :min="0" />
+          <el-input v-model="A_EFormData.url" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input-number v-model="A_EFormData.sort" :min="0" />

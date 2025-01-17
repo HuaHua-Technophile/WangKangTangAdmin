@@ -13,7 +13,7 @@ export const addAdvertise = (data: Omit<AdvertiseItem, "id">) => {
     method: "POST",
     data,
   };
-  return customRequest(config, "添加广告");
+  return customRequest(config, "添加轮播广告");
 };
 
 /**
@@ -26,7 +26,7 @@ export const delAdvertise = (ids: bigint[]) => {
     url: `/home/advertise/delete/${ids.join(",")}`,
     method: "DELETE",
   };
-  return customRequest(config, "删除广告");
+  return customRequest(config, "删除轮播广告");
 };
 
 /**
@@ -40,7 +40,7 @@ export const getAdvertiseList = (params: GetAdvertiseItemParams) => {
     method: "GET",
     params,
   };
-  return customRequest<AdvertiseItem[]>(config, "分页查询广告列表");
+  return customRequest<AdvertiseItem[]>(config, "分页查询轮播广告列表");
 };
 
 /**
@@ -54,7 +54,7 @@ export const editAdvertise = (data: AdvertiseItem) => {
     method: "PUT",
     data,
   };
-  return customRequest(config, "修改广告");
+  return customRequest(config, "修改轮播广告");
 };
 
 /**
@@ -68,7 +68,7 @@ export const editAdvertiseStatus = (id: bigint, status: 0 | 1) => {
     url: `/home/advertise/update/status/${id}/${status}`,
     method: "PUT",
   };
-  return customRequest(config, "修改广告状态");
+  return customRequest(config, "修改轮播广告状态");
 };
 
 /**
@@ -81,5 +81,5 @@ export const getAdvertiseDetail = (id: bigint) => {
     url: `/home/advertise/${id}`,
     method: "GET",
   };
-  return customRequest<AdvertiseItem>(config, "获取广告详情");
+  return customRequest<AdvertiseItem>(config, "获取轮播广告详情");
 };
