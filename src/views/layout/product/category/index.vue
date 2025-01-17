@@ -218,7 +218,7 @@
     status: [{ required: true, message: "请选择分类状态", trigger: "change" }],
   };
   /** 表单数据对象 */
-  const A_EFormData = reactive<CategoryItem>(cloneDeep(defaultForm));
+  const A_EFormData = reactive(cloneDeep(defaultForm));
   /** 分类树形选择数据 */
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
   /** 是否显示清除按钮 */
@@ -237,7 +237,16 @@
   const toAddCategory = async () => {
     A_ETitle.value = "添加药品分类";
     isAdd.value = true;
-    Object.assign(A_EFormData, defaultForm); // 重置表单
+    // 获取默认表单的 key 列表
+    const defaultKeys = Object.keys(defaultForm);
+    // 遍历当前表单数据的 key，删除冗余的 key
+    Object.keys(A_EFormData).forEach((key) => {
+      if (!defaultKeys.includes(key)) {
+        delete A_EFormData[key as keyof CategoryItem];
+      }
+    });
+    // 使用默认表单值重置数据
+    Object.assign(A_EFormData, defaultForm);
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
 

@@ -1029,7 +1029,17 @@
   const resetA_EformData = () => {
     // 清空表单
     croppedFile.value = undefined;
+    // 获取默认表单的 key 列表
+    const defaultKeys = Object.keys(defaultForm);
+    // 遍历当前表单数据的 key，删除冗余的 key
+    Object.keys(A_EFormData).forEach((key) => {
+      if (!defaultKeys.includes(key)) {
+        delete A_EFormData[key as keyof ProductItem];
+      }
+    });
+    // 使用默认表单值重置数据
     Object.assign(A_EFormData, defaultForm);
+
     fileList.value = [];
     specificationList.value = [];
     parameterList.value = [];

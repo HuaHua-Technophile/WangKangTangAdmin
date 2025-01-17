@@ -193,7 +193,7 @@
   /**
    * 添加/编辑表单数据
    */
-  const A_EFormData = reactive<AptitudeItem>(cloneDeep(defaultForm));
+  const A_EFormData = reactive(cloneDeep(defaultForm));
 
   /**
    * 添加/编辑表单引用
@@ -279,6 +279,14 @@
   const toAddAptitude = () => {
     A_ETitle.value = "添加小程序资质图片";
     isAdd.value = true;
+    // 获取默认表单的 key 列表
+    const defaultKeys = Object.keys(defaultForm);
+    // 遍历当前表单数据的 key，删除冗余的 key
+    Object.keys(A_EFormData).forEach((key) => {
+      if (!defaultKeys.includes(key)) {
+        delete A_EFormData[key as keyof AptitudeItem];
+      }
+    });
     Object.assign(A_EFormData, defaultForm);
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();

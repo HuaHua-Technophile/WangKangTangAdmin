@@ -284,7 +284,7 @@
     sort: 0,
     note: "",
   };
-  const A_EFormData = reactive<AdvertiseItem>(cloneDeep(defaultForm));
+  const A_EFormData = reactive(cloneDeep(defaultForm));
   const rules: FormRules = {
     name: [
       { required: true, message: "请输入轮播图名称", trigger: "blur" },
@@ -317,6 +317,15 @@
   const toAddAdvertise = async () => {
     A_ETitle.value = "添加轮播图";
     isAdd.value = true;
+    // 获取默认表单的 key 列表
+    const defaultKeys = Object.keys(defaultForm);
+    // 遍历当前表单数据的 key，删除冗余的 key
+    Object.keys(A_EFormData).forEach((key) => {
+      if (!defaultKeys.includes(key)) {
+        delete A_EFormData[key as keyof AdvertiseItem];
+      }
+    });
+    // 使用默认表单值重置数据
     Object.assign(A_EFormData, defaultForm);
     timeRange.value = ["", ""];
     A_EVisible.value = true;
