@@ -151,7 +151,6 @@
             v-model:croppedFile="croppedFile"
             :showUploadBtn="false"
             :showClearBtn="showClearBtn"
-            :aspectRatio="4 / 3"
             @clear="clearImg" />
         </el-form-item>
         <el-form-item label="商品ID" prop="url">
