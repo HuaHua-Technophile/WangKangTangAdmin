@@ -66,6 +66,9 @@
             preview-teleported />
         </template>
       </el-table-column>
+      <el-table-column prop="price" label="起步价">
+        <template #default="{ row }">￥{{ row.price }}</template>
+      </el-table-column>
       <el-table-column prop="freightTemplateId" label="运费(元)">
         <template #default="{ row }">￥{{ row.freightTemplateId }}</template>
       </el-table-column>
@@ -1199,6 +1202,11 @@
           });
       });
       A_EFormData.productAttributeValueList = attributeValues;
+      // 计算最低价格
+      const SKUList = A_EFormData.skuStockList;
+      A_EFormData.price = SKUList.reduce((min, current) => {
+        return current.price < min ? current.price : min;
+      }, SKUList[0].price); // 初始值设置为第一个元素的price
 
       const res = isAdd.value
         ? await addProduct(A_EFormData)

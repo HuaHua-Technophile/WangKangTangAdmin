@@ -47,6 +47,8 @@ export interface ProductItem {
   categoryId?: number;
   /** 总销量 */
   sale: number;
+  /** 最低价 */
+  price?: number;
   /** 药品备注信息 */
   note: string;
   /** 推荐状态: 0-不推荐, 1-推荐 */
