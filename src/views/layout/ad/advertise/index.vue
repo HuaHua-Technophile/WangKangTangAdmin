@@ -311,8 +311,8 @@
     return !A_EFormData.pic && A_EFormData.pic != "" && !croppedFile.value;
   });
   const handleTimeRangeChange = (val: [string, string]) => {
-    A_EFormData.startTime = val[0];
-    A_EFormData.endTime = val[1];
+    A_EFormData.startTime = val ? val[0] : "";
+    A_EFormData.endTime = val ? val[1] : "";
   };
   const toAddAdvertise = async () => {
     A_ETitle.value = "添加轮播图";
