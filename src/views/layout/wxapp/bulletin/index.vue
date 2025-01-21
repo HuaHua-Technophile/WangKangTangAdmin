@@ -165,7 +165,9 @@
         alt="公告示意图片"
         class="mb-3 w-100 rounded" />
       <!-- 富文本内容展示 -->
-      <div v-html="content.text"></div>
+      <div class="ql-container ql-snow">
+        <div class="ql-editor" v-html="content.text" />
+      </div>
     </el-drawer>
   </div>
 </template>
@@ -401,3 +403,6 @@
     drawer.value = true;
   };
 </script>
+<style lang="scss" scoped>
+  @use "quill/dist/quill.snow.css";
+</style>
