@@ -128,7 +128,7 @@
             :uploadApi="allFileUpload"
             v-model:croppedFile="croppedFile"
             :showUploadBtn="false"
-            :showClearBtn="showClearBtn"
+            :showClearBtn="!!A_EFormData.icon && A_EFormData.icon !== '#'"
             @clear="clearImg"
             needThumbnail />
         </el-form-item>
@@ -164,7 +164,7 @@
     TableInstance,
   } from "element-plus";
   import { cloneDeep } from "lodash";
-  import { computed, ComputedRef, onMounted, reactive, ref, toRaw } from "vue";
+  import { computed, onMounted, reactive, ref, toRaw } from "vue";
   /** API基础URL */
   const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
@@ -221,14 +221,6 @@
   const A_EFormData = reactive(cloneDeep(defaultForm));
   /** 分类树形选择数据 */
   const categoryTreeSelect = ref<TreeSelectItem[]>([]);
-  /** 是否显示清除按钮 */
-  const showClearBtn: ComputedRef<boolean> = computed(() => {
-    return (
-      A_EFormData.icon !== undefined &&
-      A_EFormData.icon !== "#" &&
-      A_EFormData.icon !== ""
-    );
-  });
   /**
    * 添加分类操作
    * @async

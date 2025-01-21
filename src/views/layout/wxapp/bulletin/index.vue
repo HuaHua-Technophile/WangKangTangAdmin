@@ -49,7 +49,7 @@
             :src="BASE_URL + scope.row.imgUrl"
             :preview-src-list="[BASE_URL + scope.row.imgUrl]"
             :preview-teleported="true"
-            style="width: 60px; height: 60px" />
+            style="width: 106.67px; height: 60px" />
           <span v-else class="text-muted">无图片</span>
         </template>
       </el-table-column>
@@ -139,7 +139,7 @@
             :uploadApi="allFileUpload"
             v-model:croppedFile="croppedFile"
             :showUploadBtn="false"
-            :showClearBtn="showClearBtn"
+            :showClearBtn="!!A_EFormData.imgUrl"
             :aspectRatio="16 / 9"
             @clear="clearImg" />
         </el-form-item>
@@ -237,14 +237,9 @@
       { required: true, message: "请输入广告标题", trigger: "blur" },
       { min: 2, max: 30, message: "长度在2-30个字符", trigger: "blur" },
     ],
-    content: [{ max: 200, message: "长度不能超过200个字符", trigger: "blur" }],
   };
   /** 表单数据对象 */
   const A_EFormData = reactive(cloneDeep(defaultForm));
-  /** 是否显示清除按钮 */
-  const showClearBtn = computed(() => {
-    return !!A_EFormData.imgUrl;
-  });
 
   /**
    * 添加广告操作
@@ -329,6 +324,7 @@
 
       const apiMethod = isAdd.value ? addBulletin : editBulletin;
       const res = await apiMethod(A_EFormData);
+      debugLog(`${A_ETitle.value}=>`, res);
       if (res.code === 200) {
         A_EVisible.value = false;
         ElMessage.success(`${A_ETitle.value}成功`);

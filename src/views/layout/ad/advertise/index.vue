@@ -150,7 +150,7 @@
             :uploadApi="allFileUpload"
             v-model:croppedFile="croppedFile"
             :showUploadBtn="false"
-            :showClearBtn="showClearBtn"
+            :showClearBtn="!!A_EFormData.pic"
             @clear="clearImg" />
         </el-form-item>
         <el-form-item label="商品ID" prop="url">
@@ -307,9 +307,6 @@
   // 表单内选项
   const timeRange = ref<[string, string]>(["", ""]);
   const croppedFile = ref<File>();
-  const showClearBtn = computed(() => {
-    return !A_EFormData.pic && A_EFormData.pic != "" && !croppedFile.value;
-  });
   const handleTimeRangeChange = (val: [string, string]) => {
     A_EFormData.startTime = val ? val[0] : "";
     A_EFormData.endTime = val ? val[1] : "";

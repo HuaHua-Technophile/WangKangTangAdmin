@@ -72,7 +72,7 @@
             :uploadApi="allFileUpload"
             v-model:croppedFile="croppedFile"
             :showUploadBtn="false"
-            :showClearBtn="showClearBtn"
+            :showClearBtn="!!A_EFormData.image && A_EFormData.image !== '#'"
             @clear="clearImg" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
@@ -204,18 +204,6 @@
    * 裁剪上传组件引用
    */
   const cropperUploadRef = ref();
-
-  /**
-   * 是否显示清除按钮
-   */
-  const showClearBtn = computed(() => {
-    return (
-      A_EFormData.image !== undefined &&
-      A_EFormData.image !== "#" &&
-      A_EFormData.image !== ""
-    );
-  });
-
   /**
    * 表单验证规则
    * @type {FormRules}
