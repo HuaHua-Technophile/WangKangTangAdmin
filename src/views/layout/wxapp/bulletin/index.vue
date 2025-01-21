@@ -56,17 +56,12 @@
       <!-- 公告内容 -->
       <el-table-column label="内容">
         <template #default="scope">
-          <el-tooltip content="点击查看详情" placement="top">
+          <el-tooltip effect="light" content="点击查看详情">
             <span
+              @click="toShowContent(scope.row)"
               class="cursor-pointer text-truncate"
-              style="
-                max-width: 200px;
-                display: inline-block;
-                overflow: hidden;
-                white-space: nowrap;
-              "
-              @click="viewContent(scope.row)">
-              {{ scope.row.content || "无内容" }}
+              style="max-width: 500px !important; display: inline-block">
+              {{ scope.row.text || "无内容" }}
             </span>
           </el-tooltip>
         </template>
@@ -126,39 +121,52 @@
             placeholder="若无示意图,则直接展示标题"
             clearable />
         </el-form-item>
-        <el-form-item label="公告示意图" prop="imgUrl">
-          <el-image
-            fit="cover"
-            style="width: 177.78px; height: 100px"
-            :src="A_EImgUrl"
-            :preview-src-list="A_EImgPreviewSrcList"
-            :preview-teleported="true"
-            class="me-3" />
-          <CropperUpload
-            ref="cropperUploadRef"
-            :uploadApi="allFileUpload"
-            v-model:croppedFile="croppedFile"
-            :showUploadBtn="false"
-            :showClearBtn="!!A_EFormData.imgUrl"
-            :aspectRatio="16 / 9"
-            @clear="clearImg" />
-        </el-form-item>
-        <el-form-item label="公告状态" prop="status">
-          <el-radio-group v-model="A_EFormData.status">
-            <el-radio-button :label="'有效'" :value="0" />
-            <el-radio-button :label="'过期'" :value="1" />
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="公告内容" prop="content">
+        <div class="d-flex align-items-center justify-content-between">
+          <el-form-item label="公告示意图" prop="imgUrl">
+            <el-image
+              fit="cover"
+              style="width: 177.78px; height: 100px"
+              :src="A_EImgUrl"
+              :preview-src-list="A_EImgPreviewSrcList"
+              :preview-teleported="true"
+              class="me-3" />
+            <CropperUpload
+              ref="cropperUploadRef"
+              :uploadApi="allFileUpload"
+              v-model:croppedFile="croppedFile"
+              :showUploadBtn="false"
+              :showClearBtn="!!A_EFormData.imgUrl"
+              :aspectRatio="16 / 9"
+              @clear="clearImg" />
+          </el-form-item>
+          <el-form-item label="公告状态" prop="status">
+            <el-radio-group v-model="A_EFormData.status">
+              <el-radio-button :label="'有效'" :value="0" />
+              <el-radio-button :label="'过期'" :value="1" />
+            </el-radio-group>
+          </el-form-item>
+        </div>
+        <el-form-item label="公告内容" prop="text">
           <div class="w-100">
             <QuillEditor
-              v-model="A_EFormData.content"
-              placeholder="请输入小程序公告内容(注意适配手机端屏幕尺寸)"
-              maxHeight="calc(100vh - 24rem)" />
+              v-model="A_EFormData.text"
+              placeholder="请输入小程序公告内容(注意适配手机端屏幕尺寸)" />
           </div>
         </el-form-item>
       </el-form>
     </A_EDialog>
+    <!-- 公告展示抽屉 -->
+    <el-drawer v-model="drawer" :with-header="false">
+      <h2>{{ content.title }}</h2>
+      <!-- 图片展示 -->
+      <el-image
+        v-if="content.imgUrl"
+        :src="BASE_URL + content.imgUrl"
+        alt="公告示意图片"
+        class="mb-3 w-100 rounded" />
+      <!-- 富文本内容展示 -->
+      <div v-html="content.text"></div>
+    </el-drawer>
   </div>
 </template>
 <script setup lang="ts">
@@ -228,7 +236,7 @@
   /** 默认表单数据 */
   const defaultForm: BulletinItem = {
     title: "",
-    content: "",
+    text: "",
     status: 0,
   };
   /** 表单验证规则 */
@@ -271,7 +279,7 @@
   const toEditBulletin = async (row: BulletinItem) => {
     A_ETitle.value = "修改小程序公告";
     isAdd.value = false;
-    Object.assign(A_EFormData, row);
+    Object.assign(A_EFormData, cloneDeep(row));
     A_EVisible.value = true;
     A_EFormRef.value?.clearValidate();
   };
@@ -321,7 +329,6 @@
         }
         A_EFormData.imgUrl = croppedRes.fileName;
       }
-
       const apiMethod = isAdd.value ? addBulletin : editBulletin;
       const res = await apiMethod(A_EFormData);
       debugLog(`${A_ETitle.value}=>`, res);
@@ -371,5 +378,26 @@
         } else ElMessage.error(res.msg || "删除失败");
       }
     );
+  };
+  /** 抽屉是否打开 */
+  const drawer = ref(false);
+
+  /**  当前展示的公告内容*/
+  const content = reactive<BulletinItem>({
+    title: "",
+    text: "",
+    imgUrl: "",
+  });
+
+  /**
+   * 展示公告内容的方法
+   * @param {BulletinItem} item - 当前选中的公告数据
+   * @description 点击表格内容时触发，将选中的公告内容展示在抽屉中。
+   */
+  const toShowContent = (item: BulletinItem): void => {
+    content.title = item.title;
+    content.text = item.text || "暂无详细内容";
+    content.imgUrl = item.imgUrl || "";
+    drawer.value = true;
   };
 </script>

@@ -11,7 +11,7 @@ export interface BulletinItem {
   /** 图片的 URL 地址 */
   imgUrl?: string;
   /** 公告的详细内容 */
-  content?: string;
+  text?: string;
   /** 公告的状态 0有效 1过期 */
   status?: 0 | 1;
 }
