@@ -119,7 +119,7 @@
       @current-change="fetchNoticeList"
       class="mt-3" />
 
-    <!-- 添加/修改通知/公告 -->
+    <!-- 添加/修改弹窗 -->
     <A_EDialog
       v-model:A_EVisible="A_EVisible"
       :A_ETitle="A_ETitle"
@@ -271,24 +271,16 @@
   };
 
   // 添加/修改通知/公告表单----------------
-  /**
-   * @const {Ref<boolean>} isAdd - 当前操作是否为新增。
-   */
+  /** 当前操作是否为新增。*/
   const isAdd = ref(true);
 
-  /**
-   * @const {Ref<boolean>} A_EVisible - 添加/编辑对话框的显示状态。
-   */
+  /** 添加/编辑对话框的显示状态。*/
   const A_EVisible = ref(false);
 
-  /**
-   * @const {Ref<string>} A_ETitle - 添加/编辑对话框的标题。
-   */
+  /** 添加/编辑对话框的标题。*/
   const A_ETitle = ref("");
 
-  /**
-   * @const {NoticeItem} defaultForm - 添加/编辑表单的默认数据。
-   */
+  /** 添加/编辑表单的默认数据。*/
   const defaultForm: NoticeItem = {
     noticeTitle: "",
     noticeType: "",
@@ -296,19 +288,13 @@
     status: "",
   };
 
-  /**
-   * @let {NoticeItem} A_EFormData - 添加/编辑表单数据。
-   */
+  /** 添加/编辑表单数据。*/
   let A_EFormData: NoticeItem;
 
-  /**
-   * @let {(data: NoticeItem) => Promise<AxiosResponse>} A_EFun - 当前操作的请求函数（新增或编辑）。
-   */
+  /** 当前操作的请求函数（新增或编辑）。*/
   let A_EFun: (data: NoticeItem) => Promise<AxiosResponse>;
 
-  /**
-   * @const {FormRules} rules - 表单验证规则。
-   */
+  /** 表单验证规则。 */
   const rules: FormRules = {
     noticeTitle: [
       { required: true, message: "请输入通知/公告标题", trigger: "blur" },
@@ -324,9 +310,7 @@
   };
 
   // 提交表单-----------------
-  /**
-   * @const {Ref<any>} A_EFormRef - 表单的引用，用于操作表单实例。
-   */
+  /** 表单的引用，用于操作表单实例。 */
   const A_EFormRef = ref();
 
   /**
@@ -336,15 +320,14 @@
    */
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
-      if (valid) {
-        const res = await A_EFun(A_EFormData);
-        debugLog(`${A_ETitle.value}结果=>`, res);
-        if (res.code === 200) {
-          ElMessage.success(`${A_ETitle.value}成功`);
-          A_EVisible.value = false;
-          fetchNoticeList();
-        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
-      }
+      if (!valid) return;
+      const res = await A_EFun(A_EFormData);
+      debugLog(`${A_ETitle.value}结果=>`, res);
+      if (res.code === 200) {
+        ElMessage.success(`${A_ETitle.value}成功`);
+        A_EVisible.value = false;
+        fetchNoticeList();
+      } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
     });
   };
 
@@ -384,14 +367,10 @@
   };
 
   // 删除通知/公告--------------
-  /**
-   * @const {Ref<NoticeItem[]>} selectedNotices - 当前选中的通知/公告列表。
-   */
+  /** 当前选中的通知/公告列表。*/
   const selectedNotices = ref<NoticeItem[]>([]);
 
-  /**
-   * @const {Ref<TableInstance>} noticeTable - 表格实例的引用，用于操作表格。
-   */
+  /** 表格实例的引用，用于操作表格 */
   const noticeTable = ref<TableInstance>();
 
   /**
@@ -423,7 +402,7 @@
         if (res.code === 200) {
           ElMessage.success("删除成功");
           selectedNotices.value = [];
-          fetchNoticeList();
+          refreshList();
         } else ElMessage.error(res.msg || "删除失败");
       }
     );

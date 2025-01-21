@@ -16,9 +16,9 @@
         <template #default="scope">
           <el-image
             v-if="scope.row.image"
-            :src="BASEURL + scope.row.image"
+            :src="BASE_URL + scope.row.image"
             fit="cover"
-            :preview-src-list="[BASEURL + scope.row.image]"
+            :preview-src-list="[BASE_URL + scope.row.image]"
             :preview-teleported="true"
             style="width: 50px; height: 50px" />
         </template>
@@ -110,7 +110,7 @@
   import { cloneDeep } from "lodash";
   import { computed, ComputedRef, onMounted, reactive, ref } from "vue";
 
-  const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
+  const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
   // 查询表单数据---------------------------------
 
@@ -251,7 +251,7 @@
   const A_EImgUrl: ComputedRef<string> = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
-      : BASEURL + A_EFormData.image
+      : BASE_URL + A_EFormData.image
   );
 
   /**
@@ -261,7 +261,7 @@
   const A_EImgPreviewSrcList: ComputedRef<string[]> = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
-      : [BASEURL + A_EFormData.image]
+      : [BASE_URL + A_EFormData.image]
   );
 
   /**

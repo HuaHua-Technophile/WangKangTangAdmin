@@ -54,8 +54,8 @@
         <template #default="scope">
           <el-image
             v-if="scope.row.pic"
-            :src="BASEURL + scope.row.pic"
-            :preview-src-list="[BASEURL + scope.row.pic]"
+            :src="BASE_URL + scope.row.pic"
+            :preview-src-list="[BASE_URL + scope.row.pic]"
             :preview-teleported="true"
             style="width: 60px; height: 60px; object-fit: cover" />
         </template>
@@ -245,7 +245,7 @@
   };
   onMounted(fetchAdvertiseList);
   // 数据展示------------------------------
-  const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
+  const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
   // 状态变更处理方法
   const handleStatusChange = async (row: AdvertiseItem) => {
     try {
@@ -348,13 +348,13 @@
   const A_EImgUrl = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
-      : BASEURL + A_EFormData.pic
+      : BASE_URL + A_EFormData.pic
   );
   /** 图片预览列表计算属性 */
   const A_EImgPreviewSrcList = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
-      : [BASEURL + A_EFormData.pic]
+      : [BASE_URL + A_EFormData.pic]
   );
 
   // 提交表单---------------------

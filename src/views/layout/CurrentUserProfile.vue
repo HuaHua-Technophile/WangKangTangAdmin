@@ -281,15 +281,14 @@
   const toEditProfileFun = () => {
     if (isEditing.value) {
       formRef.value?.validate(async (valid: boolean) => {
-        if (valid) {
-          const res = await editUserProfile(userProfileForm);
-          debugLog("更新个人信息=>", res);
-          if (res.code === 200) {
-            ElMessage.success("更新个人信息成功,部分信息生效需重新登录");
-            getCurrentUserProfileFun();
-            isEditing.value = false;
-          } else ElMessage.error(res.msg || "更新个人信息失败");
-        }
+        if (!valid) return;
+        const res = await editUserProfile(userProfileForm);
+        debugLog("更新个人信息=>", res);
+        if (res.code === 200) {
+          ElMessage.success("更新个人信息成功,部分信息生效需重新登录");
+          getCurrentUserProfileFun();
+          isEditing.value = false;
+        } else ElMessage.error(res.msg || "更新个人信息失败");
       });
     } else {
       userProfileForm.userName = currentUserProfile.value?.userName || "";
@@ -367,14 +366,13 @@
    */
   const submitForm = () => {
     passwordFormRef.value?.validate(async (valid: boolean) => {
-      if (valid) {
-        const res = await updatePwd(passwordForm.value);
-        debugLog("修改密码=>", res);
-        if (res.code === 200) {
-          ElMessage.success("修改成功,请重新登录");
-          const authStore = useAuthStore();
-          authStore.logout();
-        }
+      if (!valid) return;
+      const res = await updatePwd(passwordForm.value);
+      debugLog("修改密码=>", res);
+      if (res.code === 200) {
+        ElMessage.success("修改成功,请重新登录");
+        const authStore = useAuthStore();
+        authStore.logout();
       }
     });
   };

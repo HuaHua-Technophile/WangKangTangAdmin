@@ -596,26 +596,25 @@
       ? A_EFormRef.value
       : dictDataFormRef.value;
     formRef?.validate(async (valid) => {
-      if (valid) {
-        let res;
-        if (isEditingDictType.value) {
-          res = await (A_EFormData.dictId ? editDictType : addDictType)(
-            A_EFormData
-          );
-        } else {
-          res = await (dictDataFormData.dictCode ? editDictData : addDictData)(
-            dictDataFormData
-          );
-        }
+      if (!valid) return;
+      let res;
+      if (isEditingDictType.value) {
+        res = await (A_EFormData.dictId ? editDictType : addDictType)(
+          A_EFormData
+        );
+      } else {
+        res = await (dictDataFormData.dictCode ? editDictData : addDictData)(
+          dictDataFormData
+        );
+      }
 
-        debugLog(`${A_ETitle.value}结果=>`, res);
-        if (res.code === 200) {
-          A_EVisible.value = false;
-          ElMessage.success(res.msg);
-          isEditingDictType.value ? fetchDictTypeList() : fetchDictDataList();
-        } else {
-          ElMessage.error(res.msg || "提交失败");
-        }
+      debugLog(`${A_ETitle.value}结果=>`, res);
+      if (res.code === 200) {
+        A_EVisible.value = false;
+        ElMessage.success(res.msg);
+        isEditingDictType.value ? fetchDictTypeList() : fetchDictDataList();
+      } else {
+        ElMessage.error(res.msg || "提交失败");
       }
     });
   };

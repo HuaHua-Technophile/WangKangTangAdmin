@@ -125,37 +125,35 @@
    */
   const handleLogin = () => {
     loginFormRef.value?.validate(async (valid) => {
-      if (valid) {
-        loading.value = true;
-        const res = await login(loginForm); // 调用登录 API
-        debugLog("返回的登录结果=>", res); // 打印登录结果
+      if (!valid) return;
+      loading.value = true;
+      const res = await login(loginForm); // 调用登录 API
+      debugLog("返回的登录结果=>", res); // 打印登录结果
 
-        if (res.code == 200 && res.token) {
-          ElMessage.success("登录成功");
+      if (res.code == 200 && res.token) {
+        ElMessage.success("登录成功");
 
-          // 登录成功后存储 token
-          const authStore = useAuthStore();
-          authStore.token = res.token;
+        // 登录成功后存储 token
+        const authStore = useAuthStore();
+        authStore.token = res.token;
 
-          // 获取动态路由并存储
-          const routes = (await getRouters()).data;
-          debugLog("返回动态路由=>", routes);
-          authStore.dynamicRoutes = routes;
+        // 获取动态路由并存储
+        const routes = (await getRouters()).data;
+        debugLog("返回动态路由=>", routes);
+        authStore.dynamicRoutes = routes;
 
-          // 根据路由参数进行重定向
-          const redirectPath = route.query.redirect;
-          if (typeof redirectPath === "string") {
-            debugLog("重定向回到=> ", redirectPath);
-            router.push(redirectPath);
-          } else {
-            router.push({ name: "Layout" });
-          }
+        // 根据路由参数进行重定向
+        const redirectPath = route.query.redirect;
+        if (typeof redirectPath === "string") {
+          debugLog("重定向回到=> ", redirectPath);
+          router.push(redirectPath);
         } else {
-          ElMessage.error(res.msg); // 登录失败提示
+          router.push({ name: "Layout" });
         }
-
-        loading.value = false;
+      } else {
+        ElMessage.error(res.msg); // 登录失败提示
       }
+      loading.value = false;
     });
   };
 </script>

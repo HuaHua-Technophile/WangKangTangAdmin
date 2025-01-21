@@ -347,18 +347,17 @@
   const A_EFormRef = ref<FormInstance>();
   const submitForm = async () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
-      if (valid) {
-        const res = isAdd.value
-          ? await addAttribute(A_EFormData)
-          : await editAttribute(A_EFormData, A_EFormData.id!);
-        debugLog(`${A_ETitle.value}结果=>`, res);
-        if (res.code === 200) {
-          ElMessage.success(`${A_ETitle.value}成功`);
-          A_EVisible.value = false;
-          // 刷新列表
-          fetchAttributeList();
-        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
-      }
+      if (!valid) return;
+      const res = isAdd.value
+        ? await addAttribute(A_EFormData)
+        : await editAttribute(A_EFormData, A_EFormData.id!);
+      debugLog(`${A_ETitle.value}结果=>`, res);
+      if (res.code === 200) {
+        ElMessage.success(`${A_ETitle.value}成功`);
+        A_EVisible.value = false;
+        // 刷新列表
+        fetchAttributeList();
+      } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
     });
   };
   /**

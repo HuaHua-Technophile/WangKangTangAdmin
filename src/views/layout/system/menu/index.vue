@@ -411,15 +411,14 @@ Vue 3 组合式 API 和 TypeScript 实现。 */
    */
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
-      if (valid) {
-        const res = await A_EFun(A_EFormData);
-        debugLog(`${A_ETitle.value}结果`, res);
-        if (res.code === 200) {
-          A_EVisible.value = false;
-          ElMessage.success(`${A_ETitle.value}成功`);
-          fetchMenuList();
-        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
-      }
+      if (!valid) return;
+      const res = await A_EFun(A_EFormData);
+      debugLog(`${A_ETitle.value}结果`, res);
+      if (res.code === 200) {
+        A_EVisible.value = false;
+        ElMessage.success(`${A_ETitle.value}成功`);
+        fetchMenuList();
+      } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
     });
   };
 </script>

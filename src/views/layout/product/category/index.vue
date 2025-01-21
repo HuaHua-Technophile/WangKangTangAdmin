@@ -52,8 +52,8 @@
         <template #default="scope">
           <el-image
             v-if="scope.row.icon != '#' && scope.row.icon != ''"
-            :src="BASEURL + scope.row.miniImg"
-            :preview-src-list="[BASEURL + scope.row.icon]"
+            :src="BASE_URL + scope.row.miniImg"
+            :preview-src-list="[BASE_URL + scope.row.icon]"
             :preview-teleported="true"
             style="width: 60px; height: 60px" />
         </template>
@@ -166,7 +166,7 @@
   import { cloneDeep } from "lodash";
   import { computed, ComputedRef, onMounted, reactive, ref, toRaw } from "vue";
   /** API基础URL */
-  const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
+  const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
   /**
    * 查询参数对象
@@ -305,21 +305,19 @@
   const croppedFile = ref<File>();
   /**
    * 图片URL计算属性
-   * @type {ComputedRef<string>}
    */
-  const A_EImgUrl: ComputedRef<string> = computed(() =>
+  const A_EImgUrl = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
-      : BASEURL + A_EFormData.miniImg
+      : BASE_URL + A_EFormData.miniImg
   );
   /**
    * 图片预览列表计算属性
-   * @type {ComputedRef<string[]>}
    */
-  const A_EImgPreviewSrcList: ComputedRef<string[]> = computed(() =>
+  const A_EImgPreviewSrcList = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
-      : [BASEURL + A_EFormData.icon]
+      : [BASE_URL + A_EFormData.icon]
   );
 
   // 提交表单---------------------
@@ -334,33 +332,32 @@
    */
   const submitForm = () => {
     A_EFormRef.value?.validate(async (valid: boolean) => {
-      if (valid) {
-        // 如果有裁剪的图片，先上传图片
-        if (croppedFile.value) {
-          const { croppedRes, thumbnailRes } =
-            await cropperUploadRef.value.handleUpload();
+      if (!valid) return;
+      // 如果有裁剪的图片，先上传图片
+      if (croppedFile.value) {
+        const { croppedRes, thumbnailRes } =
+          await cropperUploadRef.value.handleUpload();
 
-          if (!croppedRes || croppedRes.code !== 200) {
-            ElMessage.error("图片上传失败");
-            return;
-          }
-
-          // 更新表单数据中的图片URL
-          A_EFormData.icon = croppedRes.fileName;
-          if (thumbnailRes?.code === 200)
-            A_EFormData.miniImg = thumbnailRes.fileName;
+        if (!croppedRes || croppedRes.code !== 200) {
+          ElMessage.error("图片上传失败");
+          return;
         }
 
-        const apiMethod = isAdd.value ? addCategory : editCategory;
-        const res = await apiMethod(A_EFormData);
-        debugLog(`${A_ETitle.value}结果=>`, res);
-
-        if (res.code === 200) {
-          A_EVisible.value = false;
-          ElMessage.success(`${A_ETitle.value}成功`);
-          fetchCategoryList(); // 刷新列表
-        } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
+        // 更新表单数据中的图片URL
+        A_EFormData.icon = croppedRes.fileName;
+        if (thumbnailRes?.code === 200)
+          A_EFormData.miniImg = thumbnailRes.fileName;
       }
+
+      const apiMethod = isAdd.value ? addCategory : editCategory;
+      const res = await apiMethod(A_EFormData);
+      debugLog(`${A_ETitle.value}结果=>`, res);
+
+      if (res.code === 200) {
+        A_EVisible.value = false;
+        ElMessage.success(`${A_ETitle.value}成功`);
+        fetchCategoryList(); // 刷新列表
+      } else ElMessage.error(res.msg || `${A_ETitle.value}失败`);
     });
   };
 

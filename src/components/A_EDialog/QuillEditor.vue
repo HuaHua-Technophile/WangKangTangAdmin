@@ -9,11 +9,8 @@
 <template>
   <div
     ref="quillEditor"
-    style="
-      min-height: 50px;
-      max-height: calc(100vh - 233px);
-      overflow-y: auto;
-    " />
+    style="min-height: 90px; overflow-y: auto"
+    :style="{ maxHeight }" />
 </template>
 
 <script setup lang="ts">
@@ -28,9 +25,13 @@
    * 组件的 props 定义
    * @prop {string} placeholder - 编辑器的占位符文本，默认为 "请输入内容......"
    */
-  const props = withDefaults(defineProps<{ placeholder: string }>(), {
-    placeholder: "请输入内容......",
-  });
+  const props = withDefaults(
+    defineProps<{ placeholder?: string; maxHeight?: string }>(),
+    {
+      placeholder: "请输入内容......",
+      maxHeight: "calc(100vh - 233px)",
+    }
+  );
 
   /**
    * 组件的双向绑定 modelValue 定义

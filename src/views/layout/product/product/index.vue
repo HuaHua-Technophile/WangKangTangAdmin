@@ -59,8 +59,8 @@
       <el-table-column label="封面图">
         <template #default="{ row }">
           <el-image
-            :src="BASEURL + row.miniImg"
-            :preview-src-list="[BASEURL + row.imageUrl]"
+            :src="BASE_URL + row.miniImg"
+            :preview-src-list="[BASE_URL + row.imageUrl]"
             fit="cover"
             style="width: 1.7rem; height: 1.7rem"
             preview-teleported />
@@ -869,7 +869,7 @@
   };
 
   // 裁剪图片相关------------------
-  const BASEURL = import.meta.env.VITE_APP_API_BASE_URL;
+  const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
   const croppedFile = ref<File>();
   /**
    * @description 获取商品封面图URL
@@ -878,12 +878,12 @@
   const A_EFirstImgUrl = computed(() =>
     croppedFile.value
       ? URL.createObjectURL(croppedFile.value)
-      : BASEURL + A_EFormData?.miniImg
+      : BASE_URL + A_EFormData?.miniImg
   );
   const A_EFirstImgPreviewSrcList = computed(() =>
     croppedFile.value
       ? [URL.createObjectURL(croppedFile.value)]
-      : [BASEURL + A_EFormData?.imageUrl]
+      : [BASE_URL + A_EFormData?.imageUrl]
   );
 
   // 多选图片上传----------------------
@@ -992,7 +992,7 @@
       // 如果是已经上传的图片（编辑状态），直接使用现有URL
       if (file.status === "success") {
         return {
-          imageUrl: file.url?.replace(BASEURL, "") || "", // 添加空字符串作为默认值,
+          imageUrl: file.url?.replace(BASE_URL, "") || "", // 添加空字符串作为默认值,
           sort: index + 1,
         };
       } else if (file.raw) {
@@ -1132,7 +1132,7 @@
         fileList.value = res.data.instructionImagesList.map((item, index) => {
           return {
             name: item.imageUrl.split("/").pop() || `img-${index}`,
-            url: BASEURL + item.imageUrl,
+            url: BASE_URL + item.imageUrl,
             uid: index,
             status: "success",
             raw: undefined, // 添加raw属性

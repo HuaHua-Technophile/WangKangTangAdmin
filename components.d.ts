@@ -57,7 +57,7 @@ declare module 'vue' {
     ElTreeSelect: typeof import('element-plus/es')['ElTreeSelect']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     Icon: typeof import('./src/components/Icon.vue')['default']
-    QuillEditor: typeof import('./src/components/ElForm/QuillEditor.vue')['default']
+    QuillEditor: typeof import('./src/components/A_EDialog/QuillEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ThemeSwitch: typeof import('./src/components/ThemeSwitch.vue')['default']
