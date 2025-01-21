@@ -164,8 +164,9 @@
         :src="BASE_URL + content.imgUrl"
         alt="公告示意图片"
         class="mb-3 w-100 rounded" />
+      <el-divider />
       <!-- 富文本内容展示 -->
-      <div class="ql-container ql-snow">
+      <div class="ql-container ql-snow border-0">
         <div class="ql-editor" v-html="content.text" />
       </div>
     </el-drawer>
