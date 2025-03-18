@@ -42,5 +42,15 @@
     "not dead",
     "not < 0.5%",
     "supports es2022"
-  ]
+  ],
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "vue-demi"
+    ],
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
 }
